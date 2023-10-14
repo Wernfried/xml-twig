@@ -19,28 +19,32 @@ The backside: by default you cannot navigate in the document tree, you know only
 
 This module tries to combine both principles. The XML document is read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
 
+XML documents are parsed either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat)
 
 
-## Following XPath
+## Names and Definitions
 
-This module tries to follow the  [XML-Path Language](https://www.w3.org/TR/xpath/) specification. 
-
-
-In XPath, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processing-instruction`, `comment`, and `root`. XML documents are treated as trees of nodes. The topmost element of the tree is called the `root` element.
+This module tries to follow the [XML-Path Language](https://www.w3.org/TR/xpath/) specification. 
 
 
-* ancestor 	All ancestors (parent, grandparent, etc.) of the current node
-* ancestor-or-self 	All ancestors (parent, grandparent, etc.) of the current node and the current node itself
-* attribute 	All attributes of the current node
-* child 	All children of the current node
-* descendant 	All descendants (children, grandchildren, etc.) of the current node
-* descendant-or-self 	All descendants (children, grandchildren, etc.) of the current node and the current node itself
-* following 	Everything in the document after the closing tag of the current node
-* following-sibling 	All siblings after the current node
-* namespace 	All namespace nodes of the current node
-* parent 	The parent of the current node
-* preceding 	All nodes that appear before the current node in the document, except ancestors, attribute nodes and namespace nodes
-* preceding-sibling 	All siblings before the current node
-* self 	The current node
+In XPath, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processingInstruction`, `comment`, and `root`. XML documents are treated as trees of nodes. These types are well explained in [W3Schools: Introduction to XML](https://www.w3schools.com/xml/xml_whatis.asp)
 
 
+* **root**: The topmost element of the tree
+* **ancestor**: 	All ancestors (parent, grandparent, etc.) of the current node
+* **ancestorOrSelf**: 	All ancestors (parent, grandparent, etc.) of the current node and the current node itself
+* **attribute**: 	All attributes of the current node
+* **child**: 	All children of the current node
+* **descendant**: 	All descendants (children, grandchildren, etc.) of the current node
+* **descendantOrSelf**: 	All descendants (children, grandchildren, etc.) of the current node and the current node itself
+* **following**: 	Everything in the document after the closing tag of the current node
+* **followingSibling**: 	All siblings after the current node
+* **namespace**: 	All namespace nodes of the current node
+* **parent**: 	The parent of the current node
+* **preceding**: 	All nodes that appear before the current node in the document, except ancestors, attribute nodes and namespace nodes
+* **precedingSibling**: 	All siblings before the current node
+* **self**: 	The current node
+
+## Limitations
+
+Currently this module supports only reading. Writing and modifing might be added in upcoming releases.
