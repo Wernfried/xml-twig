@@ -230,7 +230,7 @@ Generic error for unsupported data types
 ### new UnsupportedType(t)
 **Throws**:
 
-- [<code>UnsupportedType</code>](#UnsupportedType) 
+- UnsupportedType
 
 
 | Param | Type | Description |
