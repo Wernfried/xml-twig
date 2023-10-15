@@ -100,7 +100,7 @@ Modifies the text of the element
 <a name="Elt+close"></a>
 
 ### elt.close
-Closes the elemet
+Closes the element
 
 **Kind**: instance property of [<code>Elt</code>](#Elt)  
 <a name="Elt+attribute"></a>
@@ -113,8 +113,8 @@ Retrive or update XML attribute.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned.  If string or RegExp then attributes matching this string are returned.  For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use {includes: '<name of attribute>'} You can provide any filter by callback function, e.g. (name, value) => { return name === 'foo' && value === 'bar'} |
-| value | <code>string</code> | New value of the attribute |
+| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned.  If string or RegExp then attributes matching this string are returned.  For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}` You can provide any filter by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}` |
+| text | <code>string</code> | New value of the attribute |
 
 <a name="Elt"></a>
 
@@ -203,7 +203,7 @@ Modifies the text of the element
 <a name="Elt+close"></a>
 
 ### elt.close
-Closes the elemet
+Closes the element
 
 **Kind**: instance property of [<code>Elt</code>](#Elt)  
 <a name="Elt+attribute"></a>
@@ -216,8 +216,8 @@ Retrive or update XML attribute.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned.  If string or RegExp then attributes matching this string are returned.  For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use {includes: '<name of attribute>'} You can provide any filter by callback function, e.g. (name, value) => { return name === 'foo' && value === 'bar'} |
-| value | <code>string</code> | New value of the attribute |
+| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned.  If string or RegExp then attributes matching this string are returned.  For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}` You can provide any filter by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}` |
+| text | <code>string</code> | New value of the attribute |
 
 <a name="UnsupportedType"></a>
 
@@ -228,6 +228,10 @@ Generic error for unsupported data types
 <a name="new_UnsupportedType_new"></a>
 
 ### new UnsupportedType(t)
+**Throws**:
+
+- [<code>UnsupportedType</code>](#UnsupportedType) 
+
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -242,6 +246,10 @@ Generic error for unsupported data types
 <a name="new_UnsupportedCondition_new"></a>
 
 ### new UnsupportedCondition(cond, t)
+**Throws**:
+
+- UnsupportedCondition
+
 
 | Param | Type | Description |
 | --- | --- | --- |
