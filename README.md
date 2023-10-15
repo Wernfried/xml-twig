@@ -33,12 +33,13 @@ In XPath, there are seven kinds of nodes: `element`, `attribute`, `text`, `names
 * **root**: The topmost element of the tree
 * **ancestor**: 	All ancestors (parent, grandparent, etc.) of the current node
 * **ancestorOrSelf**: 	All ancestors (parent, grandparent, etc.) of the current node and the current node itself
-* **attribute**: 	All attributes of the current node
 * **child**: 	All children of the current node
 * **descendant**: 	All descendants (children, grandchildren, etc.) of the current node
 * **descendantOrSelf**: 	All descendants (children, grandchildren, etc.) of the current node and the current node itself
 * **following**: 	Everything in the document after the closing tag of the current node
 * **followingSibling**: 	All siblings after the current node
+* **sibling**: 	All iblings before and after the current node
+* **siblingOrSelf**: 	All iblings before and after the current node and the current node itself
 * **namespace**: 	All namespace nodes of the current node
 * **parent**: 	The parent of the current node
 * **preceding**: 	All nodes that appear before the current node in the document, except ancestors, attribute nodes and namespace nodes
