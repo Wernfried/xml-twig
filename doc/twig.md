@@ -113,7 +113,7 @@ Retrive or update XML attribute.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned.  If string or RegExp then attributes matching this string are returned.  For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}` You can provide any filter by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}` |
+| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned. br>  If string or RegExp then attributes matching this string are returned.<br>   For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}`<br>  You can provide any filter by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}`<br> |
 | text | <code>string</code> | New value of the attribute |
 
 <a name="Elt"></a>
@@ -216,7 +216,7 @@ Retrive or update XML attribute.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned.  If string or RegExp then attributes matching this string are returned.  For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}` You can provide any filter by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}` |
+| cond | <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code> | If undefined, then all attributes are returned. br>  If string or RegExp then attributes matching this string are returned.<br>   For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}`<br>  You can provide any filter by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}`<br> |
 | text | <code>string</code> | New value of the attribute |
 
 <a name="UnsupportedType"></a>
