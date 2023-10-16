@@ -21,9 +21,11 @@ const { isUndefined } = require('util');
 
 /**
     * Optional options for the Twig parser
-    * - `encoding`: Encoding of the XML File. Applies only to 'expat' parser. Defaults to 'UTF-8'.
+    * - `method`: String. The underlaying parer. Either 'sax' or 'expat'. Defaults to 'expat'
+    * - `encoding`: String. Encoding of the XML File. Applies only to 'expat' parser. Defaults to 'UTF-8'.
     * - `xmlns`: Boolean. If true, then namespaces are supported. Defaults to false.
     * - `trim`: Boolean. If true, then turn any whitespace into a single space. Defaults to true.
+    * - `resumeAfterError`: Boolean. If true then parser continues reading after an error. Otherwiese it throws exception. Defaults to false
     * @typedef {object} parserOptions 
     * @example { encoding: 'UTF-8', xmlns: true }
     */
@@ -34,32 +36,29 @@ let current;
 
 /**
  * Create a new Twig parser. Currently `expat` (default) and `sax` are supported.
- * @param {?string} method - The underlying parser you like to use, defaults to `expat`
- * @param {?parserOptions} method - Object of optional options 
- * @returns {Parser} - The Twig parser object
+ * @param {object} handler - The underlying parser you like to use, defaults to `expat`
+ * @param {?parserOptions} options - Object of optional options 
  * @throws {UnsupportedParser} - For an unsupported parser
  */
-function createParser(method, options) {
+function createParser(handler, options) {
    let parser;
    const namespaces = false;
    const trim = true;
+   const resumeAfterError = false;
 
    if (options?.xmlns !== undefined && typeof options.xmlns === 'boolean')
       namespaces = options.xmlns;
    if (options?.trim !== undefined && typeof options.trim === 'boolean')
       trim = options.trim;
+   let events = {};
 
-   if (method === 'sax') {
+   if (options?.method === 'sax') {
       // Set options to have the same behaviour as in expat
       parser = require("sax").createStream(true, { strictEntities: true, position: true, xmlns: false, trim: trim });
 
-      // parser.on("error", err =>  {...} does not work, because I need access to 'this'
-      parser.on("error", function (err) {
-         console.error(`error at line [${this._parser.line + 1}], column [${this._parser.column}]`, err);
-         this._parser.error = null;
-         this._parser.resume();
-      });
+      events = { method: 'sax', create: "opentagstart", close: "closetag" };
 
+      // parser.on("error", err =>  {...} does not work, because I need access to 'this'
       parser.on("processinginstruction", function (pi) {
          if (pi.name === 'xml') {
             let declaration = {};
@@ -69,83 +68,108 @@ function createParser(method, options) {
             }
             tree = new Twig(null);
             current.declaration = declaration;
-         } else {         
+         } else {
             tree.PI = { target: pi.name, data: pi.body };
          }
       })
 
-      parser.on("comment", function (str) {
-         current.comment = str;
-      })
-
-      parser.on("opentagstart", function (node) {
-         if (tree === undefined) {
-            tree = new Twig(node.name, current);
-         } else {
-            if (current.isRoot && current.name === undefined) {
-               current.setRoot(node.name);
-            } else {
-               let elt = new Twig(node.name, current);
-            }
-         }
-      })
       parser.on("attribute", function (attr) {
          for (let key in attr)
             current.attribute(key, attr[key]);
       })
-      parser.on("text", function (str) {
-         current.text = str;
-      })
       parser.on("cdata", function (str) {
          current.text = str;
       })
-      parser.on("closetag", function () {
-         const pos = { line: this._parser.line + 1, column: this._parser.column };
-         current.close(pos);
-      })
-   } else if (method === undefined || method === null || method === 'node-expat' || method === 'expat') {
+
+      if (typeof handler === 'function') {
+         parser.on("end", function () {
+            handler(tree);
+         })
+      }
+   } else if (options?.method === undefined || options.method === 'node-expat' || options.method === 'expat') {
       parser = require("node-expat").createParser();
       parser.encoding = options?.encoding === undefined ? 'UTF-8' : options.encoding;
-
-      parser.on('error', function (err) {
-         console.error("error!", err)
-         this.parser.error = null;
-         this.parser.resume();
-      });
+      events = { method: 'expat', create: "startElement", close: "endElement" };
 
       parser.on('xmlDecl', function (version, encoding, standalone) {
-         console.log(`xmlDecl (line ${this.parser.getCurrentLineNumber()},${this.parser.getCurrentColumnNumber()}) => version: ${version}  encoding: ${encoding}  standalone: ${standalone}`);
+         tree = new Twig(null);
+         let dec = {};
+         if (version !== undefined) dec.version = version;
+         if (encoding !== undefined) dec.encoding = encoding;
+         if (standalone !== undefined) dec.standalone = standalone;
+         current.declaration = dec;
       })
 
       parser.on('processingInstruction', function (target, data) {
-         console.log(`processingInstruction (line ${this.parser.getCurrentLineNumber()},${this.parser.getCurrentColumnNumber()}) => ${target} -> ${data}`);
+         tree.PI = { target: target, data: data };
       })
-
-      parser.on('comment', function (s) {
-         console.log(`comment (line ${this.parser.getCurrentLineNumber()},${this.parser.getCurrentColumnNumber()}) => ${s}`);
-      })
-
-      parser.on('startElement', function (name, attrs) {
-         console.log(`startElement (line ${this.parser.getCurrentLineNumber()},${this.parser.getCurrentColumnNumber()}) => ${name} -> ${JSON.stringify(attrs)}`);
-      })
-
-      parser.on('text', function (text) {
-         console.log(`text (line ${this.parser.getCurrentLineNumber()},${this.parser.getCurrentColumnNumber()}) => ${text.trim()}`);
-         // Kann durch Kommentare zerstückelt sein, -> this.#text .= node
-      })
-
-      parser.on('endElement', function (name) {
-         console.log(`endElement (line ${this.parser.getCurrentLineNumber()},${this.parser.getCurrentColumnNumber()}) => ${name}`);
-      })
-
    } else {
-      throw new UnsupportedParser(method)
+      throw new UnsupportedParser(options?.method);
    }
+
+   parser.on(events.create, function (node, attrs) {
+      let name = node;
+      if (events.method === 'sax')
+         name = node.name;
+
+      if (tree === undefined) {
+         tree = new Twig(name, current, attrs);
+      } else {
+         if (current.isRoot && current.name === undefined) {
+            current.setRoot(name);
+         } else {
+            let elt = new Twig(name, current, attrs);
+         }
+      }
+   })
+
+   parser.on(events.close, function (name) {
+      let pos;
+      if (events.method === 'sax') {
+         pos = { line: this._parser.line + 1, column: this._parser.column + 1 };
+      } else if (events.method === 'expat') {
+         pos = { line: this.parser.getCurrentLineNumber(), column: this.parser.getCurrentColumnNumber() };
+      }
+      current.close(pos);
+
+      if (typeof handler === 'function' && events.method === 'expat' && current === undefined) {
+         handler(tree);
+      } else if ( Array.isArray(handler)) {
+         if (typeof handler.name === 'string' && name === handler.name)
+            handler.function
+         else if (typeof handler.includes === 'string' && name.includes(handler.includes))
+            handler.function
+         else if (handler.name instanceof RegExp && handler.regex.test(name))
+            handler.function;
+      }
+   })
+
+
+   parser.on('text', function (str) {
+      current.text = trim ? str.trim() : str;
+   })
+
+   parser.on("comment", function (str) {
+      current.comment = str;
+   })
+
+   parser.on('error', function (err) {
+      let p;
+      if (events.method === 'sax') {
+         p = this._parser;
+         console.error(`error at line [${p.line + 1}], column [${p.column + 1}]`, err);
+      } else if (events.method === 'expat') {
+         p = this.parser;
+         console.error(`error at line [${p.getCurrentLineNumber()}], column [${p.getCurrentColumnNumber()}]`, err);
+      }
+      if (resumeAfterError) {
+         p.error = null;
+         p.resume();
+      }
+   });
 
    return parser;
 }
-
-
 
 
 /**
