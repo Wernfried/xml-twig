@@ -5,21 +5,21 @@ Designed with node in mind, but should work fine in the browser or other CommonJ
 
 Inspired by Perl module [XML::Twig](https://metacpan.org/pod/XML::Twig)
 
-## When should I use this 
+## When should I use this, motivation of this module
 When you need to read a XML file, then you have two pinciples:
 
-* The **Document Object Model (DOM)** style. These parsers read the entire XML document into memory. Usually they provide easy methods to navigate in the document tree or make modifications. 
+* The **Document Object Model (DOM)** style. These parser read the entire XML document into memory. Usually they provide easy methods to navigate in the document tree or make modifications. 
 
-DOM parsers are perfect for rather small files, for example configuration files or (X-)HTML pages.
+DOM parsers are perfect for rather small files, for example configuration files or (X-)HTML pages. However, for ibgger XML files you may run into memory limits.
 
-* The **stream** or **event** based parsers. These parser read the XML file "line by line" or read "node by node". The biggest advantage of such a parser is, there is no limit for the size of the XML file. You can read XML files having a size of mmany Terabytes, because you read always just a single line/node. 
+* The **stream** or **event** based parsers. These parser read the XML file "line by line". The biggest advantage of such a parser is, there is no limit in the size of the XML file. You can read XML files having a size of mmany Terabytes, because you read always just a single node. 
 
-The backside: by default you cannot navigate in the document tree, you know only the current node.
+The backside: By default you cannot navigate in the document tree, you know only the current node.
 
 
-This module tries to combine both principles. The XML document is read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
+This module tries to combine both principles. The XML document can be read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
 
-XML documents are parsed either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat)
+XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. More parser may be added in future releases.
 
 
 ## Names and Definitions
@@ -28,6 +28,12 @@ This module tries to follow the [XML-Path Language](https://www.w3.org/TR/xpath/
 
 
 In XPath, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processingInstruction`, `comment`, and `root`. XML documents are treated as trees of nodes. These types are well explained in [W3Schools: Introduction to XML](https://www.w3schools.com/xml/xml_whatis.asp)
+
+### Namespaces
+
+When the XML-Files uses [Namespaces](https://www.w3schools.com/xml/xml_namespaces.asp) then you can address the elements as they appear in the file, for example `cd:data`. 
+With option `{ namespaces : true }` you will get access to the {Elt.namespace} property.
+
 
 
 * **root**: The topmost element of the tree
@@ -49,3 +55,6 @@ In XPath, there are seven kinds of nodes: `element`, `attribute`, `text`, `names
 ## Limitations
 
 Currently this module supports only reading. Writing and modifing might be added in upcoming releases.
+
+
+

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+<bookstore>
+	<book category="cooking">
+		<title lang="en">Everyday Italian</title>
+		<author>Giada De Laurentiis</author>
+		<year>2005</year>
+		<price>30.00</price>
+	</book>
+	<book category="children">
+		<title lang="en">Harry Potter</title>
+		<author>J K. Rowling</author>
+		<year>2005</year>
+		<price>29.99</price>
+	</book>
+	<ebook category="fantasy">
+		<title lang="en">Harry <!-- A comment in the middle of the text -->Potter</title>
+		<author>Joanne Kathleen Rowling</author>
+		<year>2001 </year>
+		<price>12.99</price>
+		<format>Kindle</format>
+		<device>ePub</device>
+	</ebook>
+	<!-- A comment  -->
+	<book category="web">
+		<title lang="en">XQuery Kick Start</title>
+		<author>James McGovern</author>
+		<author>Per Bothner</author>
+		<author>Kurt Cagle</author>
+		<author>James Linn</author>
+		<author>Vaidyanathan Nagarajan</author>
+		<year>2003</year>
+		<price>29.99</price>
+	</book>
+	<ebook category="biography ">
+		<title lang="en">The Autobiography of Benjamin Franklin</title>
+		<author>Benjamin Franklin</author>
+		<year>1996</year>
+		<price>39.99</price>
+		<format>Kindle</format>
+		<device>ePub</device>
+	</ebook>	
+	<book category="web">
+		<title lang="en">Learning XML</title>
+		<author>Erik T. Ray</author>
+		<year>2003</year>
+		<price>39.95</price>
+	</book>
+</bookstore>
+<?xml-stylesheet type="text/xsl" href="style.xsl"?>
