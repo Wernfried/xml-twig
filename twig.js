@@ -172,13 +172,13 @@ class Twig {
    #name;
 
    /**
-    * @property {?[Elt]} #children - Child XML Elements
+    * @property {?Twig[]} #children - Child XML Elements
     * @private
     */
    #children = [];
 
    /**
-    * @property {?Elt} #parent - The parent object. Undefined on root element
+    * @property {?Twig} #parent - The parent object. Undefined on root element
     * @private
     */
    #parent;
@@ -196,7 +196,7 @@ class Twig {
    #comment;
 
    /**
-    * Create a new Elt object
+    * Create a new Twig object
     * @param {string} name - The name of the XML element
     * @param {Twig} parent - The parent object
     * @param {?object} attributes - Attriubte object
@@ -304,7 +304,7 @@ class Twig {
 
    /**
     * Comment in element. A XML Element may contain an array of multiple comments.
-    * @returns {string|[string]} The comment or an array of all comments
+    * @returns {string|string[]} The comment or an array of all comments
     */
    get comment() {
       return this.#comment;
@@ -324,7 +324,7 @@ class Twig {
 
    /**
        * The XML declaration. Available only on root element.
-       * @returns {string|[string]} The declaration of the XML
+       * @returns {string} The declaration of the XML
        */
    get declaration() {
       return this.isRoot ? null : this.#declaration;
@@ -340,7 +340,7 @@ class Twig {
 
    /**
        * The XML declaration. Available only on root element.
-       * @returns {string|[string]} The declaration of the XML
+       * @returns {string|string[]} The declaration of the XML
        */
    get PI() {
       return this.isRoot ? null : this.#PI;
@@ -404,7 +404,7 @@ class Twig {
     * - If RegExp` then the attribute name must match the Regular Expression
     * - For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}`<br> 
     * - You can provide custom condistion by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}`
-    * @typedef {string|RegExp|object|function} EltCondition 
+    * @typedef {string|RegExp|object|function} TwigCondition 
     */
 
 
@@ -421,7 +421,7 @@ class Twig {
 
    /**
     * Retrieve or update XML attribute.
-    * @param {?EltCondition} cond - Optional condition to select attributes
+    * @param {?TwigCondition} cond - Optional condition to select attributes
     * @param {?string|number} text - New value of the attribute
     * @returns {object} Attributes or null if no matching attribute found
     */
