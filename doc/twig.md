@@ -23,7 +23,7 @@
 
 <dl>
 <dt><a href="#createParser">createParser(handler, options)</a></dt>
-<dd><p>Create a new Twig parser. Currently <code>expat</code> (default) and <code>sax</code> are supported.</p>
+<dd><p>Create a new Twig parser</p>
 </dd>
 </dl>
 
@@ -32,17 +32,10 @@
 <dl>
 <dt><a href="#ParserOptions">ParserOptions</a></dt>
 <dd><p>Optional options for the Twig parser</p>
-<ul>
-<li><code>method</code>: The underlaying parser. Either &#39;sax&#39; or &#39;expat&#39;.</li>
-<li><code>encoding</code>: Encoding of the XML File. Applies only to &#39;expat&#39; parser.</li>
-<li><code>xmlns</code>: If true, then namespaces are supported.</li>
-<li><code>trim</code>: If true, then turn any whitespace into a single space.</li>
-<li><code>resumeAfterError</code>: If true then parser continues reading after an error. Otherwiese it throws exception.</li>
-<li><code>partial</code>: It true then unhandled elements are purged.</li>
-</ul>
 </dd>
 <dt><a href="#TwigHandler">TwigHandler</a></dt>
-<dd><p>Handler functions for Twig objects</p>
+<dd><p>Handler functions for Twig objects.<br>
+If <code>name</code> is not specified, then handler is called on every element. Otherwise the element name must be equal to the string or Regular Expression</p>
 </dd>
 <dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
 <dd><p>Optional condition to get attributes<br> </p>
@@ -86,7 +79,12 @@
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
     * [.level](#Twig+level) ℗
+    * [.namespace](#Twig+namespace) ℗
+    * [.declaration](#Twig+declaration) ℗
+    * [.PI](#Twig+PI) ℗
+    * [.comment](#Twig+comment) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
+    * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
     * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
@@ -101,6 +99,8 @@
     * [.declaration](#Twig+declaration)
     * [.PI](#Twig+PI) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
     * [.PI](#Twig+PI)
+    * [.namespace](#Twig+namespace) ⇒ <code>object</code>
+    * [.namespace](#Twig+namespace)
     * [.close](#Twig+close)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
@@ -199,7 +199,51 @@ Create a new Twig object
 
 | Name | Type | Description |
 | --- | --- | --- |
-| #level | <code>number</code> | The level in XML DOM.<br> Root element is level 0, children have 1 and so on |
+| #level | <code>number</code> | Root element is level 0, children have 1 and so on |
+
+<a name="Twig+namespace"></a>
+
+### twig.namespace ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #namespace | <code>object</code> | XML Namespace of the element. Only used when parsed  with `xmlns: true` |
+
+<a name="Twig+declaration"></a>
+
+### twig.declaration ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #declaration | <code>object</code> | XML Declaration object, exist only on root |
+
+<a name="Twig+PI"></a>
+
+### twig.PI ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #PI | <code>object</code> | XML Declaration object, exist only on root |
+
+<a name="Twig+comment"></a>
+
+### twig.comment ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #comment | <code>string</code> \| <code>Array.&lt;string&gt;</code> | Comment inside the XML Elements |
 
 <a name="Twig+isEmpty"></a>
 
@@ -208,6 +252,13 @@ Returns true if the element is empty, otherwise false.An empty element ha no te
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if empty element  
+<a name="Twig+level"></a>
+
+### twig.level ⇒ <code>number</code>
+Returns the level of the element. Root element has 0, children jave 1, grand-children 2 and so on
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>number</code> - The level of the element.  
 <a name="Twig+isRoot"></a>
 
 ### twig.isRoot ⇒ <code>boolean</code>
@@ -325,6 +376,24 @@ Set Processing Instruction. According ty my knowlege a XML must not contain more
 | Param | Type | Description |
 | --- | --- | --- |
 | pi | <code>object</code> | The Processing Instruction object in form of `{ target: <target>, data: <instruction> }`. |
+
+<a name="Twig+namespace"></a>
+
+### twig.namespace ⇒ <code>object</code>
+The XML namespace
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>object</code> - The XML namespace of the element  
+<a name="Twig+namespace"></a>
+
+### twig.namespace
+Set the XML namespace
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| nw | <code>object</code> | XML namespace definition |
 
 <a name="Twig+close"></a>
 
@@ -398,7 +467,12 @@ Returns the parent element or null if root element
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
     * [.level](#Twig+level) ℗
+    * [.namespace](#Twig+namespace) ℗
+    * [.declaration](#Twig+declaration) ℗
+    * [.PI](#Twig+PI) ℗
+    * [.comment](#Twig+comment) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
+    * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
     * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
@@ -413,6 +487,8 @@ Returns the parent element or null if root element
     * [.declaration](#Twig+declaration)
     * [.PI](#Twig+PI) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
     * [.PI](#Twig+PI)
+    * [.namespace](#Twig+namespace) ⇒ <code>object</code>
+    * [.namespace](#Twig+namespace)
     * [.close](#Twig+close)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
@@ -511,7 +587,51 @@ Create a new Twig object
 
 | Name | Type | Description |
 | --- | --- | --- |
-| #level | <code>number</code> | The level in XML DOM.<br> Root element is level 0, children have 1 and so on |
+| #level | <code>number</code> | Root element is level 0, children have 1 and so on |
+
+<a name="Twig+namespace"></a>
+
+### twig.namespace ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #namespace | <code>object</code> | XML Namespace of the element. Only used when parsed  with `xmlns: true` |
+
+<a name="Twig+declaration"></a>
+
+### twig.declaration ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #declaration | <code>object</code> | XML Declaration object, exist only on root |
+
+<a name="Twig+PI"></a>
+
+### twig.PI ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #PI | <code>object</code> | XML Declaration object, exist only on root |
+
+<a name="Twig+comment"></a>
+
+### twig.comment ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #comment | <code>string</code> \| <code>Array.&lt;string&gt;</code> | Comment inside the XML Elements |
 
 <a name="Twig+isEmpty"></a>
 
@@ -520,6 +640,13 @@ Returns true if the element is empty, otherwise false.An empty element ha no te
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if empty element  
+<a name="Twig+level"></a>
+
+### twig.level ⇒ <code>number</code>
+Returns the level of the element. Root element has 0, children jave 1, grand-children 2 and so on
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>number</code> - The level of the element.  
 <a name="Twig+isRoot"></a>
 
 ### twig.isRoot ⇒ <code>boolean</code>
@@ -637,6 +764,24 @@ Set Processing Instruction. According ty my knowlege a XML must not contain more
 | Param | Type | Description |
 | --- | --- | --- |
 | pi | <code>object</code> | The Processing Instruction object in form of `{ target: <target>, data: <instruction> }`. |
+
+<a name="Twig+namespace"></a>
+
+### twig.namespace ⇒ <code>object</code>
+The XML namespace
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>object</code> - The XML namespace of the element  
+<a name="Twig+namespace"></a>
+
+### twig.namespace
+Set the XML namespace
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| nw | <code>object</code> | XML namespace definition |
 
 <a name="Twig+close"></a>
 
@@ -772,12 +917,12 @@ Generic error for unsupported data types
 <a name="createParser"></a>
 
 ## createParser(handler, options)
-Create a new Twig parser. Currently `expat` (default) and `sax` are supported.
+Create a new Twig parser
 
 **Kind**: global function  
 **Throws**:
 
-- [<code>UnsupportedParser</code>](#UnsupportedParser) - For an unsupported parser
+- [<code>UnsupportedParser</code>](#UnsupportedParser) - For an unsupported parser. Currently `expat` (default) and `sax` are supported.
 
 
 | Param | Type | Description |
@@ -787,23 +932,32 @@ Create a new Twig parser. Currently `expat` (default) and `sax` are supported.
 
 **Example**  
 ```js
-function rootHandler(tree, elt) { console.log(elt.name);}
+function rootHandler(tree, elt) {  console.log(elt.name);}createParser(rootHandler, { method: SAX });
 ```
 **Example**  
 ```js
-function handler(tree, elt) { console.log(elt.name);}
+function oneHandlerForAll(tree, elt) {  console.log(elt.name);}createParser(  [ {function: oneHandlerForAll} ],   { method: SAX });
+```
+**Example**  
+```js
+function bookHandler(tree, elt) {  console.log(elt.name);}function customerHandler(tree, elt) {  console.log(elt.name);}createParser(  [ {name: 'book', function: bookHandler}, {name: 'customer', function: customerHandler} ],   { method: SAX });
 ```
 <a name="ParserOptions"></a>
 
 ## ParserOptions
-Optional options for the Twig parser- `method`: The underlaying parser. Either 'sax' or 'expat'.- `encoding`: Encoding of the XML File. Applies only to 'expat' parser.- `xmlns`: If true, then namespaces are supported.- `trim`: If true, then turn any whitespace into a single space.- `resumeAfterError`: If true then parser continues reading after an error. Otherwiese it throws exception.- `partial`: It true then unhandled elements are purged.
+Optional options for the Twig parser
 
 **Kind**: global typedef  
-**Default**: <code>{ method: &#x27;expat&#x27;, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
+**Default**: <code>{ method: EXPAT, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| method | <code>string</code> | The underlaying parser. Either 'sax' or 'expat'. |
+| method | <code>string</code> | The underlaying parser. Either SAX or EXPAT. |
+| encoding | <code>string</code> | Encoding of the XML File. Applies only to EXPAT parser. |
+| xmlns | <code>boolean</code> | If true, then namespaces are supported. |
+| trim | <code>boolean</code> | If true, then turn any whitespace into a single space. |
+| resumeAfterError | <code>boolean</code> | If true then parser continues reading after an error. Otherwiese it throws exception. |
+| partial | <code>boolean</code> | It true then unhandled elements are purged. |
 
 **Example**  
 ```js
@@ -812,14 +966,14 @@ Optional options for the Twig parser- `method`: The underlaying parser. Either 
 <a name="TwigHandler"></a>
 
 ## TwigHandler
-Handler functions for Twig objects
+Handler functions for Twig objects.<br>If `name` is not specified, then handler is called on every element. Otherwise the element name must be equal to the string or Regular Expression
 
 **Kind**: global typedef  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> \| <code>RegExp</code> \| <code>HandlerConditionFilter</code> | - |
-| function | <code>function</code> | - |
+| name | <code>string</code> \| <code>RegExp</code> | Name of handled element or any element if not specified |
+| function | <code>function</code> | Definition of handler function, either anonymous or explict function |
 
 <a name="AttributeCondition"></a>
 
