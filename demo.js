@@ -3,8 +3,8 @@ const fs = require('fs');
 
 
 
-const expatParser = require('./twig.js').createParser(handler, { method: 'sax' })
-fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(expatParser);
+const expatParser = require('./twig.js').createParser(handler, { method: 'expat', xmlns:true })
+fs.createReadStream(`${__dirname}/samples/xmlns2.xml`).pipe(expatParser);
 
 //const saxParser = require('./twig.js').createParser(handler, { method: 'sax' })
 //fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(saxParser);

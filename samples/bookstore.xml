@@ -47,4 +47,6 @@
 		<price>39.95</price>
 	</book>
 </bookstore>
+
 <?xml-stylesheet type="text/xsl" href="style.xsl"?>
+

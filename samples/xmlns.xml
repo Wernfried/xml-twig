@@ -1,5 +1,5 @@
 <root>
-	<h:table xmlns:h="http://www.w3.org/TR/html4/">
+	<h:table xmlns:h="http://www.w3.org/TR/html4/" id="1">
 		<h:tr>
 			<h:td>Apples</h:td>
 			<h:td>Bananas</h:td>
@@ -10,4 +10,10 @@
 		<f:width>80</f:width>
 		<f:length>120</f:length>
 	</f:table>
+	<book category="web">
+		<title lang="en">Learning XML</title>
+		<author>Erik T. Ray</author>
+		<year>2003</year>
+		<price>39.95</price>
+	</book>	
 </root>

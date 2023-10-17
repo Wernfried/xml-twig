@@ -22,7 +22,7 @@
 ## Functions
 
 <dl>
-<dt><a href="#createParser">createParser(method, method)</a> ⇒ <code>Parser</code></dt>
+<dt><a href="#createParser">createParser(handler, options)</a></dt>
 <dd><p>Create a new Twig parser. Currently <code>expat</code> (default) and <code>sax</code> are supported.</p>
 </dd>
 </dl>
@@ -30,23 +30,44 @@
 ## Typedefs
 
 <dl>
-<dt><a href="#parserOptions">parserOptions</a> : <code>object</code></dt>
+<dt><a href="#ParserOptions">ParserOptions</a></dt>
 <dd><p>Optional options for the Twig parser</p>
 <ul>
-<li><code>encoding</code>: Encoding of the XML File. Applies only to &#39;expat&#39; parser. Defaults to &#39;UTF-8&#39;.</li>
-<li><code>xmlns</code>: Boolean. If true, then namespaces are supported. Defaults to false.</li>
-<li><code>trim</code>: Boolean. If true, then turn any whitespace into a single space. Defaults to true.</li>
+<li><code>method</code>: The underlaying parser. Either &#39;sax&#39; or &#39;expat&#39;.</li>
+<li><code>encoding</code>: Encoding of the XML File. Applies only to &#39;expat&#39; parser.</li>
+<li><code>xmlns</code>: If true, then namespaces are supported.</li>
+<li><code>trim</code>: If true, then turn any whitespace into a single space.</li>
+<li><code>resumeAfterError</code>: If true then parser continues reading after an error. Otherwiese it throws exception.</li>
+<li><code>partial</code>: It true then unhandled elements are purged.</li>
 </ul>
 </dd>
-<dt><a href="#TwigCondition">TwigCondition</a> : <code>string</code> | <code>RegExp</code> | <code>object</code> | <code>function</code></dt>
-<dd><p>Optional condition to get an attribute<br> </p>
+<dt><a href="#TwigHandler">TwigHandler</a></dt>
+<dd><p>Handler functions for Twig objects</p>
+</dd>
+<dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
+<dd><p>Optional condition to get attributes<br> </p>
 <ul>
-<li>If <code>undefined</code>, then all attributes/elements are returned.<br> </li>
+<li>If <code>undefined</code>, then all attributes are returned.<br> </li>
 <li>If <code>string</code> then the attribute name must be equal to the string</li>
-<li>If RegExp` then the attribute name must match the Regular Expression</li>
-<li>For <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de">String.prototype.includes</a> match use <code>{includes: &#39;&lt;name of attribute&gt;&#39;}</code><br> </li>
-<li>You can provide custom condistion by callback function, e.g. <code>(name, text) =&gt; { return name === &#39;foo&#39; &amp;&amp; text === &#39;bar&#39;}</code></li>
+<li>If <code>RegExp</code> then the attribute name must match the Regular Expression</li>
+<li>If <a href="#AttributeConditionFilter">AttributeConditionFilter</a> then the attribute must filter function</li>
 </ul>
+</dd>
+<dt><a href="#AttributeConditionFilter">AttributeConditionFilter</a> : <code>function</code></dt>
+<dd><p>Custom filter function to get desired attributes</p>
+</dd>
+<dt><a href="#ElementCondition">ElementCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#ElementConditionFilter">ElementConditionFilter</a></code> | <code><a href="#Twig">Twig</a></code></dt>
+<dd><p>Optional condition to get elements<br> </p>
+<ul>
+<li>If <code>undefined</code>, then all elements are returned.<br> </li>
+<li>If <code>string</code> then the element name must be equal to the string</li>
+<li>If <code>RegExp</code> then the element name must match the Regular Expression</li>
+<li>If <a href="#ElementConditionFilter">ElementConditionFilter</a> then the element must filter function </li>
+<li>Use <a href="#Twig">Twig</a> object to find a specific element</li>
+</ul>
+</dd>
+<dt><a href="#ElementConditionFilter">ElementConditionFilter</a> : <code>function</code></dt>
+<dd><p>Custom filter function to get desired elements</p>
 </dd>
 </dl>
 
@@ -64,8 +85,10 @@
     * [.children](#Twig+children) ℗
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
+    * [.level](#Twig+level) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
+    * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
     * [.currentLine](#Twig+currentLine) ⇒ <code>number</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
@@ -80,6 +103,7 @@
     * [.PI](#Twig+PI)
     * [.close](#Twig+close)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code>
+    * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
 
@@ -164,7 +188,18 @@ Create a new Twig object
 
 | Name | Type | Description |
 | --- | --- | --- |
-| # | <code>object</code> | The postion of the element |
+| #postion | <code>object</code> | The postion of the element in #children array |
+
+<a name="Twig+level"></a>
+
+### twig.level ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #level | <code>number</code> | The level in XML DOM.<br> Root element is level 0, children have 1 and so on |
 
 <a name="Twig+isEmpty"></a>
 
@@ -180,6 +215,13 @@ Returns true if element is the root object
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if root element  
+<a name="Twig+root"></a>
+
+### twig.root ⇒ [<code>Twig</code>](#Twig)
+Returns the root object
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - The root element of XML tree  
 <a name="Twig+hasChildren"></a>
 
 ### twig.hasChildren ⇒ <code>boolean</code>
@@ -305,19 +347,35 @@ Closes the element
 | --- | --- | --- |
 | name | <code>string</code> | The name of the attribute |
 
+<a name="Twig+hasAttribute"></a>
+
+### twig.hasAttribute ⇒ <code>boolean</code>
+Check if the attribute exist or not
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>boolean</code> - - Returns true if the attribute exists, else false  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The name of the attribute |
+
 <a name="Twig+attribute"></a>
 
 ### twig.attribute ⇒ <code>object</code>
 Retrieve or update XML attribute.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>object</code> - Attributes or null if no matching attribute found  
+**Returns**: <code>object</code> - Attributes or `null` if no matching attribute found  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| cond | [<code>TwigCondition</code>](#TwigCondition) | Optional condition to select attributes |
+| cond | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
 | text | <code>string</code> \| <code>number</code> | New value of the attribute |
 
+**Example**  
+```js
+attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
+```
 <a name="Twig+parent"></a>
 
 ### twig.parent ⇒ [<code>Twig</code>](#Twig)
@@ -339,8 +397,10 @@ Returns the parent element or null if root element
     * [.children](#Twig+children) ℗
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
+    * [.level](#Twig+level) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
+    * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
     * [.currentLine](#Twig+currentLine) ⇒ <code>number</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
@@ -355,6 +415,7 @@ Returns the parent element or null if root element
     * [.PI](#Twig+PI)
     * [.close](#Twig+close)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code>
+    * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
 
@@ -439,7 +500,18 @@ Create a new Twig object
 
 | Name | Type | Description |
 | --- | --- | --- |
-| # | <code>object</code> | The postion of the element |
+| #postion | <code>object</code> | The postion of the element in #children array |
+
+<a name="Twig+level"></a>
+
+### twig.level ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #level | <code>number</code> | The level in XML DOM.<br> Root element is level 0, children have 1 and so on |
 
 <a name="Twig+isEmpty"></a>
 
@@ -455,6 +527,13 @@ Returns true if element is the root object
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if root element  
+<a name="Twig+root"></a>
+
+### twig.root ⇒ [<code>Twig</code>](#Twig)
+Returns the root object
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - The root element of XML tree  
 <a name="Twig+hasChildren"></a>
 
 ### twig.hasChildren ⇒ <code>boolean</code>
@@ -580,19 +659,35 @@ Closes the element
 | --- | --- | --- |
 | name | <code>string</code> | The name of the attribute |
 
+<a name="Twig+hasAttribute"></a>
+
+### twig.hasAttribute ⇒ <code>boolean</code>
+Check if the attribute exist or not
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>boolean</code> - - Returns true if the attribute exists, else false  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The name of the attribute |
+
 <a name="Twig+attribute"></a>
 
 ### twig.attribute ⇒ <code>object</code>
 Retrieve or update XML attribute.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>object</code> - Attributes or null if no matching attribute found  
+**Returns**: <code>object</code> - Attributes or `null` if no matching attribute found  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| cond | [<code>TwigCondition</code>](#TwigCondition) | Optional condition to select attributes |
+| cond | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
 | text | <code>string</code> \| <code>number</code> | New value of the attribute |
 
+**Example**  
+```js
+attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
+```
 <a name="Twig+parent"></a>
 
 ### twig.parent ⇒ [<code>Twig</code>](#Twig)
@@ -676,11 +771,10 @@ Generic error for unsupported data types
 
 <a name="createParser"></a>
 
-## createParser(method, method) ⇒ <code>Parser</code>
+## createParser(handler, options)
 Create a new Twig parser. Currently `expat` (default) and `sax` are supported.
 
 **Kind**: global function  
-**Returns**: <code>Parser</code> - - The Twig parser object  
 **Throws**:
 
 - [<code>UnsupportedParser</code>](#UnsupportedParser) - For an unsupported parser
@@ -688,22 +782,78 @@ Create a new Twig parser. Currently `expat` (default) and `sax` are supported.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| method | <code>string</code> | The underlying parser you like to use, defaults to `expat` |
-| method | [<code>parserOptions</code>](#parserOptions) | Object of optional options |
+| handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Function or array of function to handle elements |
+| options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 
-<a name="parserOptions"></a>
+**Example**  
+```js
+function rootHandler(tree, elt) { console.log(elt.name);}
+```
+**Example**  
+```js
+function handler(tree, elt) { console.log(elt.name);}
+```
+<a name="ParserOptions"></a>
 
-## parserOptions : <code>object</code>
-Optional options for the Twig parser- `encoding`: Encoding of the XML File. Applies only to 'expat' parser. Defaults to 'UTF-8'.- `xmlns`: Boolean. If true, then namespaces are supported. Defaults to false.- `trim`: Boolean. If true, then turn any whitespace into a single space. Defaults to true.
+## ParserOptions
+Optional options for the Twig parser- `method`: The underlaying parser. Either 'sax' or 'expat'.- `encoding`: Encoding of the XML File. Applies only to 'expat' parser.- `xmlns`: If true, then namespaces are supported.- `trim`: If true, then turn any whitespace into a single space.- `resumeAfterError`: If true then parser continues reading after an error. Otherwiese it throws exception.- `partial`: It true then unhandled elements are purged.
 
 **Kind**: global typedef  
+**Default**: <code>{ method: &#x27;expat&#x27;, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| method | <code>string</code> | The underlaying parser. Either 'sax' or 'expat'. |
+
 **Example**  
 ```js
 { encoding: 'UTF-8', xmlns: true }
 ```
-<a name="TwigCondition"></a>
+<a name="TwigHandler"></a>
 
-## TwigCondition : <code>string</code> \| <code>RegExp</code> \| <code>object</code> \| <code>function</code>
-Optional condition to get an attribute<br> - If `undefined`, then all attributes/elements are returned.<br> - If `string` then the attribute name must be equal to the string- If RegExp` then the attribute name must match the Regular Expression- For [String.prototype.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes?retiredLocale=de) match use `{includes: '<name of attribute>'}`<br> - You can provide custom condistion by callback function, e.g. `(name, text) => { return name === 'foo' && text === 'bar'}`
+## TwigHandler
+Handler functions for Twig objects
 
 **Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> \| <code>RegExp</code> \| <code>HandlerConditionFilter</code> | - |
+| function | <code>function</code> | - |
+
+<a name="AttributeCondition"></a>
+
+## AttributeCondition : <code>string</code> \| <code>RegExp</code> \| [<code>AttributeConditionFilter</code>](#AttributeConditionFilter)
+Optional condition to get attributes<br> - If `undefined`, then all attributes are returned.<br> - If `string` then the attribute name must be equal to the string- If `RegExp` then the attribute name must match the Regular Expression- If [AttributeConditionFilter](#AttributeConditionFilter) then the attribute must filter function
+
+**Kind**: global typedef  
+<a name="AttributeConditionFilter"></a>
+
+## AttributeConditionFilter : <code>function</code>
+Custom filter function to get desired attributes
+
+**Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | Name of the attribute |
+| value | <code>string</code> \| <code>number</code> | Value of the attribute |
+
+<a name="ElementCondition"></a>
+
+## ElementCondition : <code>string</code> \| <code>RegExp</code> \| [<code>ElementConditionFilter</code>](#ElementConditionFilter) \| [<code>Twig</code>](#Twig)
+Optional condition to get elements<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [ElementConditionFilter](#ElementConditionFilter) then the element must filter function - Use [Twig](#Twig) object to find a specific element
+
+**Kind**: global typedef  
+<a name="ElementConditionFilter"></a>
+
+## ElementConditionFilter : <code>function</code>
+Custom filter function to get desired elements
+
+**Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | Name of the element |
+| elt | [<code>Twig</code>](#Twig) | The full element Twig object |
+
