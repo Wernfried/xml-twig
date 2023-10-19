@@ -315,7 +315,9 @@ For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
 `.comment` - string|string[]: Comments or array of comments inside the element
 
-`.declaration` - object: The XML-Declaration object, exist only on `root`. Example  `{version: '1.0', encoding: 'UTF-8'}`. 
+`.declaration` - object: The XML-Declaration object, exist only on `root`. 
+
+   Example  `{version: '1.0', encoding: 'UTF-8'}`. 
 
 `.PI` - object: Processing Instruction, exist only on `root`. 
 
@@ -323,7 +325,7 @@ For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
 `.namespace` - object: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. 
 
-   Examnple `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
+   Example `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
 
 
 ## Limitations
