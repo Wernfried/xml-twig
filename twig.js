@@ -10,7 +10,7 @@ let current;
  * @param {string} method - The underlaying parser. Either `'sax'` or `'expat'`.
  * @param {string} encoding - Encoding of the XML File. Applies only to `expat` parser.
  * @param {boolean} xmlns - If true, then namespaces are accessible by `namespace` property.
- * @param {boolean} trim=false - If true, then turn any whitespace into a single space. Text and comments are trimmed.
+ * @param {boolean} [trim=false] - If true, then turn any whitespace into a single space. Text and comments are trimmed.
  * @param {boolean} resumeAfterError - If true then parser continues reading after an error. Otherwiese it throws exception.
  * @param {boolean} partial - It true then unhandled elements are purged.
  * @example { encoding: 'UTF-8', xmlns: true }
