@@ -12,9 +12,12 @@ const handle_book = [
 
 
 //const handle_ebook = [{ name: 'ebook', function: ebookHandler }];
-const parser = require('./twig.js').createParser(bookHandler, {method: 'sax'} )
+const parser = require('./twig.js').createParser(bookHandler, { method: 'sax' })
+const parser2 = require('./twig.js').createParser(bookHandler, { method: 'expat' })
 //parser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
-fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
+parser2.write('<xml>Hello, <who name="world">world</who>!</xml>');
+//parser2.write('<xml>Hello, <who name="world">world</who>!</xml>');
+//fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 
 
 // partial load
@@ -22,16 +25,17 @@ fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 // accessort
 
 function bookHandler(elt) {
+   console.log(`${elt.name} finished after ${elt.line} lines`);
    //console.log(`${elt.name} -> ${elt.index}`)
-let w = elt.root().writer(true);
-let t = elt.children();
-let tt = elt.children("ebook");
-let ttt = elt.children((x, elt) => {return elt.name === 'ebook'});
+   let w = elt.root().writer(true);
+   let t = elt.children();
+   let tt = elt.children("ebook");
+   let ttt = elt.children((x, elt) => { return elt.name === 'ebook' });
 
    console.log(elt.root().writer(true).toString());
    //elt.purge();
    console.log(elt.root().writer(true).toString());
-   
+
 }
 
 

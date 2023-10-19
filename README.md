@@ -49,11 +49,11 @@ In XPath, there are seven kinds of nodes: `element`, `attribute`, `text`, `names
 #### XML-Namespaces
 
 When the XML-Files uses [Namespaces](https://www.w3schools.com/xml/xml_namespaces.asp) then you can address the elements as they appear in the file, for example `cd:data`. 
-With option `{ namespaces : true }` you will get access to the `Elt.namespace` property.
+With option `{ namespaces : true }` you will get access to the `.namespace` property.
 
 ### Read XML Document
 
-- Rean entire XML files at once
+- Read entire XML file at once
 
   This module is designed to read huge XML-Files. Of course, it work also well for small files. First create a Twig parser. Then create a Stream and pipe it to the parser.
 
@@ -67,14 +67,18 @@ With option `{ namespaces : true }` you will get access to the `Elt.namespace` p
 
    const parser = twig.createParser(rootHandler)
    fs.createReadStream(`${__dirname}/node_modules/xml-twig/samples/bookstore.xml`).pipe(parser)
+   // Output -> bookstore finished after 48 lines
 
-   Output: 
-   bookstore finished after 48 lines
+   // Or use a Parser object instead of a Stream - works only with 'expat'!
+   const expatParser = require('./twig.js').createParser(rootHandler, { method: 'expat' })
+   expatParser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
+   // Output -> xml finished after 1 lines
+
    ```
 
 - Read XML Document in chucks
   
-  The key feature of this module is to read XML files and process it in chunks. You need to create handler function for elements you like to process. If you don't specify any name, then handler is called on every element.
+  The key feature of this module is to read XML files and process it in chunks. You need to create handler function for elements you like to process. If you don't specify any `name` property, then handler is called on every element.
 
 
    ```
@@ -83,10 +87,10 @@ With option `{ namespaces : true }` you will get access to the `Elt.namespace` p
 
    function bookHandler(elt) {
       console.log(`${elt.attr("category")} ${elt.name} at line ${elt.line}`)
-     elt.purge() // -> without `purge()` the entire XML document will be read into memory
+      elt.purge() // -> without `purge()` the entire XML document will be read into memory
    }
 
-   // different styles: below `handle_book` are all equivalent (when used with sample file `bookstore.xml`)
+   // different styles: below `handle_book` are all equivalent (with sample file `bookstore.xml`)
    handle_book = [
       { name: 'book', function: bookHandler },
       { name: 'ebook', function: bookHandler }
@@ -135,7 +139,8 @@ With option `{ namespaces : true }` you will get access to the `Elt.namespace` p
    }
 
    const handle_any = [ { function: anyHandler } ];
-   // or use regular expression which matches every element:
+   
+   // or use regular expression which matches every element
    const handle_any = [ { name: /./, function: bookHandler } ];
 
    const parser = twig.createParser(handle_any)
@@ -181,7 +186,7 @@ With option `{ namespaces : true }` you will get access to the `Elt.namespace` p
 
    ```
 
-For details about other options, see [ParserOptions](./blob/main/doc/twig.md#ParserOptions)
+For details about other options, see [ParserOptions](./doc/twig.md#ParserOptions)
 
 
 ### Access elements and attributes
