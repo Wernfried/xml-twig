@@ -278,7 +278,9 @@ You can specify condition on above methods. You can filter elements by following
 
 - If `undefined`, then all elements are returned.
 - If `string` then the element name must be equal to the string
+  Example: `book`
 - If `RegExp` then the element name must match the Regular Expression
+  Example: `/book$/i`
 - With `ElementConditionFilter` you can speficy any custom filter function.<br>
   Example: `(name, elt) => { return name === 'book' && elt.children().length > 1 }`
 
