@@ -1,15 +1,5 @@
 const fs = require('fs');
 
-const handle_entire_file = rootHandler;
-
-const handle_every_element = { function: anyHandler };
-
-const handle_book = [
-   { name: 'book', function: bookHandler },
-   { name: 'ebook', function: bookHandler }
-];
-
-
 
 //const handle_ebook = [{ name: 'ebook', function: ebookHandler }];
 const parser = require('./twig.js').createParser(rootHandler, { method: 'sax' })
@@ -20,37 +10,29 @@ fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 // purge-up-to
 // accessort
 
-function bookHandler(elt) {
-   console.log(`${elt.name} finished after ${elt.line} lines`);
-   //console.log(`${elt.name} -> ${elt.index}`)
-   let w = elt.root().writer(true);
-   let t = elt.children();
-   let tt = elt.children("ebook");
-   let ttt = elt.children((x, elt) => { return elt.name === 'ebook' });
-
-   console.log(elt.root().writer(true).toString());
-   //elt.purge();
-   console.log(elt.root().writer(true).toString());
-
+function anyHandler(elt) {
+   console.log(`${elt.name} -> ${elt.isFirstChild} ${elt.isLastChild} at line ${elt.line}`)
 }
 
 
 
-function rootHandler(elt) {   
-   let b = elt.children()[0].next();
-   while (b !== null) {
-      console.log(`<${b.name}> at line ${b.line}`);
-      b = b.next('title');
+function rootHandler(elt) {
+   let f;
+   let el = elt.first();
+   while (el !== null) {
+      //console.log(`<${el.name}> ${el.name} at line ${el.line}`);
+      if (el.line === 21) {
+         f = el;
+         break;
+      }
+      el = el.next();
    }
 
+   let rr = el.find(f);
+   console.log(`<${rr.name}> ${rr.name} at line ${rr.line}`);
 
 
 }
-
-function anyHandler(elt) {
-   console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${elt.line}`);
-}
-
 
 
 /*

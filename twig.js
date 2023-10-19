@@ -553,7 +553,6 @@ class Twig {
       return xw;
    }
 
-
    /**
    * Returns attriute value or `null` if not found.<br>
    * If more than one  matches the condition, then it returns object as [attribute()](#attribute)
@@ -670,8 +669,29 @@ class Twig {
    }
 
    /**
+   * Common function to filter Twig element
+   * @param {Twig} elt - Element you like to filter
+   * @param {?ElementCondition} condition - The filter condition
+   * @returns {boolean} `true` if the condition matches
+   */
+   filterElement(elt, condition) {
+      if (condition === undefined) {
+         return true;
+      } else if (typeof condition === 'string') {
+         return elt.name === condition;
+      } else if (condition instanceof RegExp) {
+         return condition.test(elt.name);
+      } else if (condition instanceof Twig) {
+         return Object.is(elt, condition);
+      } else if (typeof condition === 'function') {
+         return condition(elt.name, elt);
+      }
+      return false;
+   }
+
+   /**
    * All children, optionally matching `condition` of the current element or empty array 
-   * @condition {?ElementCondition} condition - Optional condition
+   * @param {?ElementCondition} condition - Optional condition
    * @returns {Twig[]} 
    */
    children = function (condition) {
@@ -680,7 +700,7 @@ class Twig {
 
    /**
    * Returns the next matching element. 
-   * @condition {?ElementCondition} condition - Optional condition
+   * @param {?ElementCondition} condition - Optional condition
    * @returns {Twig} - The next element
    */
    next = function (condition) {
@@ -691,91 +711,256 @@ class Twig {
          if (this.hasChildren) {
             elt = this.#children[0];
          } else {
-            elt = this.#parent.#children[this.index + 1];
-            if (elt === undefined) {
+            elt = this.nextSibling();
+            if (elt === null) {
                elt = this.#parent;
-               elt = elt.#parent.#children[elt.index + 1];
+               elt = elt.nextSibling();
             }
          }
          if (elt === undefined)
             elt = this.root();
 
-         let ret = this.filterElements([elt], condition);
-         return ret.length === 0 ? elt.next(condition) : ret[0];
+         return this.filterElement(elt, condition) ? elt : elt.next(condition);
       }
    }
 
    /**
-   * Returns the first matching element. This is usally the first element which has no child elements
-   * @condition {?ElementCondition} condition - Optional condition
+   * Returns the previous matching element. 
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig} - The previous element
+   */
+   previous = function (condition) {
+      let elt = null;
+      if (this.isRoot && this.hasChildren) {
+         elt = this.#children[this.#children.length - 1];
+         elt = elt.descendantOrSelf();
+         elt = elt[elt.length - 1];
+      } else {
+         elt = this.prevSibling();
+         if (elt === null) {
+            if (this.#parent.isRoot)
+               return null;
+            elt = this.#parent;
+         } else {
+            elt = elt.descendantOrSelf();
+            elt = elt[elt.length - 1];
+         }
+      }
+      if (elt === null)
+         return null;
+      return this.filterElement(elt, condition) ? elt : elt.previous(condition);
+   }
+
+   /**
+   * Returns the first matching element. This is usally the first child element
+   * @param {?ElementCondition} condition - Optional condition
    * @returns {Twig} - The first element
    */
    first = function (condition) {
-      let elt;
-      if (this.root().hasChildren) {
-         elt = this.root().#children[0];
-         while (elt.hasChildren)
-            elt = elt.#children[0];
-      } else {
-         elt = this.root();
-      }
-      let ret = this.filterElements([elt], condition);
-      return ret.length === 0 ? elt.next(condition) : ret[0];
+      let elt = this.root().hasChildren ? this.root().#children[0] : this.root();
+      return this.filterElement(elt, condition) ? elt : elt.next(condition);
    }
 
    /**
    * Returns the last matching element. This is usally the root element
-   * @condition {?ElementCondition} condition - Optional condition
+   * @param {?ElementCondition} condition - Optional condition
    * @returns {Twig} - The last element
    */
    last = function (condition) {
       let ret = this.filterElements([this.root()], condition);
-      return ret.length === 0 ? this.root().previous(condition) : ret[0];
+      return this.filterElement(elt, condition) ? elt : elt.previous(condition);
    }
 
-   previous = function (condition) {
-      throw new NotImplementedYet()
+   /**
+   * Check if the element is the first child of the parent
+   * @returns {boolean} `true` if the first child else `false`
+   */
+   get isFirstChild() {
+      if (this.isRoot) {
+         return false;
+      } else {
+         return this.index === 0
+      }
    }
 
-
-   find = function (condition, startAt) {
-      throw new NotImplementedYet()
+   /**
+   * Check if the element is the last child of the parent
+   * @returns {boolean} `true` if the last child else `false`
+   */
+   get isLastChild() {
+      if (this.isRoot) {
+         return false;
+      } else {
+         return this.index === this.#parent.#children.length - 1;
+      }
    }
 
+   /**
+   * Returns descendants (children, grandchildren, etc.) of the current element
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of descendants or empty array 
+   */
    descendant = function (condition) {
-      throw new NotImplementedYet()
+      let elts = [];
+      for (let c of this.#children) {
+         elts.push(c);
+         elts = elts.concat(c.descendant());
+      }
+      return this.filterElements(elts, condition);
    }
 
+   /**
+   * Returns descendants (children, grandchildren, etc.) of the current element and the current element itself
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of descendants or empty array 
+   */
    descendantOrSelf = function (condition) {
-      throw new NotImplementedYet()
+      let elts = [this];
+      for (let c of this.#children) {
+         elts.push(c);
+         elts = elts.concat(c.descendant());
+      }
+      return this.filterElements(elts, condition);
    }
 
-
+   /**
+   * Returns ancestors (parent, grandparent, etc.)  of the current element
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of ancestors or empty array 
+   */
    ancestor = function (condition) {
-      throw new NotImplementedYet()
+      let elts = [];
+      if (!this.isRoot) {
+         let parent = this.#parent;
+         elts.push(parent);
+         while (!parent.isRoot) {
+            parent = parent.#parent;
+            elts.push(parent);
+         }
+      }
+      return this.filterElements(elts, condition);
    }
 
+   /**
+   * Returns ancestors (parent, grandparent, etc.)  of the current element and the current element itself
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of ancestors or empty array 
+   */
    ancestorOrSelf = function (condition) {
-      throw new NotImplementedYet()
+      let elts = [this];
+      if (!this.isRoot) {
+         let parent = this.#parent;
+         elts.push(parent);
+         while (!parent.isRoot) {
+            parent = parent.#parent;
+            elts.push(parent);
+         }
+      }
+      return this.filterElements(elts, condition);
    }
 
-   following = function (condition) {
-      throw new NotImplementedYet()
+   /**
+   * Returns all sibling element of the current element
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of sibling or empty array 
+   */
+   sibling = function (condition) {
+      let elts = [];
+      if (!this.isRoot) {
+         elts = this.#parent.#children.filter(x => !Object.is(x, this));
+      }
+      return this.filterElements(elts, condition);
    }
+
+   /**
+   * Returns all sibling element of the current element and the current element itself
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of sibling or empty array 
+   */
+   siblingOrSelf = function (condition) {
+      let elts = [this];
+      if (!this.isRoot) {
+         elts = this.#parent.#children;
+      }
+      return this.filterElements(elts, condition);
+   }
+
+   /**
+   * Returns all following sibling element of the current element
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of sibling or empty array 
+   */
    followingSibling = function (condition) {
-      throw new NotImplementedYet()
+      let elts = [];
+      if (!this.isRoot) {
+         elts = this.#parent.#children.slice(this.index + 1);
+      }
+      return this.filterElements(elts, condition);
    }
 
-   preceding = function (condition) {
-      throw new NotImplementedYet()
-   }
+   /**
+   * Returns all preceding sibling element of the current element
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig[]} - Array of sibling or empty array 
+   */
    precedingSibling = function (condition) {
-      throw new NotImplementedYet()
+      let elts = [];
+      if (!this.isRoot) {
+         elts = this.#parent.#children.slice(0, this.index);
+      }
+      return this.filterElements(elts, condition);
    }
 
+   /**
+   * Returns next sibling element of the current element
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig} - The next sibling or `null`
+   */
+   nextSibling = function (condition) {
+      let elt;
+      if (!this.isRoot)
+         elt = this.#parent.#children[this.index + 1];
+      if (elt === undefined)
+         return null;
 
+      return this.filterElement(elt, condition) ? elt : elt.nextSibling(condition);
+   }
+
+   /**
+   * Returns previous sibling element of the current element
+   * @param {?ElementCondition} condition - Optional condition
+   * @returns {Twig} - The previous sibling or `null`
+   */
+   prevSibling = function (condition) {
+      let elt;
+      if (!this.isRoot && this.index > 0)
+         elt = this.#parent.#children[this.index - 1];
+      if (elt === undefined)
+         return null;
+
+      return this.filterElement(elt, condition) ? elt : elt.prevSibling(condition);
+   }
+
+   /**
+   * Find a specific element within current element. Same as `.descendant(condition)[0]`
+   * @param {ElementCondition} condition - Find condition
+   * @returns {Twig} - First matching element or `null`
+   */
+   find = function (condition) {
+      let children = this.filterElements(this.#children, condition);
+      if (children.length > 0)
+         return children[0];
+
+      for (let child of this.#children) {
+         let ret = child.find(condition);
+         if (ret !== null)
+            return ret;
+      }
+      return null;
+   }
 
 }
+
 
 /**
  * Error for unsupported data types

@@ -237,42 +237,75 @@ Specify element as name or regular expression or custom condition. For details s
 
 `.next(condition)` - Twig: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element.<br> 
 Note, the root element is the **last** element (which returns `null`), not the first.
+
 `.previous(condition)` - Twig: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
+
 `.first(condition)` - Twig: Returns the first elt (optionally matching condition) element. Usually this is the first element without any children. Used as starting point when you loop through entire document with `.next()`
+
 `.last(condition)` - Twig: Returns the last elt (optionally matching condition) element. Usually this is root element.
 
+`.ancestor(condition)` - Twig[]: All ancestors (parent, grandparent, etc.) of the current element (optionally matching condition) or an empty array.
 
-* `.nextSibling(condition)` - Twig: Returns the next matching sibling element. 
-* `.previousSibling(condition)` - Twig: Returns the previous matching sibling element. 
+`.ancestorOrSelf(condition)` - Twig[]: All ancestors (parent, grandparent, etc.) of the current element and the current element itself (optionally matching condition) or an empty array.
+
+`.descendant(condition)` - Twig[]: All descendants (children, grandchildren, etc.) of the current element (optionally matching condition) or an empty array.
+
+`.descendantOrSelf(condition)` - Twig[]: All descendants (children, grandchildren, etc.) of the current element and the current element itself (optionally matching condition) or an empty array.
+
+`.sibling(condition)` - Twig[]: All siblings (optionally matching condition) before and after the current element or an empty array.
+
+`.siblingOrSelf(condition)` - Twig[]: All siblings (optionally matching condition) before and after the current element or an empty array.
+
+`.followingSibling(condition)` - Twig[]: All siblings (optionally matching condition) after the current element or an empty array.
+
+`.precedingSibling(condition)` - Twig[]: All siblings (optionally matching condition) before the current element or an empty array.
+
+`.nextSibling(condition)` - Twig: Returns the next (optionally matching condition) sibling element. 
+
+`.prevSibling(condition)` - Twig: Returns the previous (optionally matching condition) sibling element. 
+
+**Note:** Be aware when using any `*next*`, `*last*`, `*descendant*`, `following*`, `children` method on *current* element, because following elements are not yet loaded. Thus they may unexpectively return `null` or empty array.
 
 
-* **ancestor**: 	All ancestors (parent, grandparent, etc.) of the current element
-* **ancestorOrSelf**: 	All ancestors (parent, grandparent, etc.) of the current element and the current element itself
-* **descendant**: 	All descendants (children, grandchildren, etc.) of the current element
-* **descendantOrSelf**: 	All descendants (children, grandchildren, etc.) of the current element and the current element itself
-* **following**: 	Everything in the document after the closing tag of the current element
-* **followingSibling**: 	All siblings after the current element
-* **sibling**: 	All siblings before and after the current element
-* **siblingOrSelf**: 	All iblings before and after the current element and the current element itself
-* **preceding**: 	All elements that appear before the current element in the document, except ancestors, attribute elements and namespace elements
-* **precedingSibling**: 	All siblings before the current element
+find(condition, startAt)
+
+
+
+
+
 
 
 #### Other useful Properties
 
-* `.isEmpty` - boolean: `true` if emtpy. An empty element ha no text nor any child elements, however empty elements can have attributes.
-* `.level` - integer: The level of the element. Root element has 0, children have 1, grand-children 2 and so on
-* `.isRoot` - boolean: `true` for the root element
-* `.hasChildren` - boolean: `true` if the element has any child elements
-* `.line` - integer: The line of the element (where the closing tag appears) in the XML-File. First line is 1
-* `.column` - integer: The column of the element (where the closing tag appears)  in the XML-File. First column is 1
-* `.name` - string: Name of the element/tag
-* `.tag` - string: Synonym for `name`
-* `.text` - string: The text of an element
-* `.comment` - string|string[]: Comments or array of comments inside the element
-* `.declaration` - object: The XML-Declaration object, exist only on `root`. Example  `{version: '1.0', encoding: 'UTF-8'}`. 
-* `.PI` - object: Processing Instruction, exist only on `root`. Example `{ target: 'xml-stylesheet', data: 'type="text/xsl" href="style.xsl"' }`. 
-* `.namespace` - object: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. Examnple `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
+`.isEmpty` - boolean: `true` if emtpy. An empty element ha no text nor any child elements, however empty elements can have attributes.
+
+`.level` - integer: The level of the element. Root element has 0, children have 1, grand-children 2 and so on
+
+`.isRoot` - boolean: `true` for the root element
+
+`.hasChildren` - boolean: `true` if the element has any child elements
+
+`.isFirstChild` - boolean: `true` if the element is the first child in the parent
+
+`.isLastChild` - boolean: `true` if the element is the last child in the parent
+
+`.line` - integer: The line of the element (where the closing tag appears) in the XML-File. First line is 1
+
+`.column` - integer: The column of the element (where the closing tag appears)  in the XML-File. First column is 1
+
+`.name` - string: Name of the element/tag
+
+`.tag` - string: Synonym for `name`
+
+`.text` - string: The text of an element
+
+`.comment` - string|string[]: Comments or array of comments inside the element
+
+`.declaration` - object: The XML-Declaration object, exist only on `root`. Example  `{version: '1.0', encoding: 'UTF-8'}`. 
+
+`.PI` - object: Processing Instruction, exist only on `root`. Example `{ target: 'xml-stylesheet', data: 'type="text/xsl" href="style.xsl"' }`. 
+
+`.namespace` - object: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. Examnple `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
 
 
 ## Limitations
