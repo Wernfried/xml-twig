@@ -186,7 +186,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
    ```
 
-For details about other options, see [ParserOptions](./doc/twig.md#ParserOptions)
+For details about other options, see [ParserOptions](./doc/twig.md#parseroptions)
 
 
 ### Access elements and attributes
