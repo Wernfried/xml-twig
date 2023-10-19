@@ -243,7 +243,7 @@ Note, the `root` element is the **last** element, not the first!
 
 `.previous(condition)` - **Twig**: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
 
-`.first(condition)` - **Twig**: Returns the first elt (optionally matching condition) element. Usually this is the first element without any children. Used as starting point when you loop through entire document with `.next()`
+`.first(condition)` - **Twig**: Returns the first elt (optionally matching condition) element. Usually this is the first child element. Used as starting point when you loop through entire document with `.next()`
 
 `.last(condition)` - **Twig**: Returns the last elt (optionally matching condition) element. Usually this is root element.
 
