@@ -31,7 +31,7 @@
 
 <dl>
 <dt><a href="#ParserOptions">ParserOptions</a></dt>
-<dd><p>Optional options for the Twig parser</p>
+<dd><p>Optional settings for the Twig parser</p>
 </dd>
 <dt><a href="#TwigHandler">TwigHandler</a></dt>
 <dd><p>Reference to handler functions for Twig objects.<br>
@@ -66,8 +66,17 @@ Otherwise the element name must be equal to the string or Regular Expression. Yo
 <dt><a href="#AttributeConditionFilter">AttributeConditionFilter</a> : <code>function</code></dt>
 <dd><p>Custom filter function to get desired attributes</p>
 </dd>
-<dt><a href="#+PI">#PI</a> : <code>object</code> ℗</dt>
+<dt><a href="#+PI">#PI</a> : <code>object</code></dt>
+<dd><p>XML Processing Instruction object, exist only on root</p>
+</dd>
+<dt><a href="#+declaration">#declaration</a> : <code>object</code></dt>
 <dd><p>XML Declaration object, exist only on root</p>
+</dd>
+<dt><a href="#+namespace">#namespace</a> : <code>object</code></dt>
+<dd><p>XML namespace of element. Exist onl when parsed with <code>xmlns: true</code></p>
+</dd>
+<dt><a href="#+comment">#comment</a> : <code>string</code> | <code>Array.&lt;string&gt;</code></dt>
+<dd><p>Comment or array of comments inside the XML Elements</p>
 </dd>
 </dl>
 
@@ -86,34 +95,29 @@ Otherwise the element name must be equal to the string or Regular Expression. Yo
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
     * [.level](#Twig+level) ℗
-    * [.comment](#Twig+comment) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
-    * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
     * [.line](#Twig+line) ⇒ <code>number</code>
     * [.column](#Twig+column) ⇒ <code>number</code>
     * [.index](#Twig+index) ⇒ <code>number</code>
-    * [.index](#Twig+index) ⇒ <code>string</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
-    * [.comment](#Twig+comment) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-    * [.comment](#Twig+comment)
-    * [.declaration](#Twig+declaration) ℗
-    * [.declaration](#Twig+declaration) ⇒ <code>string</code>
-    * [.declaration](#Twig+declaration)
-    * [.namespace](#Twig+namespace) ⇒ <code>object</code>
     * [.close](#Twig+close)
+    * [.addChild](#Twig+addChild)
+    * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
+    * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
     * [.self](#Twig+self) ⇒ [<code>Twig</code>](#Twig)
     * [.children](#Twig+children) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
     * [.purge(elt)](#Twig+purge)
+    * [.purgeUpTo(elt)](#Twig+purgeUpTo)
     * [.setRoot(name)](#Twig+setRoot)
     * [.filterElements(elts, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 
@@ -211,17 +215,6 @@ Create a new Twig object
 | --- | --- | --- |
 | #level | <code>number</code> | Root element is level 0, children have 1 and so on |
 
-<a name="Twig+comment"></a>
-
-### twig.comment ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #comment | <code>string</code> \| <code>Array.&lt;string&gt;</code> | Comment inside the XML Elements |
-
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
@@ -243,13 +236,6 @@ Returns true if element is the root object
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if root element  
-<a name="Twig+root"></a>
-
-### twig.root ⇒ [<code>Twig</code>](#Twig)
-Returns the root object
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: [<code>Twig</code>](#Twig) - The root element of XML tree  
 <a name="Twig+hasChildren"></a>
 
 ### twig.hasChildren ⇒ <code>boolean</code>
@@ -278,13 +264,6 @@ The position in #children array. For root object 0
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - Position of element in parent  
-<a name="Twig+index"></a>
-
-### twig.index ⇒ <code>string</code>
-The position in #children array. For root object 0
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> - Current column  
 <a name="Twig+name"></a>
 
 ### twig.name ⇒ <code>string</code>
@@ -321,60 +300,6 @@ Modifies the text of the element
 | --- | --- | --- |
 | value | <code>string</code> | New value of the attribute |
 
-<a name="Twig+comment"></a>
-
-### twig.comment ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-Comment in element. A XML Element may contain an array of multiple comments.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> \| <code>Array.&lt;string&gt;</code> - The comment or an array of all comments  
-<a name="Twig+comment"></a>
-
-### twig.comment
-Modifies the comment of the element. A XML Element may contain an array of multiple comments.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| str | <code>string</code> | New comment to be added |
-
-<a name="Twig+declaration"></a>
-
-### twig.declaration ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #declaration | <code>object</code> | XML Declaration object, exist only on root |
-
-<a name="Twig+declaration"></a>
-
-### twig.declaration ⇒ <code>string</code>
-The XML declaration. Available only on root element.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> - The declaration of the XML  
-<a name="Twig+declaration"></a>
-
-### twig.declaration
-Set the XML declaration
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dec | <code>object</code> | The XML declaration, e.g. `{ version: "1.0", encoding:"UTF-8" }` |
-
-<a name="Twig+namespace"></a>
-
-### twig.namespace ⇒ <code>object</code>
-The XML namespace
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>object</code> - The XML namespace of the element  
 <a name="Twig+close"></a>
 
 ### twig.close
@@ -385,6 +310,29 @@ Closes the element
 | Param | Type | Description |
 | --- | --- | --- |
 | pos | <code>object</code> | The current possion (line and column) in the XML document |
+
+<a name="Twig+addChild"></a>
+
+### twig.addChild
+Internal recursive function used by `writer()`
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| xw | <code>XMLWriter</code> | The writer object |
+| children | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
+
+<a name="Twig+writer"></a>
+
+### twig.writer ⇒ <code>XMLWriter</code>
+Creates xml-writer from current element
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indented | <code>boolean</code> \| <code>string</code> | `true` or intention character |
 
 <a name="Twig+attr"></a>
 
@@ -427,6 +375,13 @@ Retrieve or update XML attribute.
 ```js
 attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
 ```
+<a name="Twig+root"></a>
+
+### twig.root ⇒ [<code>Twig</code>](#Twig)
+Returns the root object
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - The root element of XML tree  
 <a name="Twig+parent"></a>
 
 ### twig.parent ⇒ [<code>Twig</code>](#Twig)
@@ -438,7 +393,7 @@ Returns the parent element or null if root element
 
 ### twig.self ⇒ [<code>Twig</code>](#Twig)
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: [<code>Twig</code>](#Twig) - - The current object  
+**Returns**: [<code>Twig</code>](#Twig) - - The current element  
 <a name="Twig+children"></a>
 
 ### twig.children ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
@@ -449,6 +404,17 @@ All children, optionally matching `cond` of the current element or empty array
 <a name="Twig+purge"></a>
 
 ### twig.purge(elt)
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elt | [<code>Twig</code>](#Twig) | If defined then it purges up to the elt element. If undefined the the current element is purged |
+
+<a name="Twig+purgeUpTo"></a>
+
+### twig.purgeUpTo(elt)
 Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -496,34 +462,29 @@ Common function to filter Twig elements from array
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
     * [.level](#Twig+level) ℗
-    * [.comment](#Twig+comment) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
-    * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
     * [.line](#Twig+line) ⇒ <code>number</code>
     * [.column](#Twig+column) ⇒ <code>number</code>
     * [.index](#Twig+index) ⇒ <code>number</code>
-    * [.index](#Twig+index) ⇒ <code>string</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
-    * [.comment](#Twig+comment) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-    * [.comment](#Twig+comment)
-    * [.declaration](#Twig+declaration) ℗
-    * [.declaration](#Twig+declaration) ⇒ <code>string</code>
-    * [.declaration](#Twig+declaration)
-    * [.namespace](#Twig+namespace) ⇒ <code>object</code>
     * [.close](#Twig+close)
+    * [.addChild](#Twig+addChild)
+    * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
+    * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
     * [.self](#Twig+self) ⇒ [<code>Twig</code>](#Twig)
     * [.children](#Twig+children) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
     * [.purge(elt)](#Twig+purge)
+    * [.purgeUpTo(elt)](#Twig+purgeUpTo)
     * [.setRoot(name)](#Twig+setRoot)
     * [.filterElements(elts, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 
@@ -621,17 +582,6 @@ Create a new Twig object
 | --- | --- | --- |
 | #level | <code>number</code> | Root element is level 0, children have 1 and so on |
 
-<a name="Twig+comment"></a>
-
-### twig.comment ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #comment | <code>string</code> \| <code>Array.&lt;string&gt;</code> | Comment inside the XML Elements |
-
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
@@ -653,13 +603,6 @@ Returns true if element is the root object
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if root element  
-<a name="Twig+root"></a>
-
-### twig.root ⇒ [<code>Twig</code>](#Twig)
-Returns the root object
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: [<code>Twig</code>](#Twig) - The root element of XML tree  
 <a name="Twig+hasChildren"></a>
 
 ### twig.hasChildren ⇒ <code>boolean</code>
@@ -688,13 +631,6 @@ The position in #children array. For root object 0
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - Position of element in parent  
-<a name="Twig+index"></a>
-
-### twig.index ⇒ <code>string</code>
-The position in #children array. For root object 0
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> - Current column  
 <a name="Twig+name"></a>
 
 ### twig.name ⇒ <code>string</code>
@@ -731,60 +667,6 @@ Modifies the text of the element
 | --- | --- | --- |
 | value | <code>string</code> | New value of the attribute |
 
-<a name="Twig+comment"></a>
-
-### twig.comment ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-Comment in element. A XML Element may contain an array of multiple comments.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> \| <code>Array.&lt;string&gt;</code> - The comment or an array of all comments  
-<a name="Twig+comment"></a>
-
-### twig.comment
-Modifies the comment of the element. A XML Element may contain an array of multiple comments.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| str | <code>string</code> | New comment to be added |
-
-<a name="Twig+declaration"></a>
-
-### twig.declaration ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #declaration | <code>object</code> | XML Declaration object, exist only on root |
-
-<a name="Twig+declaration"></a>
-
-### twig.declaration ⇒ <code>string</code>
-The XML declaration. Available only on root element.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> - The declaration of the XML  
-<a name="Twig+declaration"></a>
-
-### twig.declaration
-Set the XML declaration
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dec | <code>object</code> | The XML declaration, e.g. `{ version: "1.0", encoding:"UTF-8" }` |
-
-<a name="Twig+namespace"></a>
-
-### twig.namespace ⇒ <code>object</code>
-The XML namespace
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>object</code> - The XML namespace of the element  
 <a name="Twig+close"></a>
 
 ### twig.close
@@ -795,6 +677,29 @@ Closes the element
 | Param | Type | Description |
 | --- | --- | --- |
 | pos | <code>object</code> | The current possion (line and column) in the XML document |
+
+<a name="Twig+addChild"></a>
+
+### twig.addChild
+Internal recursive function used by `writer()`
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| xw | <code>XMLWriter</code> | The writer object |
+| children | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
+
+<a name="Twig+writer"></a>
+
+### twig.writer ⇒ <code>XMLWriter</code>
+Creates xml-writer from current element
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| indented | <code>boolean</code> \| <code>string</code> | `true` or intention character |
 
 <a name="Twig+attr"></a>
 
@@ -837,6 +742,13 @@ Retrieve or update XML attribute.
 ```js
 attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
 ```
+<a name="Twig+root"></a>
+
+### twig.root ⇒ [<code>Twig</code>](#Twig)
+Returns the root object
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - The root element of XML tree  
 <a name="Twig+parent"></a>
 
 ### twig.parent ⇒ [<code>Twig</code>](#Twig)
@@ -848,7 +760,7 @@ Returns the parent element or null if root element
 
 ### twig.self ⇒ [<code>Twig</code>](#Twig)
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: [<code>Twig</code>](#Twig) - - The current object  
+**Returns**: [<code>Twig</code>](#Twig) - - The current element  
 <a name="Twig+children"></a>
 
 ### twig.children ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
@@ -859,6 +771,17 @@ All children, optionally matching `cond` of the current element or empty array
 <a name="Twig+purge"></a>
 
 ### twig.purge(elt)
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elt | [<code>Twig</code>](#Twig) | If defined then it purges up to the elt element. If undefined the the current element is purged |
+
+<a name="Twig+purgeUpTo"></a>
+
+### twig.purgeUpTo(elt)
 Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -984,7 +907,7 @@ Create a new Twig parser
 <a name="ParserOptions"></a>
 
 ## ParserOptions
-Optional options for the Twig parser
+Optional settings for the Twig parser
 
 **Kind**: global typedef  
 **Default**: <code>{ method: &#x27;expat&#x27;, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
@@ -994,7 +917,7 @@ Optional options for the Twig parser
 | method | <code>string</code> | The underlaying parser. Either `'sax'` or `'expat'`. |
 | encoding | <code>string</code> | Encoding of the XML File. Applies only to `expat` parser. |
 | xmlns | <code>boolean</code> | If true, then namespaces are accessible by `namespace` property. |
-| trim | <code>boolean</code> | If true, then turn any whitespace into a single space. |
+| trim | <code>boolean</code> | If true, then turn any whitespace into a single space. Text and comments are trimmed. |
 | resumeAfterError | <code>boolean</code> | If true then parser continues reading after an error. Otherwiese it throws exception. |
 | partial | <code>boolean</code> | It true then unhandled elements are purged. |
 
@@ -1063,8 +986,25 @@ Custom filter function to get desired attributes
 
 <a name="+PI"></a>
 
-## #PI : <code>object</code> ℗
+## #PI : <code>object</code>
+XML Processing Instruction object, exist only on root
+
+**Kind**: global typedef  
+<a name="+declaration"></a>
+
+## #declaration : <code>object</code>
 XML Declaration object, exist only on root
 
 **Kind**: global typedef  
-**Access**: private  
+<a name="+namespace"></a>
+
+## #namespace : <code>object</code>
+XML namespace of element. Exist onl when parsed with `xmlns: true`
+
+**Kind**: global typedef  
+<a name="+comment"></a>
+
+## #comment : <code>string</code> \| <code>Array.&lt;string&gt;</code>
+Comment or array of comments inside the XML Elements
+
+**Kind**: global typedef  
