@@ -273,7 +273,8 @@ purge()
 purgeUpTo(elt)
 
 **condition** Parameter
-You can specify condition on above methods. You can filter elements by these:
+
+You can specify condition on above methods. You can filter elements by following conditions:
 
 - If `undefined`, then all elements are returned.
 - If `string` then the element name must be equal to the string
