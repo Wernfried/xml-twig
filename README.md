@@ -186,7 +186,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
    ```
 
-For details about other options, see [ParserOptions](./doc/twig.md#parseroptions)
+For details about other options, see [ParserOptions](./doc/twig.md#ParserOptions)
 
 
 ### Access elements and attributes
@@ -199,7 +199,7 @@ For details about other options, see [ParserOptions](./doc/twig.md#parseroptions
 
 `.attribute(cond)`: Get attrbitues as object or `null` if not matching attribute found. If `cond` is `undefined`, then all attributes are retured.
 
-   Specify attribute name or regular expression or custom condition. For details see [AttributeCondition](./blob/main/doc/twig.md#AttributeCondition).<br>
+   Specify attribute name or regular expression or custom condition. For details see [AttributeCondition](./doc/twig.md#AttributeCondition).<br>
    Let's assume an XML element like this: `<person firstName="Jean-Luc", lastName="Picard", age="59" />` 
 
 Here are some examples the get attribute and values:
@@ -231,14 +231,19 @@ Here are some examples the get attribute and values:
 
 `.parent()` - Twig: The parent of the current element
 
-`.children(cond)` - Twig[]: All matching children of the current element or empty array
+`.children(condition)` - Twig[]: All matching children of the current element or empty array
 
-Specify element as name or regular expression or custom condition. For details see [ElementCondition](./blob/main/doc/twig.md#ElementCondition).
+Specify element as name or regular expression or custom condition. For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
-* `.next(cond)`  - Twig: Returns the next matching element. This is defined as the next element which opens after the current element opens.<br>Useful if you like to loop over all elements.
-* `.previous(cond)` - Twig: Returns the previous matching element. This is defined as the previous element which closed before the current element opens.
-* `.nextSibling(cond)` - Twig: Returns the next matching sibling element. 
-* `.previousSibling(cond)` - Twig: Returns the previous matching sibling element. 
+`.next(condition)` - Twig: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element.<br> 
+Note, the root element is the **last** element (which returns `null`), not the first.
+`.previous(condition)` - Twig: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
+`.first(condition)` - Twig: Returns the first elt (optionally matching condition) element. Usually this is the first element without any children. Used as starting point when you loop through entire document with `.next()`
+`.last(condition)` - Twig: Returns the last elt (optionally matching condition) element. Usually this is root element.
+
+
+* `.nextSibling(condition)` - Twig: Returns the next matching sibling element. 
+* `.previousSibling(condition)` - Twig: Returns the previous matching sibling element. 
 
 
 * **ancestor**: 	All ancestors (parent, grandparent, etc.) of the current element

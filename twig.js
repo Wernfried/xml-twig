@@ -363,6 +363,7 @@ class Twig {
          if (attributes !== undefined)
             this.#attributes = attributes;
          if (parent === undefined) {
+            // Root element
             tree = this;
             this.#level = 0;
          } else {
@@ -374,8 +375,7 @@ class Twig {
    }
 
    /**
-   * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
-   * @param {?Twig} elt - If defined then it purges up to the elt element. If undefined the the current element is purged
+   * Purges the current, typically used after element has been processed.<br>The root object cannot be purged.
    */
    purge() {
       if (!this.isRoot)
@@ -383,16 +383,32 @@ class Twig {
    }
 
    /**
-   * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
-   * @param {?Twig} elt - If defined then it purges up to the elt element. If undefined the the current element is purged
+   * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
+   * @param {Twig} elt - Up to this element the tree will be purged. If `undefined` then `purge()` is called.<br>
+   * The `elt` object itself is not purged. (use `.purge()` is you like to do so)
    */
    purgeUpTo(elt) {
-      throw new NotImplementedYet();
+      if (elt === undefined) {
+         this.purge();
+      } else if (!this.isRoot) {
+         let purge = this;
+         /*while (!purge.isRoot && Object.is(purge, elt)) {            
+            
+         }
+         */
+
+      }
+
+
+
+
    }
 
    /**
-   * Sets the name of root element. In some cases the root is created before the XML-Root element is available
-   * @param {string} name - The tag names
+   * Sets the name of root element. In some cases the root is created before the XML-Root element is available<br>
+   * Used internally!
+   * @param {string} name - The element name
+   * @private
    */
    setRoot(name) {
       if (this.isRoot)
@@ -400,7 +416,7 @@ class Twig {
    }
 
    /**
-   * Returns `true` if the element is empty, otherwise false.
+   * Returns `true` if the element is empty, otherwise `false`.
    * An empty element has no text nor any child elements, however empty elements can have attributes.
    * @returns {boolean} true if empty element
    */
@@ -449,7 +465,7 @@ class Twig {
    }
 
    /**
-   * The position in #children array. For root object 0
+   * The position in `#children` array. For root object 0
    * @returns {number} Position of element in parent
    */
    get index() {
@@ -457,14 +473,14 @@ class Twig {
    }
 
    /**
-   * Returns the name of the element. Same as tag()
+   * Returns the name of the element.
    * @returns {string} Element name
    */
    get name() {
       return this.#name;
    }
    /**
-   * Returns the name of the element. Same as `twig.name`
+   * Returns the name of the element. Synonym for `twig.name`
    * @returns {string} Element name
    */
    get tag() {
@@ -541,11 +557,11 @@ class Twig {
    /**
    * Returns attriute value or `null` if not found.<br>
    * If more than one  matches the condition, then it returns object as [attribute()](#attribute)
-   * @param {?AttributeCondition} cond - Optional condition to select attribute
+   * @param {?AttributeCondition} condition - Optional condition to select attribute
    * @returns {string|number|object} - The value of the attrubute or `null` if the  does not exist
    */
-   attr = function (cond) {
-      let attr = this.attribute(cond);
+   attr = function (condition) {
+      let attr = this.attribute(condition);
       if (attr === null)
          return null;
 
@@ -563,7 +579,7 @@ class Twig {
 
    /**
    * Retrieve or update XML attribute.
-   * @param {?AttributeCondition} cond - Optional condition to select attributes
+   * @param {?AttributeCondition} condition - Optional condition to select attributes
    * @param {?string|number} text - New value of the attribute
    * @returns {object} Attributes or `null` if no matching attribute found
    * @example attribute((name, val) => { return name === 'age' && val > 50})
@@ -571,32 +587,32 @@ class Twig {
    * attribute('firstName')
    * attribute(/name/i)
    */
-   attribute = function (cond, text) {
+   attribute = function (condition, text) {
       if (text === undefined) {
          let attr;
-         if (cond === undefined) {
+         if (condition === undefined) {
             attr = this.#attributes;
-         } else if (typeof cond === 'function') {
-            attr = Object.fromEntries(Object.entries(this.#attributes).filter(([key, val]) => cond(key, val)));
-         } else if (typeof cond === 'string') {
-            attr = this.attribute(key => { return key === cond });
-         } else if (cond instanceof RegExp) {
-            attr = this.attribute(key => { return cond.test(key) });
-         } else if (cond instanceof Twig) {
-            throw new UnsupportedCondition(cond, ['string', 'RegEx', 'function']);
+         } else if (typeof condition === 'function') {
+            attr = Object.fromEntries(Object.entries(this.#attributes).filter(([key, val]) => condition(key, val)));
+         } else if (typeof condition === 'string') {
+            attr = this.attribute(key => { return key === condition });
+         } else if (condition instanceof RegExp) {
+            attr = this.attribute(key => { return condition.test(key) });
+         } else if (condition instanceof Twig) {
+            throw new UnsupportedCondition(condition, ['string', 'RegEx', 'function']);
          } else {
             return this.attribute();
          }
          return attr === null || Object.keys(attr).length == 0 ? null : attr;
       } else {
          if (text === null) {
-            delete this.#attributes[cond];
+            delete this.#attributes[condition];
          } else {
             if (!['string', 'number', 'bigint'].includes(typeof text))
                throw new UnsupportedType(text);
-            if (typeof cond !== 'string')
-               throw new UnsupportedCondition(cond, ['string']);
-            this.#attributes[cond] = text;
+            if (typeof condition !== 'string')
+               throw new UnsupportedCondition(condition, ['string']);
+            this.#attributes[condition] = text;
          }
       }
    }
@@ -654,52 +670,109 @@ class Twig {
    }
 
    /**
-   * All children, optionally matching `cond` of the current element or empty array 
-   * @condition {?ElementCondition} cond - Optional condition
+   * All children, optionally matching `condition` of the current element or empty array 
+   * @condition {?ElementCondition} condition - Optional condition
    * @returns {Twig[]} 
    */
-   children = function (cond) {
-      return this.filterElements(this.#children, cond);
+   children = function (condition) {
+      return this.filterElements(this.#children, condition);
+   }
+
+   /**
+   * Returns the next matching element. 
+   * @condition {?ElementCondition} condition - Optional condition
+   * @returns {Twig} - The next element
+   */
+   next = function (condition) {
+      if (this.isRoot) {
+         return null;
+      } else {
+         let elt;
+         if (this.hasChildren) {
+            elt = this.#children[0];
+         } else {
+            elt = this.#parent.#children[this.index + 1];
+            if (elt === undefined) {
+               elt = this.#parent;
+               elt = elt.#parent.#children[elt.index + 1];
+            }
+         }
+         if (elt === undefined)
+            elt = this.root();
+
+         let ret = this.filterElements([elt], condition);
+         return ret.length === 0 ? elt.next(condition) : ret[0];
+      }
+   }
+
+   /**
+   * Returns the first matching element. This is usally the first element which has no child elements
+   * @condition {?ElementCondition} condition - Optional condition
+   * @returns {Twig} - The first element
+   */
+   first = function (condition) {
+      let elt;
+      if (this.root().hasChildren) {
+         elt = this.root().#children[0];
+         while (elt.hasChildren)
+            elt = elt.#children[0];
+      } else {
+         elt = this.root();
+      }
+      let ret = this.filterElements([elt], condition);
+      return ret.length === 0 ? elt.next(condition) : ret[0];
+   }
+
+   /**
+   * Returns the last matching element. This is usally the root element
+   * @condition {?ElementCondition} condition - Optional condition
+   * @returns {Twig} - The last element
+   */
+   last = function (condition) {
+      let ret = this.filterElements([this.root()], condition);
+      return ret.length === 0 ? this.root().previous(condition) : ret[0];
+   }
+
+   previous = function (condition) {
+      throw new NotImplementedYet()
    }
 
 
-   descendant = function (cond) {
+   find = function (condition, startAt) {
       throw new NotImplementedYet()
    }
 
-   descendantOrSelf = function (cond) {
+   descendant = function (condition) {
+      throw new NotImplementedYet()
+   }
+
+   descendantOrSelf = function (condition) {
       throw new NotImplementedYet()
    }
 
 
-   ancestor = function (cond) {
+   ancestor = function (condition) {
       throw new NotImplementedYet()
    }
 
-   ancestorOrSelf = function (cond) {
+   ancestorOrSelf = function (condition) {
       throw new NotImplementedYet()
    }
 
-   following = function (cond) {
+   following = function (condition) {
       throw new NotImplementedYet()
    }
-   followingSibling = function (cond) {
-      throw new NotImplementedYet()
-   }
-
-   preceding = function (cond) {
-      throw new NotImplementedYet()
-   }
-   precedingSibling = function (cond) {
+   followingSibling = function (condition) {
       throw new NotImplementedYet()
    }
 
-   next = function (cond) {
+   preceding = function (condition) {
       throw new NotImplementedYet()
    }
-   previous = function (cond) {
+   precedingSibling = function (condition) {
       throw new NotImplementedYet()
    }
+
 
 
 }
@@ -737,11 +810,11 @@ class UnsupportedType extends TypeError {
  */
 class UnsupportedCondition extends TypeError {
    /**
-   * @param {*} cond The condition value
+   * @param {*} condition The condition value
    * @param {string[]} t List of supported data types
    */
-   constructor(cond, t) {
-      super(`Condition '${JSON.stringify(cond)}' must be a ${t.map(x => `'${x}'`).join(' or ')}`);
+   constructor(condition, t) {
+      super(`Condition '${JSON.stringify(condition)}' must be a ${t.map(x => `'${x}'`).join(' or ')}`);
    }
 }
 
@@ -750,10 +823,6 @@ class UnsupportedCondition extends TypeError {
  * @exception NotImplementedYet
  */
 class NotImplementedYet extends TypeError {
-   /**
-   * @param {*} cond The condition value
-   * @param {string[]} t List of supported data types
-   */
    constructor() {
       super(`Method not yet implemented`);
    }

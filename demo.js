@@ -12,7 +12,7 @@ const handle_book = [
 
 
 //const handle_ebook = [{ name: 'ebook', function: ebookHandler }];
-const parser = require('./twig.js').createParser(bookHandler, { method: 'sax' })
+const parser = require('./twig.js').createParser(rootHandler, { method: 'sax' })
 fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 
 
@@ -36,8 +36,15 @@ function bookHandler(elt) {
 
 
 
-function rootHandler(elt) {
-   console.log(`<${elt.name}> finished after ${elt.line} lines`);
+function rootHandler(elt) {   
+   let b = elt.children()[0].next();
+   while (b !== null) {
+      console.log(`<${b.name}> at line ${b.line}`);
+      b = b.next('title');
+   }
+
+
+
 }
 
 function anyHandler(elt) {
