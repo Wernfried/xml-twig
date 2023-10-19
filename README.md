@@ -27,7 +27,7 @@ XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [
 
 ## Installation
 
-Install module like any other node module and the desired underlaying parser:
+Install module like any other node module and the desired underlying parser:
 ```
 npm install xml-twig
 
