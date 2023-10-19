@@ -321,7 +321,7 @@ For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
 `.namespace` - object: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. 
 
-    Examnple `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
+   Examnple `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
 
 
 ## Limitations
