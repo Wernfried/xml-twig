@@ -317,7 +317,9 @@ For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
 `.declaration` - object: The XML-Declaration object, exist only on `root`. Example  `{version: '1.0', encoding: 'UTF-8'}`. 
 
-`.PI` - object: Processing Instruction, exist only on `root`. Example `{ target: 'xml-stylesheet', data: 'type="text/xsl" href="style.xsl"' }`. 
+`.PI` - object: Processing Instruction, exist only on `root`. 
+
+   Example `{ target: 'xml-stylesheet', data: 'type="text/xsl" href="style.xsl"' }`. 
 
 `.namespace` - object: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. 
 
