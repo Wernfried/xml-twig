@@ -107,7 +107,7 @@ Otherwise the element name must be equal to the string or Regular Expression. Yo
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
     * [.close](#Twig+close)
-    * [.addChild](#Twig+addChild)
+    * [.addChild](#Twig+addChild) ℗
     * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
@@ -218,7 +218,7 @@ Create a new Twig object
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
-Returns true if the element is empty, otherwise false.An empty element ha no text nor any child elements, however empty elements can have attributes.
+Returns `true` if the element is empty, otherwise false.An empty element has no text nor any child elements, however empty elements can have attributes.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if empty element  
@@ -232,14 +232,14 @@ Returns the level of the element. Root element has 0, children have 1, grand-chi
 <a name="Twig+isRoot"></a>
 
 ### twig.isRoot ⇒ <code>boolean</code>
-Returns true if element is the root object
+Returns `true` if element is the root object
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if root element  
 <a name="Twig+hasChildren"></a>
 
 ### twig.hasChildren ⇒ <code>boolean</code>
-Returns true if element has child elements
+Returns `true` if element has child elements
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if has child elements exists  
@@ -274,7 +274,7 @@ Returns the name of the element. Same as tag()
 <a name="Twig+tag"></a>
 
 ### twig.tag ⇒ <code>string</code>
-Returns the name of the element. Same as name()
+Returns the name of the element. Same as `twig.name`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> - Element name  
@@ -313,10 +313,11 @@ Closes the element
 
 <a name="Twig+addChild"></a>
 
-### twig.addChild
+### twig.addChild ℗
 Internal recursive function used by `writer()`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -352,7 +353,7 @@ Returns attriute value or `null` if not found.<br>If more than one  matches the
 Check if the attribute exist or not
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>boolean</code> - - Returns true if the attribute exists, else false  
+**Returns**: <code>boolean</code> - - Returns `true` if the attribute exists, else `false`  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -474,7 +475,7 @@ Common function to filter Twig elements from array
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
     * [.close](#Twig+close)
-    * [.addChild](#Twig+addChild)
+    * [.addChild](#Twig+addChild) ℗
     * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
@@ -585,7 +586,7 @@ Create a new Twig object
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
-Returns true if the element is empty, otherwise false.An empty element ha no text nor any child elements, however empty elements can have attributes.
+Returns `true` if the element is empty, otherwise false.An empty element has no text nor any child elements, however empty elements can have attributes.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if empty element  
@@ -599,14 +600,14 @@ Returns the level of the element. Root element has 0, children have 1, grand-chi
 <a name="Twig+isRoot"></a>
 
 ### twig.isRoot ⇒ <code>boolean</code>
-Returns true if element is the root object
+Returns `true` if element is the root object
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if root element  
 <a name="Twig+hasChildren"></a>
 
 ### twig.hasChildren ⇒ <code>boolean</code>
-Returns true if element has child elements
+Returns `true` if element has child elements
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if has child elements exists  
@@ -641,7 +642,7 @@ Returns the name of the element. Same as tag()
 <a name="Twig+tag"></a>
 
 ### twig.tag ⇒ <code>string</code>
-Returns the name of the element. Same as name()
+Returns the name of the element. Same as `twig.name`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> - Element name  
@@ -680,10 +681,11 @@ Closes the element
 
 <a name="Twig+addChild"></a>
 
-### twig.addChild
+### twig.addChild ℗
 Internal recursive function used by `writer()`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -719,7 +721,7 @@ Returns attriute value or `null` if not found.<br>If more than one  matches the
 Check if the attribute exist or not
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>boolean</code> - - Returns true if the attribute exists, else false  
+**Returns**: <code>boolean</code> - - Returns `true` if the attribute exists, else `false`  
 
 | Param | Type | Description |
 | --- | --- | --- |

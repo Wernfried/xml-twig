@@ -13,11 +13,7 @@ const handle_book = [
 
 //const handle_ebook = [{ name: 'ebook', function: ebookHandler }];
 const parser = require('./twig.js').createParser(bookHandler, { method: 'sax' })
-const parser2 = require('./twig.js').createParser(bookHandler, { method: 'expat' })
-//parser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
-parser2.write('<xml>Hello, <who name="world">world</who>!</xml>');
-//parser2.write('<xml>Hello, <who name="world">world</who>!</xml>');
-//fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
+fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 
 
 // partial load

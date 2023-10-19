@@ -400,8 +400,8 @@ class Twig {
    }
 
    /**
-   * Returns true if the element is empty, otherwise false.
-   * An empty element ha no text nor any child elements, however empty elements can have attributes.
+   * Returns `true` if the element is empty, otherwise false.
+   * An empty element has no text nor any child elements, however empty elements can have attributes.
    * @returns {boolean} true if empty element
    */
    get isEmpty() {
@@ -417,7 +417,7 @@ class Twig {
    }
 
    /**
-   * Returns true if element is the root object
+   * Returns `true` if element is the root object
    * @returns {boolean} true if root element
    */
    get isRoot() {
@@ -425,7 +425,7 @@ class Twig {
    }
 
    /**
-   * Returns true if element has child elements
+   * Returns `true` if element has child elements
    * @returns {boolean} true if has child elements exists
    */
    get hasChildren() {
@@ -464,7 +464,7 @@ class Twig {
       return this.#name;
    }
    /**
-   * Returns the name of the element. Same as name()
+   * Returns the name of the element. Same as `twig.name`
    * @returns {string} Element name
    */
    get tag() {
@@ -505,7 +505,7 @@ class Twig {
    * @param {XMLWriter} xw - The writer object
    * @param {Twig[]} children - Array of child elements
    */
-   addChild = function (xw, childArray) {
+   #addChild = function (xw, childArray) {
       for (let elt of childArray) {
          xw.startElement(elt.name);
          if (elt.text !== null)
@@ -514,7 +514,7 @@ class Twig {
             for (let key in elt.attributes)
                xw.writeAttribute(key, elt.attributes[key]);
          }
-         this.addChild(xw, elt.children());
+         this.#addChild(xw, elt.children());
          xw.endElement();
       }
    }
@@ -532,7 +532,7 @@ class Twig {
          xw.writeAttribute(key, this.#attributes[key]);
       if (this.#text !== null)
          xw.text(this.#text);
-      this.addChild(xw, this.#children);
+      this.#addChild(xw, this.#children);
       xw.endElement();
       return xw;
    }
@@ -555,7 +555,7 @@ class Twig {
    /**
    * Check if the attribute exist or not
    * @param {string} name - The name of the attribute
-   * @returns {boolean} - Returns true if the attribute exists, else false
+   * @returns {boolean} - Returns `true` if the attribute exists, else `false`
    */
    hasAttribute = function (name) {
       return this.#attributes[name] !== undefined;
