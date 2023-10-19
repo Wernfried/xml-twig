@@ -239,7 +239,7 @@ Here are some examples the get attribute and values:
 `.children(condition)` - **Twig[]**: All matching children of the current element or empty array
 
 `.next(condition)` - **Twig**: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element.<br> 
-Note, the root element is the **last** element (which returns `null`), not the first.
+Note, the `root` element is the **last** element, not the first!
 
 `.previous(condition)` - **Twig**: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
 
