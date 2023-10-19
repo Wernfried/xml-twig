@@ -1,8 +1,6 @@
 # xml-twig
 Node module for processing huge XML documents in tree mode
 
-Designed with node in mind, but should work fine in the browser or other CommonJS implementations.
-
 Inspired by Perl module [XML::Twig](https://metacpan.org/pod/XML::Twig)
 
 
