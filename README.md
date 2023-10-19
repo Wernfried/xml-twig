@@ -137,10 +137,10 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
       console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${elt.line}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
 
-      // Be aware if you run methods like elt.followingSibling(), elt.descendant(), elt.next(), etc. on the current element.
-      // Such calls return emtpy result, becausse following element are not yet read from the file.
+      // Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `elt.next()`, etc. on the current element.
+      // Such calls return emtpy result, because following element are not yet read from the XML file.
       // You must navigate to an earlier element, e.g. 
-      elt.root().children()[0].followingSibling();
+      `elt.root().children()[0].followingSibling()`
    }
 
    const handle_any = [ { function: anyHandler } ];
