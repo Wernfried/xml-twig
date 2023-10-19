@@ -198,11 +198,11 @@ For details about other options, see [ParserOptions](./doc/twig.md#ParserOptions
 
 #### Get XML Attributes
 
-`.hasAttribute(name)`: Checks if the attribute exists and returns true or false
+`.hasAttribute(name)`: Checks if the attribute exists and returns `true` or `false`
 
-`.attr(cond)`: Returns the value of attribute. If more than one attribute match, then it returns all attributes as object
+`.attr(cond)`: Returns the value of attribute. If more than one attribute matches, then it returns all attributes as object
 
-`.attribute(cond)`: Get attrbitues as object or `null` if not matching attribute found. If `cond` is `undefined`, then all attributes are retured.
+`.attribute(cond)`: Get attributes as object or `null` if no matching attribute was found. If `cond` is `undefined`, then all attributes are returned.
 
    Specify attribute name or regular expression or custom condition. For details see [AttributeCondition](./doc/twig.md#AttributeCondition).<br>
    Let's assume an XML element like this: `<person firstName="Jean-Luc", lastName="Picard", age="59" />` 
@@ -230,42 +230,42 @@ Here are some examples the get attribute and values:
 
 #### Get XML Elements
 
-`.root()` - Twig: The topmost element of the tree
+`.root()` - **Twig**: The topmost element of the tree
 
-`.self()` - Twig: The current element
+`.self()` - **Twig**: The current element
 
-`.parent()` - Twig: The parent of the current element
+`.parent()` - **Twig**: The parent of the current element
 
-`.children(condition)` - Twig[]: All matching children of the current element or empty array
+`.children(condition)` - **Twig[]**: All matching children of the current element or empty array
 
-`.next(condition)` - Twig: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element.<br> 
+`.next(condition)` - **Twig**: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element.<br> 
 Note, the root element is the **last** element (which returns `null`), not the first.
 
-`.previous(condition)` - Twig: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
+`.previous(condition)` - **Twig**: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
 
-`.first(condition)` - Twig: Returns the first elt (optionally matching condition) element. Usually this is the first element without any children. Used as starting point when you loop through entire document with `.next()`
+`.first(condition)` - **Twig**: Returns the first elt (optionally matching condition) element. Usually this is the first element without any children. Used as starting point when you loop through entire document with `.next()`
 
-`.last(condition)` - Twig: Returns the last elt (optionally matching condition) element. Usually this is root element.
+`.last(condition)` - **Twig**: Returns the last elt (optionally matching condition) element. Usually this is root element.
 
-`.ancestor(condition)` - Twig[]: All ancestors (parent, grandparent, etc.) of the current element (optionally matching condition) or an empty array.
+`.ancestor(condition)` - **Twig[]**: All ancestors (parent, grandparent, etc.) of the current element (optionally matching condition) or an empty array.
 
-`.ancestorOrSelf(condition)` - Twig[]: All ancestors (parent, grandparent, etc.) of the current element and the current element itself (optionally matching condition) or an empty array.
+`.ancestorOrSelf(condition)` - **Twig[]**: All ancestors (parent, grandparent, etc.) of the current element and the current element itself (optionally matching condition) or an empty array.
 
-`.descendant(condition)` - Twig[]: All descendants (children, grandchildren, etc.) of the current element (optionally matching condition) or an empty array.
+`.descendant(condition)` - **Twig[]**: All descendants (children, grandchildren, etc.) of the current element (optionally matching condition) or an empty array.
 
-`.descendantOrSelf(condition)` - Twig[]: All descendants (children, grandchildren, etc.) of the current element and the current element itself (optionally matching condition) or an empty array.
+`.descendantOrSelf(condition)` - **Twig[]**: All descendants (children, grandchildren, etc.) of the current element and the current element itself (optionally matching condition) or an empty array.
 
-`.sibling(condition)` - Twig[]: All siblings (optionally matching condition) before and after the current element or an empty array.
+`.sibling(condition)` - **Twig[]**: All siblings (optionally matching condition) before and after the current element or an empty array.
 
-`.siblingOrSelf(condition)` - Twig[]: All siblings (optionally matching condition) before and after the current element or an empty array.
+`.siblingOrSelf(condition)` - **Twig[]**: All siblings (optionally matching condition) before and after the current element or an empty array.
 
-`.followingSibling(condition)` - Twig[]: All siblings (optionally matching condition) after the current element or an empty array.
+`.followingSibling(condition)` - **Twig[]**: All siblings (optionally matching condition) after the current element or an empty array.
 
-`.precedingSibling(condition)` - Twig[]: All siblings (optionally matching condition) before the current element or an empty array.
+`.precedingSibling(condition)` - **Twig[]**: All siblings (optionally matching condition) before the current element or an empty array.
 
-`.nextSibling(condition)` - Twig: Returns the next (optionally matching condition) sibling element. 
+`.nextSibling(condition)` - **Twig**: Returns the next (optionally matching condition) sibling element. 
 
-`.prevSibling(condition)` - Twig: Returns the previous (optionally matching condition) sibling element. 
+`.prevSibling(condition)` - **Twig**: Returns the previous (optionally matching condition) sibling element. 
 
 
 find(condition)
