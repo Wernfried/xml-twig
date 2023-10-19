@@ -1,105 +1,122 @@
-const fs = require('fs');
-
 const SAX = 'sax';
 const EXPAT = 'expat';
 
-//https://metacpan.org/pod/XML::Twig#XML::Twig::Elt
-
-//const XMLWriter = require('xml-writer');
-
-// Generate doc/twog.md with `jsdoc2md --private twig.js > ..\doc\twig.md`
-//https://github.com/jsdoc2md/jsdoc-to-markdown
-
-
-
-
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment
-
-
+let tree;
+let current;
 
 /**
  * Optional options for the Twig parser
  * @typedef ParserOptions 
- * @param {string} method - The underlaying parser. Either SAX or EXPAT.
- * @param {string} encoding - Encoding of the XML File. Applies only to EXPAT parser.
- * @param {boolean} xmlns - If true, then namespaces are supported.
+ * @param {string} method - The underlaying parser. Either `'sax'` or `'expat'`.
+ * @param {string} encoding - Encoding of the XML File. Applies only to `expat` parser.
+ * @param {boolean} xmlns - If true, then namespaces are accessible by `namespace` property.
  * @param {boolean} trim - If true, then turn any whitespace into a single space.
  * @param {boolean} resumeAfterError - If true then parser continues reading after an error. Otherwiese it throws exception.
  * @param {boolean} partial - It true then unhandled elements are purged.
  * @example { encoding: 'UTF-8', xmlns: true }
- * @default  { method: EXPAT, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }
+ * @default  { method: 'expat', encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }
  */
 
 
 /**
-* Handler functions for Twig objects.<br>
-* If `name` is not specified, then handler is called on every element. Otherwise the element name must be equal to the string or Regular Expression
+* Reference to handler functions for Twig objects.<br>
+* If `name` is not specified, then handler is called on every element.<br>
+* Otherwise the element name must be equal to the string or Regular Expression. You can specify custom function
 * @typedef TwigHandler 
-* @param {?string|RegExp} name - Name of handled element or any element if not specified
-* @param {function} function - Definition of handler function, either anonymous or explict function
+* @param {?string|RegExp|ElementCondition} name - Name of handled element or any element if not specified
+* @param {function} HandlerFunction - Definition of handler function, either anonymous or explict function
+*/
+
+/**
+* Handler function for Twig objects, i.e. the way you like to use the XML element.
+* @typedef HandlerFunction 
+* @param {Twig} elt - The current Twig element on which the function was called.
 */
 
 
 
-let tree;
-let current;
+/**
+* Optional condition to get elements<br> 
+* - If `undefined`, then all elements are returned.<br> 
+* - If `string` then the element name must be equal to the string
+* - If `RegExp` then the element name must match the Regular Expression
+* - If [ElementConditionFilter](#ElementConditionFilter) then the element must filter function 
+* - Use [Twig](#Twig) object to find a specific element (rarely used in `createParser(handler)`)
+* @typedef {string|RegExp|ElementConditionFilter|Twig} ElementCondition 
+*/
+
+/**
+* 
+* Custom filter function to get desired elements
+* @typedef {function} ElementConditionFilter 
+* @param {string} name - Name of the element
+* @param {Twig} elt - The full Twig object
+*/
+
 
 /**
  * Create a new Twig parser
  * @param {TwigHandler|TwigHandler[]} handler - Function or array of function to handle elements
  * @param {?ParserOptions} options - Object of optional options 
  * @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` (default) and `sax` are supported.
- * @example 
- * function rootHandler(tree, elt) {
- *   console.log(elt.name);
- * }
- * createParser(rootHandler, { method: SAX });
- * @example 
- * function oneHandlerForAll(tree, elt) {
- *   console.log(elt.name);
- * }
- * createParser(
- *   [ {function: oneHandlerForAll} ], 
- *   { method: SAX }
- * );
- * @example 
- * function bookHandler(tree, elt) {
- *   console.log(elt.name);
- * }
- * function customerHandler(tree, elt) {
- *   console.log(elt.name);
- * }
- * createParser(
- *   [ {name: 'book', function: bookHandler}, {name: 'customer', function: customerHandler} ], 
- *   { method: SAX }
- * );
  */
 function createParser(handler, options) {
    options = Object.assign({ method: EXPAT, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }, options)
    let parser;
-   let events = {};
    let namespaces = {};
+   let closeEvent;
+
+   // `parser.on("...", err =>  {...}` does not work, because I need access to 'this'
 
    if (options.method === SAX) {
       // Set options to have the same behaviour as in expat
       parser = require("sax").createStream(true, { strictEntities: true, position: true, xmlns: options.xmlns, trim: options.trim });
 
-      events = { method: SAX, create: "opentagstart", close: "closetag" };
+      closeEvent = "closetag";
+      parser.on("opentagstart", function (node) {
+         if (tree === undefined) {
+            tree = new Twig(node.name, current);
+         } else {
+            if (current.isRoot && current.name === undefined) {
+               current.setRoot(node.name);
+            } else {
+               let cur = new Twig(node.name, current);
+            }
+         }
+         if (options.xmlns) {
+            if (node.name.includes(':')) {
+               let prefix = node.name.split(':')[0];
+               if (namespaces[prefix] !== undefined) {
+                  Object.defineProperty(current, 'namespace', {
+                     value: { local: prefix, uri: namespaces[prefix] },
+                     writable: false,
+                     enumerable: true
+                  });
+               }
+            }
+         }
+      })
 
-      // parser.on("error", err =>  {...} does not work, because I need access to 'this'
       parser.on("processinginstruction", function (pi) {
          if (pi.name === 'xml') {
+            // SAX parser handles XML declaration as Processing Instruction
             let declaration = {};
             for (let item of pi.body.split(' ')) {
                let [k, v] = item.split('=');
                declaration[k] = v.replaceAll('"', '').replaceAll("'", '');
             }
             tree = new Twig(null);
-            current.declaration = declaration;
+            Object.defineProperty(tree, 'declaration', {
+               value: declaration,
+               writable: false,
+               enumerable: true
+            });
          } else {
-            tree.PI = { target: pi.name, data: pi.body };
+            Object.defineProperty(tree, 'PI', {
+               value: { target: pi.name, data: pi.body },
+               writable: false,
+               enumerable: true
+            });
          }
       })
 
@@ -107,7 +124,11 @@ function createParser(handler, options) {
          current.attribute(attr.name, attr.value);
          if (attr.uri !== undefined && attr.uri !== '') {
             namespaces[attr.local] = attr.uri;
-            current.namespace = { local: attr.local, uri: attr.uri };
+            Object.defineProperty(current, 'namespace', {
+               value: { local: attr.local, uri: attr.uri },
+               writable: false,
+               enumerable: true
+            });
          }
       })
       parser.on("cdata", function (str) {
@@ -116,13 +137,40 @@ function createParser(handler, options) {
 
       if (typeof handler === 'function') {
          parser.on("end", function () {
-            handler(tree);
+            if (typeof handler === 'function')
+               handler(tree);
          })
       }
    } else if (options.method === EXPAT) {
       parser = require("node-expat").createParser();
       parser.encoding = options.encoding;
-      events = { method: EXPAT, create: "startElement", close: "endElement" };
+      closeEvent = "endElement";
+
+      parser.on("startElement", function (name, attrs) {
+         if (tree === undefined) {
+            tree = new Twig(name, current, attrs);
+         } else {
+            if (current.isRoot && current.name === undefined) {
+               current.setRoot(name);
+            } else {
+               let cur = new Twig(name, current, attrs);
+            }
+         }
+         if (options.xmlns) {
+            for (let key of Object.keys(attrs).filter(x => x.startsWith('xmlns:')))
+               namespaces[key.split(':')[1]] = attrs[key];
+            if (name.includes(':')) {
+               let prefix = name.split(':')[0];
+               if (namespaces[prefix] !== undefined) {
+                  Object.defineProperty(current, 'namespace', {
+                     value: { local: prefix, uri: namespaces[prefix] },
+                     writable: false,
+                     enumerable: true
+                  });
+               }
+            }
+         }
+      })
 
       parser.on('xmlDecl', function (version, encoding, standalone) {
          tree = new Twig(null);
@@ -130,7 +178,11 @@ function createParser(handler, options) {
          if (version !== undefined) dec.version = version;
          if (encoding !== undefined) dec.encoding = encoding;
          if (standalone !== undefined) dec.standalone = standalone;
-         current.declaration = dec;
+         Object.defineProperty(tree, 'declaration', {
+            value: dec,
+            writable: false,
+            enumerable: true
+         });
       })
 
       parser.on('processingInstruction', function (target, data) {
@@ -140,78 +192,68 @@ function createParser(handler, options) {
       throw new UnsupportedParser(options.method);
    }
 
-   parser.on(events.create, function (node, attrs) {
-      let name = node;
-      if (events.method === SAX)
-         name = node.name;
-
-      if (tree === undefined) {
-         tree = new Twig(name, current, attrs);
-      } else {
-         if (current.isRoot && current.name === undefined) {
-            current.setRoot(name);
-         } else {
-            let elt = new Twig(name, current, attrs);
-         }
+   parser.on(closeEvent, function (name) {
+      let pos;
+      if (options.method === SAX) {
+         pos = { line: this._parser.line + 1, column: this._parser.column + 1 };
+      } else if (options.method === EXPAT) {
+         pos = { line: this.parser.getCurrentLineNumber(), column: this.parser.getCurrentColumnNumber() };
       }
-      if (options.xmlns) {
-         if (events.method === SAX && name.includes(':')) {
-            let prefix = name.split(':')[0];
-            if (namespaces[prefix] !== undefined)
-               current.namespace = { local: prefix, uri: namespaces[prefix] };
-         } else if (events.method === EXPAT) {
-            for (let key of Object.keys(attrs).filter(x => x.startsWith('xmlns:')))
-               namespaces[key.split(':')[1]] = attrs[key];
-            if (name.includes(':')) {
-               let prefix = name.split(':')[0];
-               if (namespaces[prefix] !== undefined)
-                  current.namespace = { local: prefix, uri: namespaces[prefix] };
+      current.close(pos);
+
+      if (typeof handler === 'function' && options.method === EXPAT && current.isRoot) {
+         // Entire XML file was parsed at once. EXPAT parser has no event "document end", so trigger at "endElement" of root object
+         handler(tree);
+      } else {
+         for (let hndl of Array.isArray(handler) ? handler : [handler]) {
+            if (hndl.name === undefined) {
+               hndl.function(current ?? tree);
+            } else if (typeof hndl.name === 'string' && name === hndl.name) {
+               hndl.function(current ?? tree);
+            } else if (hndl.name instanceof RegExp && hndl.name.test(name)) {
+               hndl.function(current ?? tree);
+            } else if (typeof hndl.name === 'function' && hndl.name(name, current ?? tree)) {
+               hndl.function(current ?? tree);
             }
          }
       }
+
+      current = current.parent();
    })
 
-   parser.on(events.close, function (name) {
-      let pos;
-      if (events.method === SAX) {
-         pos = { line: this._parser.line + 1, column: this._parser.column + 1 };
-      } else if (events.method === EXPAT) {
-         pos = { line: this.parser.getCurrentLineNumber(), column: this.parser.getCurrentColumnNumber() };
-      }
-      console.log(`Close ${current.name}`);
-      current.close(pos);
-
-      /*if (typeof handler === 'function' && events.method === EXPAT && current === undefined) {
-         handler(tree);
-      } else if (Array.isArray(handler)) {
-         if (typeof handler.name === 'string' && name === handler.name)
-            handler.function
-         else if (typeof handler.includes === 'string' && name.includes(handler.includes))
-            handler.function
-         else if (handler.name instanceof RegExp && handler.regex.test(name))
-            handler.function;
-      }*/
-   })
-
-
+   // Common events
    parser.on('text', function (str) {
       current.text = options.trim ? str.trim() : str;
    })
 
    parser.on("comment", function (str) {
-      current.comment = options.trim ? str.trim() : str;;
+      if (current.hasOwnProperty('comment')) {
+         if (typeof current.comment === 'string') {
+            current.comment = [current.comment, str.trim()]
+         } else {
+            current.comment.push(str.trim());
+         }
+      } else {
+         Object.defineProperty(current, 'comment', {
+            value: str.trim(),
+            writable: true,
+            enumerable: true,
+            configurable: true
+         });
+      }
+
    })
 
    parser.on('error', function (err) {
       let p;
-      if (events.method === SAX) {
+      if (options.method === SAX) {
          p = this._parser;
          console.error(`error at line [${p.line + 1}], column [${p.column + 1}]`, err);
-      } else if (events.method === EXPAT) {
+      } else if (options.method === EXPAT) {
          p = this.parser;
          console.error(`error at line [${p.getCurrentLineNumber()}], column [${p.getCurrentColumnNumber()}]`, err);
       }
-      if (resumeAfterError) {
+      if (options.resumeAfterError) {
          p.error = null;
          p.resume();
       }
@@ -242,26 +284,25 @@ class Twig {
    * @param {string|number} value - Value of the attribute
    */
 
-
    /**
-   * Optional condition to get elements<br> 
-   * - If `undefined`, then all elements are returned.<br> 
-   * - If `string` then the element name must be equal to the string
-   * - If `RegExp` then the element name must match the Regular Expression
-   * - If [ElementConditionFilter](#ElementConditionFilter) then the element must filter function 
-   * - Use [Twig](#Twig) object to find a specific element
-   * @typedef {string|RegExp|ElementConditionFilter|Twig} ElementCondition 
+   * XML Processing Instruction object, exist only on root
+   * @typedef {object} #PI 
    */
 
    /**
-   * 
-   * Custom filter function to get desired elements
-   * @typedef {function} ElementConditionFilter 
-   * @param {string} name - Name of the element
-   * @param {Twig} elt - The full element Twig object
+   * XML Declaration object, exist only on root
+   * @typedef {object} #declaration 
    */
 
+   /**
+   * XML namespace of element. Exist onl when parsed with `xmlns: true`
+   * @typedef {object} #namespace 
+   */
 
+   /**
+   * Comment or array of comments inside the XML Elements
+   * @typedef {string|string[]} #comment 
+   */
 
    /**
    * @property {?object} #attributes - XML attribute `{ <attribute 1>: <value 1>, <attribute 2>: <value 2>, ... }`
@@ -273,7 +314,7 @@ class Twig {
    * @property {?string|number} #text - Content of XML Element
    * @private
    */
-   #text;
+   #text = null;
 
    /**
    * @property {string} #name - The XML tag name
@@ -306,30 +347,6 @@ class Twig {
    #level;
 
    /**
-   * @property {object} #namespace - XML Namespace of the element. Only used when parsed  with `xmlns: true`
-   * @private
-   */
-   #namespace;
-
-   /**
-   * @property {object} #declaration - XML Declaration object, exist only on root
-   * @private
-   */
-   #declaration;
-
-   /**
-   * @property {object} #PI - XML Declaration object, exist only on root
-   * @private
-   */
-   #PI;
-
-   /**
-   * @property {string|string[]} #comment - Comment inside the XML Elements
-   * @private
-   */
-   #comment;
-
-   /**
    * Create a new Twig object
    * @param {string} name - The name of the XML element
    * @param {Twig} parent - The parent object
@@ -338,7 +355,6 @@ class Twig {
    constructor(name, parent, attributes) {
       current = this;
       if (name === null) {
-         console.log(`Create empty root`);
          // Root element not available yet
          tree = this;
          this.#level = 0;
@@ -347,20 +363,38 @@ class Twig {
          if (attributes !== undefined)
             this.#attributes = attributes;
          if (parent === undefined) {
-            console.log(`Create root element ${name}`);
             tree = this;
             this.#level = 0;
          } else {
             this.#parent = parent;
             this.#level = this.#parent.#level + 1;
             parent.#children.push(this);
-            console.log(`Create element ${name} in ${current.#parent.#name}`);
          }
       }
    }
 
+   /**
+   * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
+   * @param {?Twig} elt - If defined then it purges up to the elt element. If undefined the the current element is purged
+   */
+   purge() {
+      if (!this.isRoot)
+         this.#parent.#children = this.#parent.#children.filter(x => !Object.is(this, x));
+   }
+
+   /**
+   * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
+   * @param {?Twig} elt - If defined then it purges up to the elt element. If undefined the the current element is purged
+   */
+   purgeUpTo(elt) {
+      throw new NotImplementedYet();
+   }
+
+   /**
+   * Sets the name of root element. In some cases the root is created before the XML-Root element is available
+   * @param {string} name - The tag names
+   */
    setRoot(name) {
-      console.log(`Update root element to ${name}`);
       if (this.isRoot)
          this.#name = name;
    }
@@ -371,11 +405,11 @@ class Twig {
    * @returns {boolean} true if empty element
    */
    get isEmpty() {
-      return this.#text === undefined && this.#children.length == 0;
+      return this.#text === null && this.#children.length == 0;
    }
 
    /**
-   * Returns the level of the element. Root element has 0, children jave 1, grand-children 2 and so on
+   * Returns the level of the element. Root element has 0, children have 1, grand-children 2 and so on
    * @returns {number} The level of the element. 
    */
    get level() {
@@ -391,17 +425,6 @@ class Twig {
    }
 
    /**
-   * Returns the root object
-   * @returns {Twig} The root element of XML tree
-   */
-   get root() {
-      if (this.isRoot)
-         return this
-      else
-         return root(this.#parent);
-   }
-
-   /**
    * Returns true if element has child elements
    * @returns {boolean} true if has child elements exists
    */
@@ -409,13 +432,28 @@ class Twig {
       return this.#children.length > 0;
    }
 
-
    /**
    * Returns the line where current element is closed
    * @returns {number} Current line
    */
-   get currentLine() {
+   get line() {
       return this.#postion.line;
+   }
+
+   /**
+   * Returns the column where current element is closed
+   * @returns {number} Current column
+   */
+   get column() {
+      return this.#postion.column;
+   }
+
+   /**
+   * The position in #children array. For root object 0
+   * @returns {number} Position of element in parent
+   */
+   get index() {
+      return this.isRoot ? 0 : this.#parent.#children.indexOf(this);
    }
 
    /**
@@ -430,7 +468,7 @@ class Twig {
    * @returns {string} Element name
    */
    get tag() {
-      return this.name();
+      return this.#name;
    }
 
    /**
@@ -449,76 +487,9 @@ class Twig {
    set text(value) {
       if (!['string', 'number', 'bigint'].includes(typeof value))
          throw new UnsupportedType(value);
-      this.#text = this.#text ?? '' + value.toString();
+      if (value !== '')
+         this.#text = this.#text ?? '' + value;
    }
-
-   /**
-   * Comment in element. A XML Element may contain an array of multiple comments.
-   * @returns {string|string[]} The comment or an array of all comments
-   */
-   get comment() {
-      return this.#comment;
-   }
-   /**
-   * Modifies the comment of the element. A XML Element may contain an array of multiple comments.
-   * @param {string} str - New comment to be added
-   */
-   set comment(str) {
-      if (this.#comment === undefined)
-         this.#comment = str
-      else if (typeof this.#comment === 'string')
-         this.#comment = [this.#comment, str]
-      else
-         this.#comment.push(str);
-   }
-
-   /**
-   * The XML declaration. Available only on root element.
-   * @returns {string} The declaration of the XML
-   */
-   get declaration() {
-      return this.isRoot ? null : this.#declaration;
-   }
-   /**
-   * Set the XML declaration
-   * @param {object} dec - The XML declaration, e.g. `{ version: "1.0", encoding:"UTF-8" }`
-   */
-   set declaration(dec) {
-      if (this.isRoot)
-         this.#declaration = dec;
-   }
-
-   /**
-   * The XML declaration. Available only on root element.
-   * @returns {string|string[]} The declaration of the XML
-   */
-   get PI() {
-      return this.isRoot ? null : this.#PI;
-   }
-   /**
-   * Set Processing Instruction. According ty my knowlege a XML must not contain more than one PI
-   * @param {object} pi - The Processing Instruction object in form of `{ target: <target>, data: <instruction> }`. 
-   */
-   set PI(pi) {
-      if (this.isRoot)
-         this.#PI = pi;
-   }
-
-   /**
-   * The XML namespace
-   * @returns {object} The XML namespace of the element
-   */
-   get namespace() {
-      return this.#namespace;
-   }
-   /**
-   * Set the XML namespace
-   * @param {object} nw - XML namespace definition
-   */
-   set namespace(ns) {
-      this.#namespace = ns;
-   }
-
 
    /**
    * Closes the element
@@ -527,45 +498,58 @@ class Twig {
    close = function (pos) {
       this.#postion = pos;
       Object.seal(this);
-      current = this.#parent;
    }
 
-
-
-
-   dump = function (indented) {
-      addChild = function (xw, elements) {
-         for (let child of elements) {
-            xw.startElement(child);
-            this.writer.addChild(xw, child);
-            xw.endElement();
+   /**
+   * Internal recursive function used by `writer()`
+   * @param {XMLWriter} xw - The writer object
+   * @param {Twig[]} children - Array of child elements
+   */
+   addChild = function (xw, childArray) {
+      for (let elt of childArray) {
+         xw.startElement(elt.name);
+         if (elt.text !== null)
+            xw.text(elt.text);
+         if (elt.attributes !== null) {
+            for (let key in elt.attributes)
+               xw.writeAttribute(key, elt.attributes[key]);
          }
+         this.addChild(xw, elt.children());
+         xw.endElement();
       }
+   }
 
+   /**
+   * Creates xml-writer from current element
+   * @param {?boolean|string} indented - `true` or intention character
+   * @returns 
+   */
+   writer = function (indented) {
       const XMLWriter = require('xml-writer');
-      const xw = new XMLWriter(indented);
+      let xw = new XMLWriter(indented);
       xw.startElement(this.#name);
       for (let key in this.#attributes)
          xw.writeAttribute(key, this.#attributes[key]);
-      if (this.#text !== undefined && this.#text !== null)
+      if (this.#text !== null)
          xw.text(this.#text);
-
-      addChild(xw, this.#children);
-      xw.endDocument();
-
+      this.addChild(xw, this.#children);
+      xw.endElement();
       return xw;
    }
 
 
-
    /**
-   * 
-   * @param {string} name - The name of the attribute
-   * @returns {string|number} - The value of the attrubute or `null` if the attribute does not exist
+   * Returns attriute value or `null` if not found.<br>
+   * If more than one  matches the condition, then it returns object as [attribute()](#attribute)
+   * @param {?AttributeCondition} cond - Optional condition to select attribute
+   * @returns {string|number|object} - The value of the attrubute or `null` if the  does not exist
    */
-   attr = function (name) {
-      let attr = attribute(name);
-      return attr === null ? null : attribute(cond).value;
+   attr = function (cond) {
+      let attr = this.attribute(cond);
+      if (attr === null)
+         return null;
+
+      return Object.keys(attr).length === 1 ? attr[Object.keys(attr)[0]] : attr;
    }
 
    /**
@@ -574,10 +558,8 @@ class Twig {
    * @returns {boolean} - Returns true if the attribute exists, else false
    */
    hasAttribute = function (name) {
-      return attribute(name) !== null;
+      return this.#attributes[name] !== undefined;
    }
-
-
 
    /**
    * Retrieve or update XML attribute.
@@ -595,7 +577,7 @@ class Twig {
          if (cond === undefined) {
             attr = this.#attributes;
          } else if (typeof cond === 'function') {
-            attr = Object.fromEntries(Object.entries(this.#attributes).filter(([key, text]) => cond(key, text)));
+            attr = Object.fromEntries(Object.entries(this.#attributes).filter(([key, val]) => cond(key, val)));
          } else if (typeof cond === 'string') {
             attr = this.attribute(key => { return key === cond });
          } else if (cond instanceof RegExp) {
@@ -608,11 +590,11 @@ class Twig {
          return attr === null || Object.keys(attr).length == 0 ? null : attr;
       } else {
          if (text === null) {
-            delete this.#attributes[code];
+            delete this.#attributes[cond];
          } else {
             if (!['string', 'number', 'bigint'].includes(typeof text))
                throw new UnsupportedType(text);
-            if (typeof text !== 'string')
+            if (typeof cond !== 'string')
                throw new UnsupportedCondition(cond, ['string']);
             this.#attributes[cond] = text;
          }
@@ -620,59 +602,105 @@ class Twig {
    }
 
    /**
+   * Returns the root object
+   * @returns {Twig} The root element of XML tree
+   */
+   root = function () {
+      if (this.isRoot) {
+         return this;
+      } else {
+         let ret = this.#parent;
+         while (!ret.isRoot) {
+            ret = ret.#parent;
+         }
+         return ret;
+      }
+   }
+
+   /**
    * Returns the parent element or null if root element
    * @returns {Twig} The parament element
    */
-   get parent() {
+   parent = function () {
       return this.isRoot ? null : this.#parent;
    }
 
-
-   child = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
-   descendant = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
-   descendantOrSelf = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
-
-   ancestor = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
-   ancestorOrSelf = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
-   following = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-   followingSibling = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
-   preceding = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-   precedingSibling = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
-   next = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-   previous = function (filter, strict = false) {
-      throw new NotImplementedYet()
-   }
-
+   /**
+   * @returns {Twig} - The current element
+   */
    self = function () {
       return this;
    }
+
+   /**
+   * Common function to filter Twig elements from array
+   * @param {Twig[]} elts  - Array of elements you like to filter
+   * @param {?ElementCondition} condition - The filter condition
+   * @returns {Twig[]} List of matching elements or empty array
+   */
+   filterElements(elts, condition) {
+      if (condition === undefined) {
+         return elts;
+      } else if (typeof condition === 'string') {
+         return elts.filter(x => x.name === condition);
+         //return this.filterElements(elts, x => { return x === condition });
+      } else if (condition instanceof RegExp) {
+         return elts.filter(x => x.condition.test(x.name));
+      } else if (condition instanceof Twig) {
+         return elts.filter(x => Object.is(x, condition));
+      } else if (typeof condition === 'function') {
+         return elts.filter(x => condition(x.name, x));
+      }
+   }
+
+   /**
+   * All children, optionally matching `cond` of the current element or empty array 
+   * @condition {?ElementCondition} cond - Optional condition
+   * @returns {Twig[]} 
+   */
+   children = function (cond) {
+      return this.filterElements(this.#children, cond);
+   }
+
+
+   descendant = function (cond) {
+      throw new NotImplementedYet()
+   }
+
+   descendantOrSelf = function (cond) {
+      throw new NotImplementedYet()
+   }
+
+
+   ancestor = function (cond) {
+      throw new NotImplementedYet()
+   }
+
+   ancestorOrSelf = function (cond) {
+      throw new NotImplementedYet()
+   }
+
+   following = function (cond) {
+      throw new NotImplementedYet()
+   }
+   followingSibling = function (cond) {
+      throw new NotImplementedYet()
+   }
+
+   preceding = function (cond) {
+      throw new NotImplementedYet()
+   }
+   precedingSibling = function (cond) {
+      throw new NotImplementedYet()
+   }
+
+   next = function (cond) {
+      throw new NotImplementedYet()
+   }
+   previous = function (cond) {
+      throw new NotImplementedYet()
+   }
+
 
 }
 
@@ -734,7 +762,7 @@ class NotImplementedYet extends TypeError {
 
 
 
-module.exports = { createParser };
+module.exports = { createParser, Twig };
 
 /*
 // All events emit with a single argument. To listen to an event, assign a function to on<eventname>. 

@@ -1,35 +1,76 @@
 const fs = require('fs');
 
+const handle_entire_file = rootHandler;
+
+const handle_every_element = { function: anyHandler };
+
+const handle_book = [
+   { name: 'book', function: bookHandler },
+   { name: 'ebook', function: bookHandler }
+];
 
 
 
-const expatParser = require('./twig.js').createParser(handler, { method: 'expat', xmlns:true })
-fs.createReadStream(`${__dirname}/samples/xmlns2.xml`).pipe(expatParser);
-
-//const saxParser = require('./twig.js').createParser(handler, { method: 'sax' })
-//fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(saxParser);
-
-
-//const parser = require('./twig.js').createParser(handler)
-//fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
+//const handle_ebook = [{ name: 'ebook', function: ebookHandler }];
+const parser = require('./twig.js').createParser(bookHandler, {method: 'sax'} )
+//parser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
+fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 
 
+// partial load
+// purge-up-to
+// accessort
 
-function handler(tree, elt) {
-   console.log("Done");
-   console.log(tree.name);
-   console.log(tree.currentLine);
+function bookHandler(elt) {
+   //console.log(`${elt.name} -> ${elt.index}`)
+let w = elt.root().writer(true);
+let t = elt.children();
+let tt = elt.children("ebook");
+let ttt = elt.children((x, elt) => {return elt.name === 'ebook'});
+
+   console.log(elt.root().writer(true).toString());
+   //elt.purge();
+   console.log(elt.root().writer(true).toString());
+   
+}
+
+
+
+function rootHandler(elt) {
+   console.log(`<${elt.name}> finished after ${elt.line} lines`);
+}
+
+function anyHandler(elt) {
+   console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${elt.line}`);
 }
 
 
 
 /*
-const obj = new Elt('tag', null, { firstName: 'Jean-Luc', lastName: 'Picard', age: 59 });
-console.log(`attribute => ${JSON.stringify(obj.attribute())}`);
-console.log(`attribute("FIRSTNAME") => ${JSON.stringify(obj.attribute("FIRSTNAME"))}`);
-console.log(`attribute("firstName") => ${JSON.stringify(obj.attribute("firstName"))}`);
-console.log(`attribute({includes: 'Name'}) => ${JSON.stringify(obj.attribute({ includes: 'Name' }))}`);
-console.log(`attribute({includes: 'name'}) => ${JSON.stringify(obj.attribute({ includes: 'name' }))}`);
-console.log(`attribute => ${JSON.stringify(obj.attribute((attr, val) => { return attr === 'age' && val > 50 }))}`);
-console.log(`attribute(/name/i) => ${JSON.stringify(obj.attribute(/name/i))}`);
+
+const twig = require('./twig.js');
+
+
+
+const obj = new twig.Twig('tag', null, { firstName: 'Jean-Luc', lastName: 'Picard', age: 59 });
+
+console.log(obj.attr('lastName'));
+console.log(obj.attr(attr => { return ['firstName', 'lastName'].includes(attr) }));
+console.log(obj.attr('lastName'));
+console.log(obj.attr('lastName'));
+
+/*
+elt.hasAttribute('foo')                                                     => false
+elt.hasAttribute('age')                                                     => true
+elt.attr('lastName')                                                        => Picard
+
+elt.attribute()                                                              => { "firstName": "Jean-Luc", "lastName": "Picard", "age":59 }
+elt.attribute("FIRSTNAME")                                                   => null
+elt.attribute("firstName")                                                   => { "firstName": "Jean-Luc" }
+
+elt.attribute(attr => { return ['firstName', 'lastName'].includes(attr) }))  => { "firstName": "Jean-Luc", "lastName": "Picard" }
+elt.attribute(attr => { return attr.includes('Name') }))                     => { "firstName": "Jean-Luc", "lastName": "Picard" }
+elt.attribute(/name/i) => { "firstName": "Jean-Luc", "lastName": "Picard" }  => { "firstName": "Jean-Luc", "lastName": "Picard" }
+
+elt.attribute((attr, val) => { return attr === 'age' && val > 50 }))         => { "age": 59 }
 */

@@ -34,8 +34,25 @@
 <dd><p>Optional options for the Twig parser</p>
 </dd>
 <dt><a href="#TwigHandler">TwigHandler</a></dt>
-<dd><p>Handler functions for Twig objects.<br>
-If <code>name</code> is not specified, then handler is called on every element. Otherwise the element name must be equal to the string or Regular Expression</p>
+<dd><p>Reference to handler functions for Twig objects.<br>
+If <code>name</code> is not specified, then handler is called on every element.<br>
+Otherwise the element name must be equal to the string or Regular Expression. You can specify custom function</p>
+</dd>
+<dt><a href="#HandlerFunction">HandlerFunction</a></dt>
+<dd><p>Handler function for Twig objects, i.e. the way you like to use the XML element.</p>
+</dd>
+<dt><a href="#ElementCondition">ElementCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#ElementConditionFilter">ElementConditionFilter</a></code> | <code><a href="#Twig">Twig</a></code></dt>
+<dd><p>Optional condition to get elements<br> </p>
+<ul>
+<li>If <code>undefined</code>, then all elements are returned.<br> </li>
+<li>If <code>string</code> then the element name must be equal to the string</li>
+<li>If <code>RegExp</code> then the element name must match the Regular Expression</li>
+<li>If <a href="#ElementConditionFilter">ElementConditionFilter</a> then the element must filter function </li>
+<li>Use <a href="#Twig">Twig</a> object to find a specific element (rarely used in <code>createParser(handler)</code>)</li>
+</ul>
+</dd>
+<dt><a href="#ElementConditionFilter">ElementConditionFilter</a> : <code>function</code></dt>
+<dd><p>Custom filter function to get desired elements</p>
 </dd>
 <dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
 <dd><p>Optional condition to get attributes<br> </p>
@@ -49,18 +66,8 @@ If <code>name</code> is not specified, then handler is called on every element. 
 <dt><a href="#AttributeConditionFilter">AttributeConditionFilter</a> : <code>function</code></dt>
 <dd><p>Custom filter function to get desired attributes</p>
 </dd>
-<dt><a href="#ElementCondition">ElementCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#ElementConditionFilter">ElementConditionFilter</a></code> | <code><a href="#Twig">Twig</a></code></dt>
-<dd><p>Optional condition to get elements<br> </p>
-<ul>
-<li>If <code>undefined</code>, then all elements are returned.<br> </li>
-<li>If <code>string</code> then the element name must be equal to the string</li>
-<li>If <code>RegExp</code> then the element name must match the Regular Expression</li>
-<li>If <a href="#ElementConditionFilter">ElementConditionFilter</a> then the element must filter function </li>
-<li>Use <a href="#Twig">Twig</a> object to find a specific element</li>
-</ul>
-</dd>
-<dt><a href="#ElementConditionFilter">ElementConditionFilter</a> : <code>function</code></dt>
-<dd><p>Custom filter function to get desired elements</p>
+<dt><a href="#+PI">#PI</a> : <code>object</code> ℗</dt>
+<dd><p>XML Declaration object, exist only on root</p>
 </dd>
 </dl>
 
@@ -79,33 +86,36 @@ If <code>name</code> is not specified, then handler is called on every element. 
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
     * [.level](#Twig+level) ℗
-    * [.namespace](#Twig+namespace) ℗
-    * [.declaration](#Twig+declaration) ℗
-    * [.PI](#Twig+PI) ℗
     * [.comment](#Twig+comment) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
     * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
-    * [.currentLine](#Twig+currentLine) ⇒ <code>number</code>
+    * [.line](#Twig+line) ⇒ <code>number</code>
+    * [.column](#Twig+column) ⇒ <code>number</code>
+    * [.index](#Twig+index) ⇒ <code>number</code>
+    * [.index](#Twig+index) ⇒ <code>string</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
     * [.comment](#Twig+comment) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
     * [.comment](#Twig+comment)
+    * [.declaration](#Twig+declaration) ℗
     * [.declaration](#Twig+declaration) ⇒ <code>string</code>
     * [.declaration](#Twig+declaration)
-    * [.PI](#Twig+PI) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-    * [.PI](#Twig+PI)
     * [.namespace](#Twig+namespace) ⇒ <code>object</code>
-    * [.namespace](#Twig+namespace)
     * [.close](#Twig+close)
-    * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code>
+    * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
+    * [.self](#Twig+self) ⇒ [<code>Twig</code>](#Twig)
+    * [.children](#Twig+children) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+    * [.purge(elt)](#Twig+purge)
+    * [.setRoot(name)](#Twig+setRoot)
+    * [.filterElements(elts, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 
 <a name="new_Twig_new"></a>
 
@@ -201,39 +211,6 @@ Create a new Twig object
 | --- | --- | --- |
 | #level | <code>number</code> | Root element is level 0, children have 1 and so on |
 
-<a name="Twig+namespace"></a>
-
-### twig.namespace ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #namespace | <code>object</code> | XML Namespace of the element. Only used when parsed  with `xmlns: true` |
-
-<a name="Twig+declaration"></a>
-
-### twig.declaration ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #declaration | <code>object</code> | XML Declaration object, exist only on root |
-
-<a name="Twig+PI"></a>
-
-### twig.PI ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #PI | <code>object</code> | XML Declaration object, exist only on root |
-
 <a name="Twig+comment"></a>
 
 ### twig.comment ℗
@@ -255,7 +232,7 @@ Returns true if the element is empty, otherwise false.An empty element ha no te
 <a name="Twig+level"></a>
 
 ### twig.level ⇒ <code>number</code>
-Returns the level of the element. Root element has 0, children jave 1, grand-children 2 and so on
+Returns the level of the element. Root element has 0, children have 1, grand-children 2 and so on
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - The level of the element.  
@@ -280,13 +257,34 @@ Returns true if element has child elements
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if has child elements exists  
-<a name="Twig+currentLine"></a>
+<a name="Twig+line"></a>
 
-### twig.currentLine ⇒ <code>number</code>
+### twig.line ⇒ <code>number</code>
 Returns the line where current element is closed
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - Current line  
+<a name="Twig+column"></a>
+
+### twig.column ⇒ <code>number</code>
+Returns the column where current element is closed
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>number</code> - Current column  
+<a name="Twig+index"></a>
+
+### twig.index ⇒ <code>number</code>
+The position in #children array. For root object 0
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>number</code> - Position of element in parent  
+<a name="Twig+index"></a>
+
+### twig.index ⇒ <code>string</code>
+The position in #children array. For root object 0
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>string</code> - Current column  
 <a name="Twig+name"></a>
 
 ### twig.name ⇒ <code>string</code>
@@ -343,6 +341,17 @@ Modifies the comment of the element. A XML Element may contain an array of multi
 
 <a name="Twig+declaration"></a>
 
+### twig.declaration ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #declaration | <code>object</code> | XML Declaration object, exist only on root |
+
+<a name="Twig+declaration"></a>
+
 ### twig.declaration ⇒ <code>string</code>
 The XML declaration. Available only on root element.
 
@@ -359,24 +368,6 @@ Set the XML declaration
 | --- | --- | --- |
 | dec | <code>object</code> | The XML declaration, e.g. `{ version: "1.0", encoding:"UTF-8" }` |
 
-<a name="Twig+PI"></a>
-
-### twig.PI ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-The XML declaration. Available only on root element.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> \| <code>Array.&lt;string&gt;</code> - The declaration of the XML  
-<a name="Twig+PI"></a>
-
-### twig.PI
-Set Processing Instruction. According ty my knowlege a XML must not contain more than one PI
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| pi | <code>object</code> | The Processing Instruction object in form of `{ target: <target>, data: <instruction> }`. |
-
 <a name="Twig+namespace"></a>
 
 ### twig.namespace ⇒ <code>object</code>
@@ -384,17 +375,6 @@ The XML namespace
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>object</code> - The XML namespace of the element  
-<a name="Twig+namespace"></a>
-
-### twig.namespace
-Set the XML namespace
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| nw | <code>object</code> | XML namespace definition |
-
 <a name="Twig+close"></a>
 
 ### twig.close
@@ -408,13 +388,15 @@ Closes the element
 
 <a name="Twig+attr"></a>
 
-### twig.attr ⇒ <code>string</code> \| <code>number</code>
+### twig.attr ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
+Returns attriute value or `null` if not found.<br>If more than one  matches the condition, then it returns object as [attribute()](#attribute)
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> \| <code>number</code> - - The value of the attrubute or `null` if the attribute does not exist  
+**Returns**: <code>string</code> \| <code>number</code> \| <code>object</code> - - The value of the attrubute or `null` if the  does not exist  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | The name of the attribute |
+| cond | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attribute |
 
 <a name="Twig+hasAttribute"></a>
 
@@ -452,6 +434,53 @@ Returns the parent element or null if root element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: [<code>Twig</code>](#Twig) - The parament element  
+<a name="Twig+self"></a>
+
+### twig.self ⇒ [<code>Twig</code>](#Twig)
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - - The current object  
+<a name="Twig+children"></a>
+
+### twig.children ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+All children, optionally matching `cond` of the current element or empty array
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Condition**: <code>?ElementCondition</code> cond - Optional condition  
+<a name="Twig+purge"></a>
+
+### twig.purge(elt)
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elt | [<code>Twig</code>](#Twig) | If defined then it purges up to the elt element. If undefined the the current element is purged |
+
+<a name="Twig+setRoot"></a>
+
+### twig.setRoot(name)
+Sets the name of root element. In some cases the root is created before the XML-Root element is available
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The tag names |
+
+<a name="Twig+filterElements"></a>
+
+### twig.filterElements(elts, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+Common function to filter Twig elements from array
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Array.&lt;Twig&gt;</code>](#Twig) - List of matching elements or empty array  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elts | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter |
+| condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
+
 <a name="Twig"></a>
 
 ## Twig
@@ -467,33 +496,36 @@ Returns the parent element or null if root element
     * [.parent](#Twig+parent) ℗
     * [.postion](#Twig+postion) ℗
     * [.level](#Twig+level) ℗
-    * [.namespace](#Twig+namespace) ℗
-    * [.declaration](#Twig+declaration) ℗
-    * [.PI](#Twig+PI) ℗
     * [.comment](#Twig+comment) ℗
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
     * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
-    * [.currentLine](#Twig+currentLine) ⇒ <code>number</code>
+    * [.line](#Twig+line) ⇒ <code>number</code>
+    * [.column](#Twig+column) ⇒ <code>number</code>
+    * [.index](#Twig+index) ⇒ <code>number</code>
+    * [.index](#Twig+index) ⇒ <code>string</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
     * [.comment](#Twig+comment) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
     * [.comment](#Twig+comment)
+    * [.declaration](#Twig+declaration) ℗
     * [.declaration](#Twig+declaration) ⇒ <code>string</code>
     * [.declaration](#Twig+declaration)
-    * [.PI](#Twig+PI) ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-    * [.PI](#Twig+PI)
     * [.namespace](#Twig+namespace) ⇒ <code>object</code>
-    * [.namespace](#Twig+namespace)
     * [.close](#Twig+close)
-    * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code>
+    * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
+    * [.self](#Twig+self) ⇒ [<code>Twig</code>](#Twig)
+    * [.children](#Twig+children) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+    * [.purge(elt)](#Twig+purge)
+    * [.setRoot(name)](#Twig+setRoot)
+    * [.filterElements(elts, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 
 <a name="new_Twig_new"></a>
 
@@ -589,39 +621,6 @@ Create a new Twig object
 | --- | --- | --- |
 | #level | <code>number</code> | Root element is level 0, children have 1 and so on |
 
-<a name="Twig+namespace"></a>
-
-### twig.namespace ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #namespace | <code>object</code> | XML Namespace of the element. Only used when parsed  with `xmlns: true` |
-
-<a name="Twig+declaration"></a>
-
-### twig.declaration ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #declaration | <code>object</code> | XML Declaration object, exist only on root |
-
-<a name="Twig+PI"></a>
-
-### twig.PI ℗
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #PI | <code>object</code> | XML Declaration object, exist only on root |
-
 <a name="Twig+comment"></a>
 
 ### twig.comment ℗
@@ -643,7 +642,7 @@ Returns true if the element is empty, otherwise false.An empty element ha no te
 <a name="Twig+level"></a>
 
 ### twig.level ⇒ <code>number</code>
-Returns the level of the element. Root element has 0, children jave 1, grand-children 2 and so on
+Returns the level of the element. Root element has 0, children have 1, grand-children 2 and so on
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - The level of the element.  
@@ -668,13 +667,34 @@ Returns true if element has child elements
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if has child elements exists  
-<a name="Twig+currentLine"></a>
+<a name="Twig+line"></a>
 
-### twig.currentLine ⇒ <code>number</code>
+### twig.line ⇒ <code>number</code>
 Returns the line where current element is closed
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - Current line  
+<a name="Twig+column"></a>
+
+### twig.column ⇒ <code>number</code>
+Returns the column where current element is closed
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>number</code> - Current column  
+<a name="Twig+index"></a>
+
+### twig.index ⇒ <code>number</code>
+The position in #children array. For root object 0
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>number</code> - Position of element in parent  
+<a name="Twig+index"></a>
+
+### twig.index ⇒ <code>string</code>
+The position in #children array. For root object 0
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>string</code> - Current column  
 <a name="Twig+name"></a>
 
 ### twig.name ⇒ <code>string</code>
@@ -731,6 +751,17 @@ Modifies the comment of the element. A XML Element may contain an array of multi
 
 <a name="Twig+declaration"></a>
 
+### twig.declaration ℗
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Access**: private  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| #declaration | <code>object</code> | XML Declaration object, exist only on root |
+
+<a name="Twig+declaration"></a>
+
 ### twig.declaration ⇒ <code>string</code>
 The XML declaration. Available only on root element.
 
@@ -747,24 +778,6 @@ Set the XML declaration
 | --- | --- | --- |
 | dec | <code>object</code> | The XML declaration, e.g. `{ version: "1.0", encoding:"UTF-8" }` |
 
-<a name="Twig+PI"></a>
-
-### twig.PI ⇒ <code>string</code> \| <code>Array.&lt;string&gt;</code>
-The XML declaration. Available only on root element.
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> \| <code>Array.&lt;string&gt;</code> - The declaration of the XML  
-<a name="Twig+PI"></a>
-
-### twig.PI
-Set Processing Instruction. According ty my knowlege a XML must not contain more than one PI
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| pi | <code>object</code> | The Processing Instruction object in form of `{ target: <target>, data: <instruction> }`. |
-
 <a name="Twig+namespace"></a>
 
 ### twig.namespace ⇒ <code>object</code>
@@ -772,17 +785,6 @@ The XML namespace
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>object</code> - The XML namespace of the element  
-<a name="Twig+namespace"></a>
-
-### twig.namespace
-Set the XML namespace
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| nw | <code>object</code> | XML namespace definition |
-
 <a name="Twig+close"></a>
 
 ### twig.close
@@ -796,13 +798,15 @@ Closes the element
 
 <a name="Twig+attr"></a>
 
-### twig.attr ⇒ <code>string</code> \| <code>number</code>
+### twig.attr ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
+Returns attriute value or `null` if not found.<br>If more than one  matches the condition, then it returns object as [attribute()](#attribute)
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: <code>string</code> \| <code>number</code> - - The value of the attrubute or `null` if the attribute does not exist  
+**Returns**: <code>string</code> \| <code>number</code> \| <code>object</code> - - The value of the attrubute or `null` if the  does not exist  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | The name of the attribute |
+| cond | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attribute |
 
 <a name="Twig+hasAttribute"></a>
 
@@ -840,6 +844,53 @@ Returns the parent element or null if root element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: [<code>Twig</code>](#Twig) - The parament element  
+<a name="Twig+self"></a>
+
+### twig.self ⇒ [<code>Twig</code>](#Twig)
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - - The current object  
+<a name="Twig+children"></a>
+
+### twig.children ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+All children, optionally matching `cond` of the current element or empty array
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Condition**: <code>?ElementCondition</code> cond - Optional condition  
+<a name="Twig+purge"></a>
+
+### twig.purge(elt)
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The root objec cannot be purged.
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elt | [<code>Twig</code>](#Twig) | If defined then it purges up to the elt element. If undefined the the current element is purged |
+
+<a name="Twig+setRoot"></a>
+
+### twig.setRoot(name)
+Sets the name of root element. In some cases the root is created before the XML-Root element is available
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The tag names |
+
+<a name="Twig+filterElements"></a>
+
+### twig.filterElements(elts, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+Common function to filter Twig elements from array
+
+**Kind**: instance method of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Array.&lt;Twig&gt;</code>](#Twig) - List of matching elements or empty array  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elts | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter |
+| condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
+
 <a name="UnsupportedParser"></a>
 
 ## UnsupportedParser
@@ -930,31 +981,19 @@ Create a new Twig parser
 | handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Function or array of function to handle elements |
 | options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 
-**Example**  
-```js
-function rootHandler(tree, elt) {  console.log(elt.name);}createParser(rootHandler, { method: SAX });
-```
-**Example**  
-```js
-function oneHandlerForAll(tree, elt) {  console.log(elt.name);}createParser(  [ {function: oneHandlerForAll} ],   { method: SAX });
-```
-**Example**  
-```js
-function bookHandler(tree, elt) {  console.log(elt.name);}function customerHandler(tree, elt) {  console.log(elt.name);}createParser(  [ {name: 'book', function: bookHandler}, {name: 'customer', function: customerHandler} ],   { method: SAX });
-```
 <a name="ParserOptions"></a>
 
 ## ParserOptions
 Optional options for the Twig parser
 
 **Kind**: global typedef  
-**Default**: <code>{ method: EXPAT, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
+**Default**: <code>{ method: &#x27;expat&#x27;, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| method | <code>string</code> | The underlaying parser. Either SAX or EXPAT. |
-| encoding | <code>string</code> | Encoding of the XML File. Applies only to EXPAT parser. |
-| xmlns | <code>boolean</code> | If true, then namespaces are supported. |
+| method | <code>string</code> | The underlaying parser. Either `'sax'` or `'expat'`. |
+| encoding | <code>string</code> | Encoding of the XML File. Applies only to `expat` parser. |
+| xmlns | <code>boolean</code> | If true, then namespaces are accessible by `namespace` property. |
 | trim | <code>boolean</code> | If true, then turn any whitespace into a single space. |
 | resumeAfterError | <code>boolean</code> | If true then parser continues reading after an error. Otherwiese it throws exception. |
 | partial | <code>boolean</code> | It true then unhandled elements are purged. |
@@ -966,14 +1005,43 @@ Optional options for the Twig parser
 <a name="TwigHandler"></a>
 
 ## TwigHandler
-Handler functions for Twig objects.<br>If `name` is not specified, then handler is called on every element. Otherwise the element name must be equal to the string or Regular Expression
+Reference to handler functions for Twig objects.<br>If `name` is not specified, then handler is called on every element.<br>Otherwise the element name must be equal to the string or Regular Expression. You can specify custom function
 
 **Kind**: global typedef  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> \| <code>RegExp</code> | Name of handled element or any element if not specified |
-| function | <code>function</code> | Definition of handler function, either anonymous or explict function |
+| name | <code>string</code> \| <code>RegExp</code> \| [<code>ElementCondition</code>](#ElementCondition) | Name of handled element or any element if not specified |
+| HandlerFunction | <code>function</code> | Definition of handler function, either anonymous or explict function |
+
+<a name="HandlerFunction"></a>
+
+## HandlerFunction
+Handler function for Twig objects, i.e. the way you like to use the XML element.
+
+**Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elt | [<code>Twig</code>](#Twig) | The current Twig element on which the function was called. |
+
+<a name="ElementCondition"></a>
+
+## ElementCondition : <code>string</code> \| <code>RegExp</code> \| [<code>ElementConditionFilter</code>](#ElementConditionFilter) \| [<code>Twig</code>](#Twig)
+Optional condition to get elements<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [ElementConditionFilter](#ElementConditionFilter) then the element must filter function - Use [Twig](#Twig) object to find a specific element (rarely used in `createParser(handler)`)
+
+**Kind**: global typedef  
+<a name="ElementConditionFilter"></a>
+
+## ElementConditionFilter : <code>function</code>
+Custom filter function to get desired elements
+
+**Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | Name of the element |
+| elt | [<code>Twig</code>](#Twig) | The full Twig object |
 
 <a name="AttributeCondition"></a>
 
@@ -993,21 +1061,10 @@ Custom filter function to get desired attributes
 | name | <code>string</code> | Name of the attribute |
 | value | <code>string</code> \| <code>number</code> | Value of the attribute |
 
-<a name="ElementCondition"></a>
+<a name="+PI"></a>
 
-## ElementCondition : <code>string</code> \| <code>RegExp</code> \| [<code>ElementConditionFilter</code>](#ElementConditionFilter) \| [<code>Twig</code>](#Twig)
-Optional condition to get elements<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [ElementConditionFilter](#ElementConditionFilter) then the element must filter function - Use [Twig](#Twig) object to find a specific element
-
-**Kind**: global typedef  
-<a name="ElementConditionFilter"></a>
-
-## ElementConditionFilter : <code>function</code>
-Custom filter function to get desired elements
+## #PI : <code>object</code> ℗
+XML Declaration object, exist only on root
 
 **Kind**: global typedef  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | Name of the element |
-| elt | [<code>Twig</code>](#Twig) | The full element Twig object |
-
+**Access**: private  
