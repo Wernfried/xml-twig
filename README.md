@@ -330,7 +330,7 @@ For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
 ## Limitations
 
-This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the `Twig` class. However, I think there are better modules availabe. Create/update/delete methods are rather limited. Perhaps I will add it in later release.
+This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the `Twig` class. However, I think there are better modules available. Create/update/delete methods are rather limited. Perhaps I will add it in later release.
 
 Accessing XML-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported yet.
 
