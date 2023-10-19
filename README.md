@@ -87,7 +87,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
    function bookHandler(elt) {
       console.log(`${elt.attr("category")} ${elt.name} at line ${elt.line}`)
-      elt.purge() // -> without `purge()` the entire XML document will be read into memory
+      elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
    }
 
    // different styles: below `handle_book` are all equivalent (with sample file `bookstore.xml`)
@@ -124,7 +124,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    web book at line 48
    ```
 
-- Read evey element from XML Document
+- Read every element from XML Document
 
   Skip the `name` proeprty if you like to read every element one-by-one:
 
@@ -135,13 +135,18 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
    function anyHandler(elt) {
       console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${elt.line}`)
-      elt.purge() // -> without `purge()` the entire XML document will be read into memory
+      elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
+
+      // Be aware if you run methods like elt.followingSibling(), elt.descendant(), elt.next(), etc. on the current element.
+      // Such calls return emtpy result, becausse following element are not yet read from the file.
+      // You must navigate to an earlier element, e.g. 
+      elt.root().children()[0].followingSibling();
    }
 
    const handle_any = [ { function: anyHandler } ];
    
-   // or use regular expression which matches every element
-   const handle_any = [ { name: /./, function: bookHandler } ];
+   // or use regular expression which matches every element, if you prefer
+   const handle_any = [ { name: /./, function: anyHandler } ];
 
    const parser = twig.createParser(handle_any)
    fs.createReadStream(`${__dirname}/node_modules/xml-twig/samples/bookstore.xml`).pipe(parser)
@@ -233,8 +238,6 @@ Here are some examples the get attribute and values:
 
 `.children(condition)` - Twig[]: All matching children of the current element or empty array
 
-Specify element as name or regular expression or custom condition. For details see [ElementCondition](./doc/twig.md#ElementCondition).
-
 `.next(condition)` - Twig: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element.<br> 
 Note, the root element is the **last** element (which returns `null`), not the first.
 
@@ -264,13 +267,21 @@ Note, the root element is the **last** element (which returns `null`), not the f
 
 `.prevSibling(condition)` - Twig: Returns the previous (optionally matching condition) sibling element. 
 
-**Note:** Be aware when using any `*next*`, `*last*`, `*descendant*`, `following*`, `children` method on *current* element, because following elements are not yet loaded. Thus they may unexpectively return `null` or empty array.
 
+find(condition)
+purge()
+purgeUpTo(elt)
 
-find(condition, startAt)
+**condition** Parameter
+You can specify condition on above methods. You can filter elements by these:
 
+- If `undefined`, then all elements are returned.
+- If `string` then the element name must be equal to the string
+- If `RegExp` then the element name must match the Regular Expression
+- With `ElementConditionFilter` you can speficy any custom filter function.<br>
+  Example: `(name, elt) => { return name === 'book' && elt.children().length > 1 }`
 
-
+For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
 
 
