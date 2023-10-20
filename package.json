@@ -4,7 +4,7 @@
   },
   "name": "xml-twig",
   "description": "Node module for processing huge XML documents in tree mode",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "twig.js",
   "directories": {
     "doc": "doc"

@@ -276,7 +276,7 @@ Here are some examples the get attribute and values:
 
 `.sibling(condition)` - **Twig[]**: All siblings (optionally matching condition) before and after the current element or an empty array.
 
-`.siblingOrSelf(condition)` - **Twig[]**: All siblings (optionally matching condition) before and after the current element or an empty array.
+`.siblingOrSelf(condition)` - **Twig[]**: All siblings (optionally matching condition) before and after the current element and the current element itself or an empty array.
 
 `.followingSibling(condition)` - **Twig[]**: All siblings (optionally matching condition) after the current element or an empty array.
 
