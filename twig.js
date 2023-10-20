@@ -41,7 +41,7 @@ let current;
 * - If `string` then the element name must be equal to the string
 * - If `RegExp` then the element name must match the Regular Expression
 * - If [ElementConditionFilter](#ElementConditionFilter) then the element must filter function 
-* - Use [Twig](#Twig) object to find a specific element (rarely used in `createParser(handler)`)
+* - Use [Twig](#Twig) object to find a specific element (rarely used)
 * @typedef {string|RegExp|ElementConditionFilter|Twig} ElementCondition 
 */
 
@@ -67,7 +67,6 @@ function createParser(handler, options) {
    let closeEvent;
 
    // `parser.on("...", err =>  {...}` does not work, because I need access to 'this'
-
    if (options.method === SAX) {
       // Set options to have the same behaviour as in expat
       parser = require("sax").createStream(true, { strictEntities: true, position: true, xmlns: options.xmlns, trim: options.trim });
@@ -80,7 +79,21 @@ function createParser(handler, options) {
             if (current.isRoot && current.name === undefined) {
                current.setRoot(node.name);
             } else {
-               let cur = new Twig(node.name, current);
+               let elt = new Twig(node.name, current);
+               if (options.partial) {
+                  for (let hndl of Array.isArray(handler) ? handler : [handler]) {
+                     if (typeof hndl.name === 'string' && node.name === hndl.name) {
+                        elt.pin();
+                        break;
+                     } else if (hndl.name instanceof RegExp && hndl.name.test(node.name)) {
+                        elt.pin();
+                        break;
+                     } else if (typeof hndl.name === 'function' && hndl.name(node.name, current ?? tree)) {
+                        elt.pin();
+                        break;
+                     }
+                  }
+               }
             }
          }
          if (options.xmlns) {
@@ -153,7 +166,21 @@ function createParser(handler, options) {
             if (current.isRoot && current.name === undefined) {
                current.setRoot(name);
             } else {
-               let cur = new Twig(name, current, attrs);
+               let elt = new Twig(name, current, attrs);
+               if (options.partial) {
+                  for (let hndl of Array.isArray(handler) ? handler : [handler]) {
+                     if (typeof hndl.name === 'string' && name === hndl.name) {
+                        elt.pin();
+                        break;
+                     } else if (hndl.name instanceof RegExp && hndl.name.test(name)) {
+                        elt.pin();
+                        break;
+                     } else if (typeof hndl.name === 'function' && hndl.name(name, current ?? tree)) {
+                        elt.pin();
+                        break;
+                     }
+                  }
+               }
             }
          }
          if (options.xmlns) {
@@ -200,6 +227,7 @@ function createParser(handler, options) {
          pos = { line: this.parser.getCurrentLineNumber(), column: this.parser.getCurrentColumnNumber() };
       }
       current.close(pos);
+      let purge = true;
 
       if (typeof handler === 'function' && options.method === EXPAT && current.isRoot) {
          // Entire XML file was parsed at once. EXPAT parser has no event "document end", so trigger at "endElement" of root object
@@ -208,17 +236,25 @@ function createParser(handler, options) {
          for (let hndl of Array.isArray(handler) ? handler : [handler]) {
             if (hndl.name === undefined) {
                hndl.function(current ?? tree);
+               purge = false;
             } else if (typeof hndl.name === 'string' && name === hndl.name) {
                hndl.function(current ?? tree);
+               purge = false;
             } else if (hndl.name instanceof RegExp && hndl.name.test(name)) {
                hndl.function(current ?? tree);
+               purge = false;
             } else if (typeof hndl.name === 'function' && hndl.name(name, current ?? tree)) {
                hndl.function(current ?? tree);
+               purge = false;
             }
          }
       }
 
+      if (options.partial && purge && !current.pinned && !current.isRoot)
+         current.purge();
       current = current.parent();
+
+
    })
 
    // Common events
@@ -347,6 +383,12 @@ class Twig {
    #level;
 
    /**
+   * @property {boolean} #pinned - Determines whether twig is needed in partial load
+   * @private
+   */
+   #pinned = false;
+
+   /**
    * Create a new Twig object
    * @param {string} name - The name of the XML element
    * @param {Twig} parent - The parent object
@@ -369,6 +411,8 @@ class Twig {
          } else {
             this.#parent = parent;
             this.#level = this.#parent.#level + 1;
+            if (this.#parent.#pinned)
+               this.#pinned = true;
             parent.#children.push(this);
          }
       }
@@ -384,24 +428,23 @@ class Twig {
 
    /**
    * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
-   * @param {Twig} elt - Up to this element the tree will be purged. If `undefined` then `purge()` is called.<br>
-   * The `elt` object itself is not purged. (use `.purge()` is you like to do so)
+   * @param {Twig} elt - Up to this element the tree will be purged. The `elt` object itself is not purged.<br>
+   * If `undefined` then the current element is purged (i.e. `purge()`)
    */
    purgeUpTo(elt) {
       if (elt === undefined) {
          this.purge();
-      } else if (!this.isRoot) {
-         let purge = this;
-         /*while (!purge.isRoot && Object.is(purge, elt)) {            
-            
+      } else {
+         let purgeThis = this.descendantOrSelf();
+         purgeThis = purgeThis[purgeThis.length - 1];
+         let stopAt = elt.descendantOrSelf();
+         stopAt = stopAt[stopAt.length - 1];
+         while (purgeThis !== null && !Object.is(purgeThis, stopAt)) {
+            let prev = purgeThis.previous();
+            purgeThis.purge();
+            purgeThis = prev;
          }
-         */
-
       }
-
-
-
-
    }
 
    /**
@@ -489,10 +532,10 @@ class Twig {
 
    /**
    * The text of the element. No matter if given as text or CDATA entity
-   * @returns {string} Element text
+   * @returns {string} Element text or empty string
    */
    get text() {
-      return this.#text;
+      return this.#text ?? '';
    }
 
    /**
@@ -503,9 +546,35 @@ class Twig {
    set text(value) {
       if (!['string', 'number', 'bigint'].includes(typeof value))
          throw new UnsupportedType(value);
-      if (value !== '')
-         this.#text = this.#text ?? '' + value;
+      this.#text = this.#text ?? '' + value;
    }
+
+   /**
+   * Pins the current element. Used for partial reading.
+   */
+   pin = function () {
+      this.#pinned = true;
+   }
+
+   /**
+   * Checks if element is pinned
+   * @returns {boolean} `true` when the element is pinned
+   */
+   get pinned() {
+      return this.#pinned;
+   }
+
+   /**
+   * Modifies the text of the element
+   * @param {string} value - New value of the attribute
+   * @throws {UnsupportedType} - If value is not a string or numeric type
+   */
+   set text(value) {
+      if (!['string', 'number', 'bigint'].includes(typeof value))
+         throw new UnsupportedType(value);
+      this.#text = this.#text ?? '' + value;
+   }
+
 
    /**
    * Closes the element
@@ -524,25 +593,25 @@ class Twig {
    #addChild = function (xw, childArray) {
       for (let elt of childArray) {
          xw.startElement(elt.name);
+         for (let key in elt.attributes)
+            xw.writeAttribute(key, elt.attributes[key]);
          if (elt.text !== null)
             xw.text(elt.text);
-         if (elt.attributes !== null) {
-            for (let key in elt.attributes)
-               xw.writeAttribute(key, elt.attributes[key]);
-         }
          this.#addChild(xw, elt.children());
-         xw.endElement();
       }
+      xw.endElement();
    }
+
 
    /**
    * Creates xml-writer from current element
-   * @param {?boolean|string} indented - `true` or intention character
+   * @param {?boolean|string|XMLWriter} par - `true` or intention character or an already created XMLWriter
    * @returns {XMLWriter} 
    */
-   writer = function (indented) {
+   writer = function (par) {
       const XMLWriter = require('xml-writer');
-      let xw = new XMLWriter(indented);
+      let xw = par instanceof XMLWriter ? par : new XMLWriter(par);
+
       xw.startElement(this.#name);
       for (let key in this.#attributes)
          xw.writeAttribute(key, this.#attributes[key]);
@@ -565,6 +634,14 @@ class Twig {
          return null;
 
       return Object.keys(attr).length === 1 ? attr[Object.keys(attr)[0]] : attr;
+   }
+
+   /**
+   * Returns all attributes of the element
+   * @returns {obejct} All XML Atrributes
+   */
+   get attributes() {
+      return this.#attributes;
    }
 
    /**
@@ -649,11 +726,14 @@ class Twig {
 
    /**
    * Common function to filter Twig elements from array
-   * @param {Twig[]} elts  - Array of elements you like to filter
+   * @param {Twig|Twig[]} elts - Array of elements you like to filter or a single element
    * @param {?ElementCondition} condition - The filter condition
    * @returns {Twig[]} List of matching elements or empty array
    */
    filterElements(elts, condition) {
+      if (!Array.isArray(elts))
+         return filterElements([elts], condition);
+
       if (condition === undefined) {
          return elts;
       } else if (typeof condition === 'string') {
@@ -674,7 +754,7 @@ class Twig {
    * @param {?ElementCondition} condition - The filter condition
    * @returns {boolean} `true` if the condition matches
    */
-   filterElement(elt, condition) {
+   testElement(elt, condition) {
       if (condition === undefined) {
          return true;
       } else if (typeof condition === 'string') {
@@ -702,53 +782,47 @@ class Twig {
    * Returns the next matching element. 
    * @param {?ElementCondition} condition - Optional condition
    * @returns {Twig} - The next element
+   * @see https://www.w3.org/TR/xpath-datamodel-31/#document-order
    */
    next = function (condition) {
-      if (this.isRoot) {
+      if (this === null)
          return null;
-      } else {
-         let elt;
-         if (this.hasChildren) {
-            elt = this.#children[0];
-         } else {
-            elt = this.nextSibling();
-            if (elt === null) {
-               elt = this.#parent;
-               elt = elt.nextSibling();
-            }
-         }
-         if (elt === undefined)
-            elt = this.root();
 
-         return this.filterElement(elt, condition) ? elt : elt.next(condition);
+      let elt;
+      if (this.hasChildren) {
+         elt = this.#children[0];
+      } else {
+         elt = this.nextSibling();
+         if (elt === null) {
+            elt = this.#parent;
+            elt = elt.nextSibling();
+         }
       }
+      if (elt === null)
+         return null;
+
+      return this.testElement(elt, condition) ? elt : elt.next(condition);
    }
 
    /**
    * Returns the previous matching element. 
    * @param {?ElementCondition} condition - Optional condition
    * @returns {Twig} - The previous element
+   * @see https://www.w3.org/TR/xpath-datamodel-31/#document-order
    */
    previous = function (condition) {
-      let elt = null;
-      if (this.isRoot && this.hasChildren) {
-         elt = this.#children[this.#children.length - 1];
+      if (this === null || this.isRoot)
+         return null;
+
+      let elt = this.prevSibling();
+      if (elt === null) {
+         elt = this.parent();
+      } else {
          elt = elt.descendantOrSelf();
          elt = elt[elt.length - 1];
-      } else {
-         elt = this.prevSibling();
-         if (elt === null) {
-            if (this.#parent.isRoot)
-               return null;
-            elt = this.#parent;
-         } else {
-            elt = elt.descendantOrSelf();
-            elt = elt[elt.length - 1];
-         }
       }
-      if (elt === null)
-         return null;
-      return this.filterElement(elt, condition) ? elt : elt.previous(condition);
+
+      return this.testElement(elt, condition) ? elt : elt.previous(condition);
    }
 
    /**
@@ -757,8 +831,9 @@ class Twig {
    * @returns {Twig} - The first element
    */
    first = function (condition) {
-      let elt = this.root().hasChildren ? this.root().#children[0] : this.root();
-      return this.filterElement(elt, condition) ? elt : elt.next(condition);
+      if (this === null)
+         return null;
+      return this.testElement(this.root(), condition) ? this.root() : this.root().next(condition);
    }
 
    /**
@@ -767,8 +842,17 @@ class Twig {
    * @returns {Twig} - The last element
    */
    last = function (condition) {
-      let ret = this.filterElements([this.root()], condition);
-      return this.filterElement(elt, condition) ? elt : elt.previous(condition);
+      if (this === null)
+         return null;
+
+      let elt = this.root();
+      if (this.root().hasChildren) {
+         elt = this.root().#children[this.root().#children.length - 1];
+         while (elt.hasChildren)
+            elt = elt.children()[elt.children().length - 1];
+      }
+
+      return this.testElement(elt, condition) ? elt : elt.previous(condition);
    }
 
    /**
@@ -923,7 +1007,7 @@ class Twig {
       if (elt === undefined)
          return null;
 
-      return this.filterElement(elt, condition) ? elt : elt.nextSibling(condition);
+      return this.testElement(elt, condition) ? elt : elt.nextSibling(condition);
    }
 
    /**
@@ -932,13 +1016,12 @@ class Twig {
    * @returns {Twig} - The previous sibling or `null`
    */
    prevSibling = function (condition) {
-      let elt;
-      if (!this.isRoot && this.index > 0)
-         elt = this.#parent.#children[this.index - 1];
-      if (elt === undefined)
+      if (!this.isRoot && this.index > 0) {
+         let elt = this.#parent.#children[this.index - 1];
+         return this.testElement(elt, condition) ? elt : elt.prevSibling(condition);
+      } else {
          return null;
-
-      return this.filterElement(elt, condition) ? elt : elt.prevSibling(condition);
+      }
    }
 
    /**

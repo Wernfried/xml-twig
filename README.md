@@ -4,7 +4,6 @@ Node module for processing huge XML documents in tree mode
 Inspired by Perl module [XML::Twig](https://metacpan.org/pod/XML::Twig)
 
 
-
 ## When should I use this, motivation of this module
 When you need to read a XML file, then you have two pinciples:
 
@@ -41,8 +40,10 @@ When I load  a 300 MB big XML file, the `node-expat` is much faster than `sax`. 
 
 #### Names and Definitions
 
-This module tries to follow the [XML-Path](https://www.w3.org/TR/xpath/) convention. 
-In XPath, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processingInstruction`, `comment`, and `root`. XML documents are treated as trees of nodes. These types are well explained in [W3Schools: Introduction to XML](https://www.w3schools.com/xml/xml_whatis.asp)
+In XML-Path, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processingInstruction`, `comment`, and `document`, see [Nodes at W3C](https://www.w3.org/TR/xpath-datamodel-31/#Node). XML documents are treated as trees of nodes.
+
+The [Twig](./doc/twig.md#Twig) Class models a "some-kind" Element tree.  I try to follow the [XML-Path](https://www.w3.org/TR/xpath/) conventions whenver possible to avoid confusion.
+
 
 #### XML-Namespaces
 
@@ -169,8 +170,10 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
 - Read only parts from XML Document
 
-   If you like to read only certain elements, and ignore ohters completely, use option `partial: true`:
-   This sample program reads only the `root` element and `<ebook>` elements (include their children elements), other are ignored. The `root` element is always read.
+   If you like to read only certain elements, use option `partial: true`. The `root` element is always read. 
+
+
+   This sample program reads the `root` element and `<ebook>` elements (include their children elements), and the brances to reach the element.
 
    ```
    const handle_ebook = [{ name: 'ebook', function: ebookHandler }];
@@ -178,14 +181,33 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 
    function ebookHandler(elt) {
-      console.log(`${elt.attr("category")} at line ${elt.line}`)
-      elt.purge() // -> without purge() all `<ebook>` elements will be read into memory
+      console.log( elt.root().writer('  ').toString() );
+      elt.purge();
    }
 
    Output:
 
-   fantasy at line 22
-   biography  at line 41
+   <bookstore>
+     <ebook category="fantasy">
+        <title lang="en">Harry Potter</title>
+        <author>Joanne Kathleen Rowling</author>
+        <year>2001</year>
+        <price>12.99</price>
+        <format>Kindle</format>
+        <device>ePub</device>
+     </ebook>
+   </bookstore>
+
+   <bookstore>
+     <ebook category="biography">
+        <title lang="en">The Autobiography of Benjamin Franklin</title>
+        <author>Benjamin Franklin</author>
+        <year>1996</year>
+        <price>39.99</price>
+        <format>Kindle</format>
+        <device>ePub</device>
+     </ebook>
+   </bookstore>
 
    ```
 
@@ -226,7 +248,7 @@ Here are some examples the get attribute and values:
 .attribute((key, val) => { return key === 'age' && val > 50 }))         => { "age": 59 }
 ```
 
-#### Get XML Elements
+#### Twig Methods, acessing XML Elements
 
 `.root()` - **Twig**: The topmost element of the tree
 
@@ -236,12 +258,11 @@ Here are some examples the get attribute and values:
 
 `.children(condition)` - **Twig[]**: All matching children of the current element or empty array
 
-`.next(condition)` - **Twig**: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element.<br> 
-Note, the `root` element is the **last** element, not the first!
+`.next(condition)` - **Twig**: Returns the next elt (optionally matching condition) element. This is defined as the next element which opens after the current element opens. Which usually means the first child of the element. Counter-intuitive as it might look this allows you to loop through the whole document by starting from the `root`.
 
 `.previous(condition)` - **Twig**: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
 
-`.first(condition)` - **Twig**: Returns the first elt (optionally matching condition) element. Usually this is the first child element. Used as starting point when you loop through entire document with `.next()`
+`.first(condition)` - **Twig**: Returns the first elt (optionally matching condition) element. Usually the `root` element.
 
 `.last(condition)` - **Twig**: Returns the last elt (optionally matching condition) element. Usually this is root element.
 
@@ -265,72 +286,91 @@ Note, the `root` element is the **last** element, not the first!
 
 `.prevSibling(condition)` - **Twig**: Returns the previous (optionally matching condition) sibling element. 
 
+`.find(condition)` - **Twig**: Find a specific element in current element and returns the first match. In principle `.descendant(condition)[0]`
 
-find(condition)
-purge()
-purgeUpTo(elt)
+`.purge()` - void: Removes the current element from treee. Usually this methond is called after the element has been processed and when not needed anymore.
+
+`.purgeUpTo(elt)` - void: Purges up to the elt element. This allows you to keep part of the tree in memory when you purge. 
+
+`.writer(indented|xw)` - **XMLWriter**: Returns a [XMLWriter](https://www.npmjs.com/package/xml-writer) object you can use to print the currently loaded XML tree.<br>Instead of providing an indented parameter (`true`, `false` or indent character) you can also provide an `XMLWriter` object which adds more flexibility.
 
 **condition** Parameter
 
 You can specify condition on above methods. You can filter elements by following conditions:
 
 - If `undefined`, then all elements are returned.
+
 - If `string` then the element name must be equal to the string
-  Example: `book`
+
+  Example: `"book"`
+
 - If `RegExp` then the element name must match the Regular Expression
+
   Example: `/book$/i`
+
 - With `ElementConditionFilter` you can speficy any custom filter function.<br>
+
   Example: `(name, elt) => { return name === 'book' && elt.children().length > 1 }`
+
+- With a `Twig` object, you can specify the element direclty. Apart from `purgeUpTo(elt)`, it is rarely used, because when you know the element then there is no reason to find it again.
+
+  Example: `elt.children()[2]`
+
 
 For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
+For methods which return a **Twig[]** array, a call like `elt.siblings("book")` is equal to `elt.sibling().filter( x => x.name === "book" )`
+
+For methods which return a single **Twig** element (e.g. `elt.next("book")`) the method is executed in a loop till a `<book>` element is found.
 
 
+#### Twig Properties
 
-#### Other useful Properties
+`.isEmpty` - **boolean**: `true` if emtpy. An empty element ha no text nor any child elements, however empty elements can have attributes.
 
-`.isEmpty` - boolean: `true` if emtpy. An empty element ha no text nor any child elements, however empty elements can have attributes.
+`.level` - **integer**: The level of the element. Root element has 0, children have 1, grand-children 2 and so on
 
-`.level` - integer: The level of the element. Root element has 0, children have 1, grand-children 2 and so on
+`.isRoot` - **boolean**: `true` for the root element
 
-`.isRoot` - boolean: `true` for the root element
+`.hasChildren` - **boolean**: `true` if the element has any child elements
 
-`.hasChildren` - boolean: `true` if the element has any child elements
+`.isFirstChild` - **boolean**: `true` if the element is the first child in the parent
 
-`.isFirstChild` - boolean: `true` if the element is the first child in the parent
+`.isLastChild` - **boolean**: `true` if the element is the last child in the parent
 
-`.isLastChild` - boolean: `true` if the element is the last child in the parent
+`.line` - **integer**: The line of the element (where the closing tag appears) in the XML-File. First line is 1
 
-`.line` - integer: The line of the element (where the closing tag appears) in the XML-File. First line is 1
+`.column` - **integer**: The column of the element (where the closing tag appears) in the XML-File. First column is 1
 
-`.column` - integer: The column of the element (where the closing tag appears)  in the XML-File. First column is 1
+`.name` - **string**: Name of the element/tag
 
-`.name` - string: Name of the element/tag
+`.tag` - **string**: Synonym for `name`
 
-`.tag` - string: Synonym for `name`
+`.text` - **string**: The text of an element, no matter if given as CDATA entitiy or plain character data node (PCDATA)
 
-`.text` - string: The text of an element
+`.attributes` - **object**: All attributes of the object
 
-`.comment` - string|string[]: Comments or array of comments inside the element
+`.comment` - **string|string[]**: Comments or array of comments inside the element
 
-`.declaration` - object: The XML-Declaration object, exist only on `root`. 
+`.declaration` - **object**: The XML-Declaration object, exist only on `root`. 
 
    Example  `{version: '1.0', encoding: 'UTF-8'}`. 
 
-`.PI` - object: Processing Instruction, exist only on `root`. 
+`.PI` - **object**: Processing Instruction, exist only on `root`. 
 
    Example `{ target: 'xml-stylesheet', data: 'type="text/xsl" href="style.xsl"' }`. 
 
-`.namespace` - object: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. 
+`.namespace` - **object**: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. 
 
    Example `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
 
 
 ## Limitations
 
-This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the `Twig` class. However, I think there are better modules available. Create/update/delete methods are rather limited. Perhaps I will add it in later release.
+This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the [Twig](./doc/twig.md#Twig) class. However, I think there are better modules available. Create/update/delete methods are rather limited. Perhaps I will add it in later release.
 
-Accessing XML-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported yet.
+Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more am [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
+
 
 
 
