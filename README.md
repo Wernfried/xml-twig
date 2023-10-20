@@ -248,7 +248,7 @@ Here are some examples the get attribute and values:
 .attribute((key, val) => { return key === 'age' && val > 50 }))         => { "age": 59 }
 ```
 
-#### Twig Methods, acessing XML Elements
+#### Twig Methods, accessing XML Elements
 
 `.root()` - **Twig**: The topmost element of the tree
 
@@ -262,9 +262,9 @@ Here are some examples the get attribute and values:
 
 `.previous(condition)` - **Twig**: Return the previous elt (optionally matching condition) of the element. This is the first element which opens before the current one. It is usually either the last descendant of the previous sibling or simply the parent
 
-`.first(condition)` - **Twig**: Returns the first elt (optionally matching condition) element. Usually the `root` element.
+`.first(condition)` - **Twig**: Returns the first (optionally matching condition) element. Usually the `root` element.
 
-`.last(condition)` - **Twig**: Returns the last elt (optionally matching condition) element. Usually this is root element.
+`.last(condition)` - **Twig**: Returns the last (optionally matching condition) element. Usually the last element in the document without children.
 
 `.ancestor(condition)` - **Twig[]**: All ancestors (parent, grandparent, etc.) of the current element (optionally matching condition) or an empty array.
 
