@@ -288,7 +288,7 @@ Here are some examples the get attribute and values:
 
 `.find(condition)` - **Twig**: Find a specific element in current element and returns the first match. In principle `.descendant(condition)[0]`
 
-`.purge()` - void: Removes the current element from treee. Usually this methond is called after the element has been processed and when not needed anymore.
+`.purge()` - void: Removes the current element from tree. Usually this methond is called after the element has been processed and when not needed anymore.
 
 `.purgeUpTo(elt)` - void: Purges up to the elt element. This allows you to keep part of the tree in memory when you purge. 
 
@@ -369,7 +369,7 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the [Twig](./doc/twig.md#Twig) class. However, I think there are better modules available. Create/update/delete methods are rather limited. Perhaps I will add it in later release.
 
-Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more am [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
+Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more an [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
 
 
 
