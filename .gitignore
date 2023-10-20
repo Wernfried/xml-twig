@@ -133,3 +133,5 @@ dist
 # Huge XML sample files
 samples/*.tar
 samples/*SRAN.xml
+
+package-lock.json
