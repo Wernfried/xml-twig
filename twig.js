@@ -14,7 +14,7 @@ let current;
  * @param {boolean} resumeAfterError - If true then parser continues reading after an error. Otherwiese it throws exception.
  * @param {boolean} partial - It true then unhandled elements are purged.
  * @example { encoding: 'UTF-8', xmlns: true }
- * @default  { method: 'expat', encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }
+ * @default  { method: 'sax', encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }
  */
 
 
@@ -58,10 +58,10 @@ let current;
  * Create a new Twig parser
  * @param {TwigHandler|TwigHandler[]} handler - Function or array of function to handle elements
  * @param {?ParserOptions} options - Object of optional options 
- * @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` (default) and `sax` are supported.
+ * @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` and `sax` (default) are supported.
  */
 function createParser(handler, options) {
-   options = Object.assign({ method: EXPAT, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }, options)
+   options = Object.assign({ method: SAX, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }, options)
    let parser;
    let namespaces = {};
    let closeEvent;
@@ -1054,7 +1054,7 @@ class UnsupportedParser extends TypeError {
    * @param {string} t Parser type
    */
    constructor(t) {
-      super(`Parser '${t}' is not supported. Use EXPAT (default) or SAX`);
+      super(`Parser '${t}' is not supported. Use 'expat' or 'sax' (default)`);
    }
 }
 
@@ -1086,15 +1086,6 @@ class UnsupportedCondition extends TypeError {
    }
 }
 
-/**
- * Generic error for unsupported data types
- * @exception NotImplementedYet
- */
-class NotImplementedYet extends TypeError {
-   constructor() {
-      super(`Method not yet implemented`);
-   }
-}
 
 
 

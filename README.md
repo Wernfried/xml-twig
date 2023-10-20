@@ -18,7 +18,7 @@ When you need to read a XML file, then you have two pinciples:
 This module tries to combine both principles. The XML document can be read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
 
 ## Dependencies
-XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. More parser may be added in future releases.
+XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. More parser may be added in future releases. By default the `sax` parser is used.
 
 **NOTE: The `sax` or `node-expat` module is not automatically installed with this module. Install desired parser by yourself**
 
@@ -33,7 +33,7 @@ npm install sax
 npm install node-expat
 
 ```
-When I load  a 300 MB big XML file, the `node-expat` is much faster than `sax`. However, you may run into problems when you try to install the `node-expat` parser. That's the reason why underlying parsers are not installed automatically. 
+In my tests I parsed a 750 MB big XML file, the `node-expat` is around times faster than `sax` (node-expat: 2:20 Minutes, sax: 4:34 Minutes ). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why underlying parsers are not installed automatically. 
 
 
 ## How to use it

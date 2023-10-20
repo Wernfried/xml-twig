@@ -1,9 +1,0 @@
-<?xml version = "1.0"?>
-<contact-info>
-   <address category = "residence">
-      <name>Tanmay<!-- comment--> Patil</name>
-      <company>TutorialsPoint</company>
-      <!-- comment-->
-      <phone>(011) 123-4567</phone>
-   </address>
-</contact-info>

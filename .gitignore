@@ -129,4 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# Huge XML sample files
 samples/*.tar
+samples/*SRAN.xml
