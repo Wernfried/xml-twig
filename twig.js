@@ -38,10 +38,12 @@ const Any = new AnyHandler();
 
 /**
 * Reference to handler functions for Twig objects.<br> 
-* Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`
+* Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`<br> 
+* You can specify a `function` or a `event` name
 * @typedef TwigHandler 
-* @param {HandlerCondition} element - Element specification
-* @param {function} handler - Definition of handler function, either anonymous or explicit function
+* @param {HandlerCondition} tag - Element specification
+* @param {?HandlerFunction} function - Definition of handler function, either anonymous or explicit function
+* @param {?string} event - Type of the event to be emitted
 */
 
 /**
@@ -50,9 +52,9 @@ const Any = new AnyHandler();
 * - If `string` then the element name must be equal to the string
 * - If `RegExp` then the element name must match the Regular Expression
 * - If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`
-* - Use `Twig.Root` to specify the root element
+* - Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached
 * - Use `Twig.Any` to call the handler on every element
-* @typedef {string|RegExp|HandlerConditionFilter|Root|Any} HandlerCondition 
+* @typedef {string|RegExp|HandlerConditionFilter|RootHandler|AnyHandler} HandlerCondition 
 */
 
 /**
@@ -90,11 +92,11 @@ const Any = new AnyHandler();
 
 
 /**
- * Create a new Twig parser
- * @param {TwigHandler|TwigHandler[]} handler - Object or array of element specification and function to handle elements
- * @param {?ParserOptions} options - Object of optional options 
- * @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` and `sax` (default) are supported.
- */
+* Create a new Twig parser
+* @param {TwigHandler|TwigHandler[]} handler - Object or array of element specification and function to handle elements
+* @param {?ParserOptions} options - Object of optional options 
+* @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` and `sax` (default) are supported.
+*/
 function createParser(handler, options) {
    options = Object.assign({ method: SAX, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }, options)
    let parser;
@@ -103,9 +105,9 @@ function createParser(handler, options) {
 
    if (options.partial) {
       let hndl = Array.isArray(handler) ? handler : [handler];
-      let any = hndl.find(x => x.element instanceof Any);
+      let any = hndl.find(x => x.tag instanceof AnyHandler);
       if (any !== undefined)
-         console.warn(`Using option '{ partial: true }' and handler '{ element: Any, function: ${any.function.toString()} }' does not make much sense`);
+         console.warn(`Using option '{ partial: true }' and handler '{ tag: Any, function: ${any.function.toString()} }' does not make much sense`);
    }
 
    // `parser.on("...", err =>  {...}` does not work, because I need access to 'this'
@@ -115,18 +117,13 @@ function createParser(handler, options) {
 
       Object.defineProperty(parser, 'currentLine', {
          enumerable: true,
-         get() {
-            return parser._parser.line + 1;
-         }
+         get() { return parser._parser.line + 1 }
       });
       Object.defineProperty(parser, 'currentColumn', {
          enumerable: true,
-         get() {
-            return parser._parser.column + 1;
-         }
+         get() { return parser._parser.column + 1 }
       });
       parser.underlyingParser = parser._parser;
-
 
       closeEvent = "closetag";
       parser.on("opentagstart", function (node) {
@@ -139,13 +136,13 @@ function createParser(handler, options) {
                let elt = new Twig(node.name, current);
                if (options.partial) {
                   for (let hndl of Array.isArray(handler) ? handler : [handler]) {
-                     if (typeof hndl.element === 'string' && node.name === hndl.element) {
+                     if (typeof hndl.tag === 'string' && node.name === hndl.tag) {
                         elt.pin();
                         break;
-                     } else if (hndl.element instanceof RegExp && hndl.element.test(node.name)) {
+                     } else if (hndl.tag instanceof RegExp && hndl.tag.test(node.name)) {
                         elt.pin();
                         break;
-                     } else if (typeof hndl.element === 'function' && hndl.element(node.name, current ?? tree)) {
+                     } else if (typeof hndl.tag === 'function' && hndl.tag(node.name, current ?? tree)) {
                         elt.pin();
                         break;
                      }
@@ -206,27 +203,23 @@ function createParser(handler, options) {
       })
 
       let hndl = Array.isArray(handler) ? handler : [handler];
-      let rootHandler = hndl.find(x => x.element instanceof RootHandler);
-      if (rootHandler !== undefined) {
-         parser.on("end", function () {
-            rootHandler.handler(tree);
-         })
-      }
+      let rootHandler = hndl.find(x => x.tag instanceof RootHandler);
+      parser.on("end", function () {
+         if (typeof rootHandler?.function === 'function') rootHandler.function(tree);
+         if (typeof rootHandler?.event === 'string') parser.emit(rootHandler.event, tree);
+      })
+
    } else if (options.method === EXPAT) {
       parser = require("node-expat").createParser();
       parser.encoding = options.encoding;
 
       Object.defineProperty(parser, 'currentLine', {
          enumerable: true,
-         get() {
-            return parser.parser.getCurrentLineNumber();
-         }
+         get() { return parser.parser.getCurrentLineNumber() }
       });
       Object.defineProperty(parser, 'currentColumn', {
          enumerable: true,
-         get() {
-            return parser.parser.getCurrentColumnNumber();
-         }
+         get() { return parser.parser.getCurrentColumnNumber() }
       });
       parser.underlyingParser = parser.parser;
       closeEvent = "endElement";
@@ -241,13 +234,13 @@ function createParser(handler, options) {
                let elt = new Twig(name, current, attrs);
                if (options.partial) {
                   for (let hndl of Array.isArray(handler) ? handler : [handler]) {
-                     if (typeof hndl.element === 'string' && name === hndl.element) {
+                     if (typeof hndl.tag === 'string' && name === hndl.tag) {
                         elt.pin();
                         break;
-                     } else if (hndl.element instanceof RegExp && hndl.element.test(name)) {
+                     } else if (hndl.tag instanceof RegExp && hndl.tag.test(name)) {
                         elt.pin();
                         break;
-                     } else if (typeof hndl.element === 'function' && hndl.element(name, current ?? tree)) {
+                     } else if (typeof hndl.tag === 'function' && hndl.tag(name, current ?? tree)) {
                         elt.pin();
                         break;
                      }
@@ -296,23 +289,29 @@ function createParser(handler, options) {
       let purge = true;
 
       for (let hndl of Array.isArray(handler) ? handler : [handler]) {
-         if (hndl.element instanceof AnyHandler) {
-            hndl.handler(current ?? tree);
+         if (hndl.tag instanceof AnyHandler) {
+            if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+            if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
             purge = false;
-         } else if (hndl.element instanceof RootHandler && options.method === EXPAT && current.isRoot) {
-            hndl.handler(current ?? tree);
+         } else if (hndl.tag instanceof RootHandler && options.method === EXPAT && current.isRoot) {
+            if (typeof hndl.function === 'function') hndl.function(tree);
+            if (typeof hndl.event === 'string') parser.emit(hndl.event, tree);
             purge = false;
-         } else if (typeof hndl.element === 'string' && name === hndl.element) {
-            hndl.handler(current ?? tree);
+         } else if (typeof hndl.tag === 'string' && name === hndl.tag) {
+            if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+            if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
             purge = false;
-         } else if (hndl.element instanceof RegExp && hndl.element.test(name)) {
-            hndl.handler(current ?? tree);
+         } else if (hndl.tag instanceof RegExp && hndl.tag.test(name)) {
+            if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+            if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
             purge = false;
-         } else if (typeof hndl.element === 'function' && hndl.element(name, current ?? tree)) {
-            hndl.handler(current ?? tree);
+         } else if (typeof hndl.tag === 'function' && hndl.tag(name, current ?? tree)) {
+            if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+            if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
             purge = false;
          }
       }
+
       if (options.partial && purge && !current.pinned && !current.isRoot)
          current.purge();
       current = current.parent();
@@ -621,8 +620,8 @@ class Twig {
    #addChild = function (xw, childArray) {
       for (let elt of childArray) {
          xw.startElement(elt.name);
-         for (let key in elt.attributes)
-            xw.writeAttribute(key, elt.attributes[key]);
+         for (let [key, val] of Object.entries(elt.attributes))
+            xw.writeAttribute(key, val);
          if (elt.text !== null)
             xw.text(elt.text);
          this.#addChild(xw, elt.children());
@@ -641,8 +640,8 @@ class Twig {
       let xw = par instanceof XMLWriter ? par : new XMLWriter(par);
 
       xw.startElement(this.#name);
-      for (let key in this.#attributes)
-         xw.writeAttribute(key, this.#attributes[key]);
+      for (let [key, val] of Object.entries(this.#attributes))
+         xw.writeAttribute(key, val);
       if (this.#text !== null)
          xw.text(this.#text);
       this.#addChild(xw, this.#children);
@@ -754,45 +753,44 @@ class Twig {
 
    /**
    * Common function to filter Twig elements from array
-   * @param {Twig|Twig[]} elts - Array of elements you like to filter or a single element
+   * @param {Twig|Twig[]} elements - Array of elements you like to filter or a single element
    * @param {?ElementCondition} condition - The filter condition
    * @returns {Twig[]} List of matching elements or empty array
    */
-   filterElements(elts, condition) {
-      if (!Array.isArray(elts))
-         return filterElements([elts], condition);
+   filterElements(elements, condition) {
+      if (!Array.isArray(elements))
+         return filterElements([elements], condition);
 
       if (condition === undefined) {
-         return elts;
+         return elements;
       } else if (typeof condition === 'string') {
-         return elts.filter(x => x.name === condition);
-         //return this.filterElements(elts, x => { return x === condition });
+         return elements.filter(x => x.name === condition);
       } else if (condition instanceof RegExp) {
-         return elts.filter(x => x.condition.test(x.name));
+         return elements.filter(x => x.condition.test(x.name));
       } else if (condition instanceof Twig) {
-         return elts.filter(x => Object.is(x, condition));
+         return elements.filter(x => Object.is(x, condition));
       } else if (typeof condition === 'function') {
-         return elts.filter(x => condition(x.name, x));
+         return elements.filter(x => condition(x.name, x));
       }
    }
 
    /**
    * Common function to filter Twig element
-   * @param {Twig} elt - Element you like to filter
+   * @param {Twig} element - Element you like to filter
    * @param {?ElementCondition} condition - The filter condition
    * @returns {boolean} `true` if the condition matches
    */
-   testElement(elt, condition) {
+   testElement(element, condition) {
       if (condition === undefined) {
          return true;
       } else if (typeof condition === 'string') {
-         return elt.name === condition;
+         return element.name === condition;
       } else if (condition instanceof RegExp) {
-         return condition.test(elt.name);
+         return condition.test(element.name);
       } else if (condition instanceof Twig) {
-         return Object.is(elt, condition);
+         return Object.is(element, condition);
       } else if (typeof condition === 'function') {
-         return condition(elt.name, elt);
+         return condition(element.name, element);
       }
       return false;
    }
@@ -1114,54 +1112,5 @@ class UnsupportedCondition extends TypeError {
    }
 }
 
-
-
-
-
 module.exports = { createParser, Twig, Any, Root };
 
-/*
-// All events emit with a single argument. To listen to an event, assign a function to on<eventname>. 
-sax.EVENTS = [
-   'text',
-   'processinginstruction',
-   'sgmldeclaration',
-   'doctype',
-   'comment',
-   'opentagstart',
-   'attribute',
-   'opentag',
-   'closetag',
-   'opencdata',
-   'cdata',
-   'closecdata',
-   'error',
-   'end',
-   'ready',
-   'script',
-   'opennamespace',
-   'closenamespace'
- ]
-parser.onerror = function (e) {
-  // an error happened.
-};
-
-
-
-
-node-expat.events = {
-   #on('startElement' function (name, attrs) {})
-   #on('endElement' function (name) {})
-   #on('text' function (text) {})
-   #on('processingInstruction', function (target, data) {})
-   #on('comment', function (s) {})
-   #on('xmlDecl', function (version, encoding, standalone) {})
-   #on('startCdata', function () {})
-   #on('endCdata', function () {})
-   #on('entityDecl', function (entityName, isParameterEntity, value, base, systemId, publicId, notationName) {})
-   #on('error', function (e) {})
-   #stop() pauses
-   #resume() resumes
-}
-
-*/

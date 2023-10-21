@@ -63,17 +63,30 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
       console.log(`<${elt.name}> finished after ${parser.currentLine} lines`);
    }
 
-   parser = twig.createParser({ element: twig.Root, handler: rootHandler }, { method: 'sax' })
-   fs.createReadStream(`${__dirname}/../samples/bookstore.xml`).pipe(parser)
+   const parser = twig.createParser({ tag: twig.Root, function: rootHandler }, { method: 'sax' })
+   fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
    // Output -> <bookstore> finished after 48 lines
 
+
    // Or use a Parser object instead of a Stream - works only with 'expat'!
-   parser = twig.createParser({ element: twig.Root, handler: rootHandler }, { method: 'expat' })
+   const parser = twig.createParser({ tag: twig.Root, function: rootHandler }, { method: 'expat' })
    parser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
+
    // Output -> xml finished after 1 lines
+   ```
+
+   If you prefer events, then use `event` property instead of `function` in handler declaration:
 
    ```
+   const parser = twig.createParser({ tag: twig.Root, event: 'rootElement' }, { method: 'sax' })
+   fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
+
+   parser.on('rootElement', (elt) => {
+      console.log(`<${elt.name}> finished after ${parser.currentLine} lines`);
+   })
+   ```
+
 
 - Read XML Document in chucks
   
@@ -81,9 +94,6 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
 
    ```
-   const fs = require('fs')
-   const twig = require('xml-twig')
-
    function bookHandler(elt) {
       console.log(`${elt.attr("category")} ${elt.name} at line ${parser.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
@@ -91,25 +101,25 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
    // different styles: below `handle_book` are all equivalent (with sample file `bookstore.xml`)
    handle_book = [
-      { element: 'book', handler: bookHandler },
-      { element: 'ebook', handler: bookHandler }
+      { tag: 'book', function: bookHandler },
+      { tag: 'ebook', function: bookHandler }
    ];
-   handle_book = { element: /book$/, handler: bookHandler };
+   handle_book = { tag: /book$/, function: bookHandler };
    handle_book = [{
-      element: function(name, elt) { return name.endsWith('book') },
-      handler: bookHandler
+      tag: function(name, elt) { return name.endsWith('book') },
+      function: bookHandler
    }];
    handle_book = [{
-      element: function(name, elt) { return ['book', 'ebook'].includes(name) },
-      handler: bookHandler
+      tag: function(name, elt) { return ['book', 'ebook'].includes(name) },
+      function: bookHandler
    }];
    handle_book = [{
-      element: function(name, elt) { return ['book', 'ebook'].includes(elt.name) },
-      handler: bookHandler
+      tag: function(name, elt) { return ['book', 'ebook'].includes(elt.name) },
+      function: bookHandler
    }];
 
-   parser = twig.createParser(handle_book, { method: 'sax' })
-   fs.createReadStream(`${__dirname}/../samples/bookstore.xml`).pipe(parser)
+   const parser = twig.createParser(handle_book, { method: 'sax' })
+   fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
    Output: 
    
@@ -122,29 +132,17 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    ```
 
 - Read every element from XML Document
-
   
    ```
-   const fs = require('fs')
-   const twig = require('xml-twig')
-
    function anyHandler(elt) {
-      console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${elt.line}`)
+      console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${parser.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
-
-      // Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `elt.next()`, etc. on the current element.
-      // Such calls return emtpy result, because following element are not yet read from the XML file.
-      // You must navigate to an earlier element, e.g. 
-      `elt.root().children()[0].followingSibling()`
    }
 
-   const handle_any = [ { function: anyHandler } ];
-   
-   // or use regular expression which matches every element, if you prefer
-   const handle_any = [ { name: /./, function: anyHandler } ];
-
-   const parser = twig.createParser(handle_any)
-   fs.createReadStream(`${__dirname}/node_modules/xml-twig/samples/bookstore.xml`).pipe(parser)
+   const parser = twig.createParser({ tag: twig.Any, function: anyHandler }) 
+   // or with Regular Expression -> `{ tag: /i/, function: anyHandler }` 
+   // or with Function -> `{ tag: () => {return true}, function: anyHandler }`
+   fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
    Output: 
 
@@ -163,51 +161,58 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
    ```
 
+Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `elt.next()`, etc. on the current element. Such calls return empty result, because following element are not yet read from the XML file. You must navigate to an earlier element, e.g.<br>
+`elt.root().children()[0].followingSibling()`
+
 
 - Read only parts from XML Document
 
    If you like to read only certain elements, use option `partial: true`. The `root` element is always read. 
 
-
-   This sample program reads the `root` element and `<ebook>` elements (include their children elements), and the brances to reach the element.
+   This sample program reads the `root` element and `<ebook>` elements (include their children elements), and the branches to reach the element.
 
    ```
-   const handle_ebook = [{ name: 'ebook', function: ebookHandler }];
-   const parser = require('./twig.js').createParser(handle_ebook, { partial: true })
+   const handle_ebook = [
+      { tag: 'ebook', function: ebookHandler },
+      { tag: twig.Root, function: rootHandler }
+   ];
+   const parser = twig.createParser(handle_ebook, { partial: true })
    fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 
    function ebookHandler(elt) {
-      console.log( elt.root().writer('  ').toString() );
-      elt.purge();
+      console.log(`${elt.name} at line ${parser.currentLine}`)
    }
+
+   function rootHandler(elt) {
+      console.log( elt.writer('  ').toString() );
+   }
+
 
    Output:
 
+   ebook at line 23
+   ebook at line 41
    <bookstore>
      <ebook category="fantasy">
-        <title lang="en">Harry Potter</title>
-        <author>Joanne Kathleen Rowling</author>
-        <year>2001</year>
-        <price>12.99</price>
-        <format>Kindle</format>
-        <device>ePub</device>
+       <title lang="en">Harry Potter</title>
+       <author>Joanne Kathleen Rowling</author>
+       <year>2001</year>
+       <price>12.99</price>
+       <format>Kindle</format>
+       <device>ePub</device>
      </ebook>
-   </bookstore>
-
-   <bookstore>
      <ebook category="biography">
-        <title lang="en">The Autobiography of Benjamin Franklin</title>
-        <author>Benjamin Franklin</author>
-        <year>1996</year>
-        <price>39.99</price>
-        <format>Kindle</format>
-        <device>ePub</device>
+       <title lang="en">The Autobiography of Benjamin Franklin</title>
+       <author>Benjamin Franklin</author>
+       <year>1996</year>
+       <price>39.99</price>
+       <format>Kindle</format>
+       <device>ePub</device>
      </ebook>
    </bookstore>
-
    ```
 
-For details about other options, see [ParserOptions](./doc/twig.md#ParserOptions)
+For details and other options, see [ParserOptions](./doc/twig.md#ParserOptions) and [TwigHandler](./doc/twig.md#TwigHandler)
 
 
 ### Access elements and attributes
@@ -216,9 +221,9 @@ For details about other options, see [ParserOptions](./doc/twig.md#ParserOptions
 
 `.hasAttribute(name)`: Checks if the attribute exists and returns `true` or `false`
 
-`.attr(cond)`: Returns the value of attribute. If more than one attribute matches, then it returns all attributes as object
+`.attr(condition)`: Returns the value of attribute. If more than one attribute matches, then it returns all attributes as object
 
-`.attribute(cond)`: Get attributes as object or `null` if no matching attribute was found. If `cond` is `undefined`, then all attributes are returned.
+`.attribute(condition)`: Get attributes as object or `null` if no matching attribute was found. If `condition` is `undefined`, then all attributes are returned.
 
    Specify attribute name or regular expression or custom condition. For details see [AttributeCondition](./doc/twig.md#AttributeCondition).<br>
    Let's assume an XML element like this: `<person firstName="Jean-Luc", lastName="Picard", age="59" />` 
@@ -284,7 +289,7 @@ Here are some examples the get attribute and values:
 
 `.find(condition)` - **Twig**: Find a specific element in current element and returns the first match. In principle `.descendant(condition)[0]`
 
-`.purge()` - void: Removes the current element from tree. Usually this methond is called after the element has been processed and when not needed anymore.
+`.purge()` - void: Removes the current element from tree. Usually this method is called after the element has been processed and when not needed anymore.
 
 `.purgeUpTo(elt)` - void: Purges up to the elt element. This allows you to keep part of the tree in memory when you purge. 
 
@@ -304,11 +309,11 @@ You can specify condition on above methods. You can filter elements by following
 
   Example: `/book$/i`
 
-- With `ElementConditionFilter` you can speficy any custom filter function.<br>
+- With `ElementConditionFilter` you can specify any custom filter function.<br>
 
   Example: `(name, elt) => { return name === 'book' && elt.children().length > 1 }`
 
-- With a `Twig` object, you can specify the element direclty. Apart from `purgeUpTo(elt)`, it is rarely used, because when you know the element then there is no reason to find it again.
+- With a `Twig` object, you can specify the element directly. Apart from `purgeUpTo(elt)`, it is rarely used, because when you know the element then there is no reason to find it again.
 
   Example: `elt.children()[2]`
 
@@ -322,7 +327,7 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 #### Twig Properties
 
-`.isEmpty` - **boolean**: `true` if emtpy. An empty element ha no text nor any child elements, however empty elements can have attributes.
+`.isEmpty` - **boolean**: `true` if empty. An empty element ha no text nor any child elements, however empty elements can have attributes.
 
 `.level` - **integer**: The level of the element. Root element has 0, children have 1, grand-children 2 and so on
 
@@ -334,15 +339,11 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 `.isLastChild` - **boolean**: `true` if the element is the last child in the parent
 
-`.line` - **integer**: The line of the element (where the closing tag appears) in the XML-File. First line is 1
-
-`.column` - **integer**: The column of the element (where the closing tag appears) in the XML-File. First column is 1
-
 `.name` - **string**: Name of the element/tag
 
 `.tag` - **string**: Synonym for `name`
 
-`.text` - **string**: The text of an element, no matter if given as CDATA entitiy or plain character data node (PCDATA)
+`.text` - **string**: The text of an element, no matter if given as CDATA entity or plain character data node (PCDATA)
 
 `.attributes` - **object**: All attributes of the object
 
@@ -363,7 +364,7 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 ## Limitations
 
-This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the [Twig](./doc/twig.md#Twig) class. However, I think there are better modules available. Create/update/delete methods are rather limited. Perhaps I will add it in later release.
+This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the [Twig](./doc/twig.md#Twig) class. However, I think there are better modules available. Of course, you may run operations like `elt.root().children().push(elt.root().children()[0])`, but I think this is not so handy to use.
 
 Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more an [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
 
