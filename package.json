@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "sax": "^1.3.0",
     "xml-writer": "^1.7.0"
   },
   "name": "xml-twig",
@@ -10,8 +11,8 @@
     "doc": "doc"
   },
   "devDependencies": {
+    "jsdoc-to-markdown": "^8.0.0",
     "luxon": "^2.1.1",
-    "sax": "^1.3.0",
     "node-expat": "^2.4.0"
   },
   "scripts": {

@@ -5,7 +5,7 @@ Inspired by Perl module [XML::Twig](https://metacpan.org/pod/XML::Twig)
 
 
 ## When should I use this, motivation of this module
-When you need to read a XML file, then you have two pinciples:
+When you need to read a XML file, then you have two principles:
 
 * The **Document Object Model (DOM)** style. These parser read the entire XML document into memory. Usually they provide easy methods to navigate in the document tree or make modifications. 
 
@@ -20,20 +20,19 @@ This module tries to combine both principles. The XML document can be read in ch
 ## Dependencies
 XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. More parser may be added in future releases. By default the `sax` parser is used.
 
-**NOTE: The `sax` or `node-expat` module is not automatically installed with this module. Install desired parser by yourself**
+**NOTE: The `node-expat` module is not automatically installed with this module. Install the parser by yourself, if you like to use it**
 
 ## Installation
 
-Install module like any other node module and the desired underlying parser:
+Install module like any other node module and optionally `node-expat`:
 ```
 npm install xml-twig
 
-npm install sax
-# and/or
+# and optionally 
 npm install node-expat
 
 ```
-In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times faster than `sax` (node-expat: 2:20 Minutes, sax: 4:20 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why underlying parsers are not installed automatically. 
+In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times faster than `sax` (node-expat: 2:20 Minutes, sax: 4:20 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parsers is not installed automatically. 
 
 
 ## How to use it
@@ -42,7 +41,7 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
 
 In XML-Path, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processingInstruction`, `comment`, and `document`, see [Nodes at W3C](https://www.w3.org/TR/xpath-datamodel-31/#Node). XML documents are treated as trees of nodes.
 
-The [Twig](./doc/twig.md#Twig) Class models a "some-kind" Element tree.  I try to follow the [XML-Path](https://www.w3.org/TR/xpath/) conventions whenver possible to avoid confusion.
+The [Twig](./doc/twig.md#Twig) Class models a "some-kind" Element tree.  I try to follow the [XML-Path](https://www.w3.org/TR/xpath/) conventions whenever possible to avoid confusion.
 
 
 #### XML-Namespaces
@@ -61,23 +60,24 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    const twig = require('xml-twig')
 
    function rootHandler(elt) {
-      console.log(`${elt.name} finished after ${elt.line} lines`);
+      console.log(`<${elt.name}> finished after ${parser.currentLine} lines`);
    }
 
-   const parser = twig.createParser(rootHandler)
-   fs.createReadStream(`${__dirname}/node_modules/xml-twig/samples/bookstore.xml`).pipe(parser)
-   // Output -> bookstore finished after 48 lines
+   parser = twig.createParser({ element: twig.Root, handler: rootHandler }, { method: 'sax' })
+   fs.createReadStream(`${__dirname}/../samples/bookstore.xml`).pipe(parser)
+
+   // Output -> <bookstore> finished after 48 lines
 
    // Or use a Parser object instead of a Stream - works only with 'expat'!
-   const expatParser = require('./twig.js').createParser(rootHandler, { method: 'expat' })
-   expatParser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
+   parser = twig.createParser({ element: twig.Root, handler: rootHandler }, { method: 'expat' })
+   parser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
    // Output -> xml finished after 1 lines
 
    ```
 
 - Read XML Document in chucks
   
-  The key feature of this module is to read XML files and process it in chunks. You need to create handler function for elements you like to process. If you don't specify any `name` property, then handler is called on every element.
+  The key feature of this module is to read and process XML files in chunks. You need to create handler functions for elements you like to process.
 
 
    ```
@@ -85,33 +85,31 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    const twig = require('xml-twig')
 
    function bookHandler(elt) {
-      console.log(`${elt.attr("category")} ${elt.name} at line ${elt.line}`)
+      console.log(`${elt.attr("category")} ${elt.name} at line ${parser.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
    }
 
    // different styles: below `handle_book` are all equivalent (with sample file `bookstore.xml`)
    handle_book = [
-      { name: 'book', function: bookHandler },
-      { name: 'ebook', function: bookHandler }
+      { element: 'book', handler: bookHandler },
+      { element: 'ebook', handler: bookHandler }
    ];
-   handle_book = [
-      { name: /book$/, function: bookHandler }
-   ];
+   handle_book = { element: /book$/, handler: bookHandler };
    handle_book = [{
-      name: function(name,elt) { return name.endsWith('book') },
-      function: bookHandler
+      element: function(name, elt) { return name.endsWith('book') },
+      handler: bookHandler
    }];
    handle_book = [{
-      name: function(name,elt) { return ['book', 'ebook'].includes(name) },
-      function: bookHandler
+      element: function(name, elt) { return ['book', 'ebook'].includes(name) },
+      handler: bookHandler
    }];
    handle_book = [{
-      name: function(name,elt) { return ['book', 'ebook'].includes(elt.name) },
-      function: bookHandler
+      element: function(name, elt) { return ['book', 'ebook'].includes(elt.name) },
+      handler: bookHandler
    }];
 
-   const parser = twig.createParser(handle_book)
-   fs.createReadStream(`${__dirname}/node_modules/xml-twig/samples/bookstore.xml`).pipe(parser)
+   parser = twig.createParser(handle_book, { method: 'sax' })
+   fs.createReadStream(`${__dirname}/../samples/bookstore.xml`).pipe(parser)
 
    Output: 
    
@@ -125,9 +123,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
 - Read every element from XML Document
 
-  Skip the `name` proeprty if you like to read every element one-by-one:
-
-
+  
    ```
    const fs = require('fs')
    const twig = require('xml-twig')
