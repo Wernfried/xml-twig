@@ -88,7 +88,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    ```
 
 
-- Read XML Document in chucks
+- **Read XML Document in chucks**
   
   The key feature of this module is to read and process XML files in chunks. You need to create handler functions for elements you like to process.
 
@@ -131,7 +131,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    web book at line 48
    ```
 
-- Read every element from XML Document
+- **Read every element from XML Document**
   
    ```
    function anyHandler(elt) {
@@ -165,7 +165,7 @@ Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `
 `elt.root().children()[0].followingSibling()`
 
 
-- Read only parts from XML Document
+- **Read only parts from XML Document**
 
    If you like to read only certain elements, use option `partial: true`. The `root` element is always read. 
 
@@ -177,7 +177,7 @@ Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `
       { tag: twig.Root, function: rootHandler }
    ];
    const parser = twig.createParser(handle_ebook, { partial: true })
-   fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
+   fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser);
 
    function ebookHandler(elt) {
       console.log(`${elt.name} at line ${parser.currentLine}`)

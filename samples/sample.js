@@ -1,7 +1,7 @@
 const fs = require('fs');
 const twig = require('../twig.js');
 
-/*
+
 // Sample 1.1
 function rootHandler(elt) {
    console.log(`<${elt.name}> finished after ${parser.currentLine} lines`);
@@ -67,7 +67,7 @@ parser = twig.createParser({ tag: twig.Any, function: anyHandler })
 // or with Regular Expression: `{ tag: tag: /i/, function: anyHandler }` 
 // or with Function: `{ tag: () => {return true}, function: anyHandler }`
 fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
-*/
+
 
 // Sample 5
 const handle_ebook = [
