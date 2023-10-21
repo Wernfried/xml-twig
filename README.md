@@ -140,7 +140,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    }
 
    const parser = twig.createParser({ tag: twig.Any, function: anyHandler }) 
-   // or with Regular Expression -> `{ tag: /i/, function: anyHandler }` 
+   // or with Regular Expression -> `{ tag: /./, function: anyHandler }` 
    // or with Function -> `{ tag: () => {return true}, function: anyHandler }`
    fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
