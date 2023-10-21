@@ -37,18 +37,6 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
 
 ## How to use it
 
-#### Names and Definitions
-
-In XML-Path, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processingInstruction`, `comment`, and `document`, see [Nodes at W3C](https://www.w3.org/TR/xpath-datamodel-31/#Node). XML documents are treated as trees of nodes.
-
-The [Twig](./doc/twig.md#Twig) Class models a "some-kind" Element tree.  I try to follow the [XML-Path](https://www.w3.org/TR/xpath/) conventions whenever possible to avoid confusion.
-
-
-#### XML-Namespaces
-
-When the XML-Files uses [Namespaces](https://www.w3schools.com/xml/xml_namespaces.asp) then you can address the elements as they appear in the file, for example `cd:data`. 
-With option `{ namespaces : true }` you will get access to the `.namespace` property.
-
 ### Read XML Document
 
 - **Read entire XML file at once**
@@ -90,7 +78,9 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
 - **Read XML Document in chucks**
   
-  The key feature of this module is to read and process XML files in chunks. You need to create handler functions for elements you like to process.
+  The key feature of this module is to read and process XML files in chunks. You need to create handler functions for elements you like to process.<br>
+  The most notable difference to other parsers is the `purge()` and `purgeUpTo()` method. The parser reads the element and you decide how long you need to keep it in the memory. 
+  In many cases you will purge it immediatly after you have used it but in some cases you may keep the element for later use. The parser knows the element position in the XML-Tree. 
 
 
    ```
@@ -214,6 +204,18 @@ Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `
 
 For details and other options, see [ParserOptions](./doc/twig.md#ParserOptions) and [TwigHandler](./doc/twig.md#TwigHandler)
 
+
+#### Names and Definitions
+
+In XML-Path, there are seven kinds of nodes: `element`, `attribute`, `text`, `namespace`, `processingInstruction`, `comment`, and `document`, see [Nodes at W3C](https://www.w3.org/TR/xpath-datamodel-31/#Node). XML documents are treated as trees of nodes.
+
+The [Twig](./doc/twig.md#Twig) Class models a "some-kind" Element tree.  I try to follow the [XML-Path](https://www.w3.org/TR/xpath/) conventions whenever possible to avoid confusion.
+
+
+#### XML-Namespaces
+
+When the XML-Files uses [Namespaces](https://www.w3schools.com/xml/xml_namespaces.asp) then you can address the elements as they appear in the file, for example `cd:data`. 
+With option `{ namespaces : true }` you will get access to the `.namespace` property.
 
 ### Access elements and attributes
 
