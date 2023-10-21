@@ -51,7 +51,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 
 ### Read XML Document
 
-- Read entire XML file at once
+- *Read entire XML file at once*
 
   This module is designed to read huge XML-Files. Of course, it works also well for small files. First create the Twig parser. Then create a Stream and pipe it to the parser.
 
