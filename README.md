@@ -76,7 +76,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    // Output -> xml finished after 1 lines
    ```
 
-   If you prefer events, then use `event` property instead of `function` in handler declaration:
+   If you prefer [events](https://nodejs.org/api/events.html), then use `event` property instead of `function` in handler declaration:
 
    ```
    const parser = twig.createParser({ tag: twig.Root, event: 'rootElement' }, { method: 'sax' })
