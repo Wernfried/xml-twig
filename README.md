@@ -339,6 +339,8 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 `.isLastChild` - **boolean**: `true` if the element is the last child in the parent
 
+`.index` - **integer**: The postion (starting at 0) of the element within the parent. The root element returns always 0
+
 `.name` - **string**: Name of the element/tag
 
 `.tag` - **string**: Synonym for `name`
