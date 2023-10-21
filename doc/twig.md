@@ -20,7 +20,8 @@
 
 <dl>
 <dt><a href="#Root">Root</a> : <code>RootHandler</code></dt>
-<dd></dd>
+<dd><p>`</p>
+</dd>
 <dt><a href="#Any">Any</a> : <code>AnyHandler</code></dt>
 <dd></dd>
 </dl>
@@ -41,21 +42,22 @@
 </dd>
 <dt><a href="#TwigHandler">TwigHandler</a></dt>
 <dd><p>Reference to handler functions for Twig objects.<br> 
-Element can be specified as string, Regular Expression, custom function, <code>Twig.Root</code> or <code>Twig.Any</code></p>
+Element can be specified as string, Regular Expression, custom function, <code>Twig.Root</code> or <code>Twig.Any</code><br> 
+You can specify a <code>function</code> or a <code>event</code> name</p>
 </dd>
-<dt><a href="#HandlerFunction">HandlerFunction</a></dt>
-<dd><p>Handler function for Twig objects, i.e. the way you like to use the XML element.</p>
-</dd>
-<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code><a href="#Root">Root</a></code> | <code><a href="#Any">Any</a></code></dt>
+<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code>RootHandler</code> | <code>AnyHandler</code></dt>
 <dd><p>Condition to specify when handler shall be called<br> </p>
 <ul>
 <li>If <code>undefined</code>, then all elements are returned.<br> </li>
 <li>If <code>string</code> then the element name must be equal to the string</li>
 <li>If <code>RegExp</code> then the element name must match the Regular Expression</li>
-<li>If <a href="#HandlerConditionFilter">HandlerConditionFilter</a> then the element must filter function </li>
-<li>Use <code>Twig.Root</code> to specify the root element</li>
+<li>If <a href="#HandlerConditionFilter">HandlerConditionFilter</a> then function must return <code>true</code></li>
+<li>Use <code>Twig.Root</code> to call the handler on root element, i.e. when the end of document is reached</li>
 <li>Use <code>Twig.Any</code> to call the handler on every element</li>
 </ul>
+</dd>
+<dt><a href="#HandlerFunction">HandlerFunction</a></dt>
+<dd><p>Handler function for Twig objects, i.e. the way you like to use the XML element.</p>
 </dd>
 <dt><a href="#HandlerConditionFilter">HandlerConditionFilter</a> : <code>function</code></dt>
 <dd><p>Custom filter function to specify when handler shall be called</p>
@@ -66,12 +68,12 @@ Element can be specified as string, Regular Expression, custom function, <code>T
 <li>If <code>undefined</code>, then all elements are returned.<br> </li>
 <li>If <code>string</code> then the element name must be equal to the string</li>
 <li>If <code>RegExp</code> then the element name must match the Regular Expression</li>
-<li>If <a href="#ElementConditionFilter">ElementConditionFilter</a> then the element must filter function </li>
+<li>If <a href="#ElementConditionFilter">ElementConditionFilter</a> then function must return <code>true</code></li>
 <li>Use <a href="#Twig">Twig</a> object to find a specific element</li>
 </ul>
 </dd>
 <dt><a href="#ElementConditionFilter">ElementConditionFilter</a> : <code>function</code></dt>
-<dd><p>Custom filter function to get desired elements</p>
+<dd><p>Custom filter function to select desired elements</p>
 </dd>
 <dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
 <dd><p>Optional condition to get attributes<br> </p>
@@ -156,8 +158,8 @@ Element can be specified as string, Regular Expression, custom function, <code>T
     * [.purge()](#Twig+purge)
     * [.purgeUpTo(elt)](#Twig+purgeUpTo)
     * [.setRoot(name)](#Twig+setRoot) ℗
-    * [.filterElements(elts, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
-    * [.testElement(elt, condition)](#Twig+testElement) ⇒ <code>boolean</code>
+    * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+    * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
 
 <a name="new_Twig_new"></a>
 
@@ -676,7 +678,7 @@ Sets the name of root element. In some cases the root is created before the XML-
 
 <a name="Twig+filterElements"></a>
 
-### twig.filterElements(elts, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+### twig.filterElements(elements, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 Common function to filter Twig elements from array
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -684,12 +686,12 @@ Common function to filter Twig elements from array
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elts | [<code>Twig</code>](#Twig) \| [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter or a single element |
+| elements | [<code>Twig</code>](#Twig) \| [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter or a single element |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="Twig+testElement"></a>
 
-### twig.testElement(elt, condition) ⇒ <code>boolean</code>
+### twig.testElement(element, condition) ⇒ <code>boolean</code>
 Common function to filter Twig element
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -697,7 +699,7 @@ Common function to filter Twig element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elt | [<code>Twig</code>](#Twig) | Element you like to filter |
+| element | [<code>Twig</code>](#Twig) | Element you like to filter |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="Twig"></a>
@@ -757,8 +759,8 @@ Common function to filter Twig element
     * [.purge()](#Twig+purge)
     * [.purgeUpTo(elt)](#Twig+purgeUpTo)
     * [.setRoot(name)](#Twig+setRoot) ℗
-    * [.filterElements(elts, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
-    * [.testElement(elt, condition)](#Twig+testElement) ⇒ <code>boolean</code>
+    * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+    * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
 
 <a name="new_Twig_new"></a>
 
@@ -1277,7 +1279,7 @@ Sets the name of root element. In some cases the root is created before the XML-
 
 <a name="Twig+filterElements"></a>
 
-### twig.filterElements(elts, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+### twig.filterElements(elements, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 Common function to filter Twig elements from array
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -1285,12 +1287,12 @@ Common function to filter Twig elements from array
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elts | [<code>Twig</code>](#Twig) \| [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter or a single element |
+| elements | [<code>Twig</code>](#Twig) \| [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter or a single element |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="Twig+testElement"></a>
 
-### twig.testElement(elt, condition) ⇒ <code>boolean</code>
+### twig.testElement(element, condition) ⇒ <code>boolean</code>
 Common function to filter Twig element
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -1298,7 +1300,7 @@ Common function to filter Twig element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elt | [<code>Twig</code>](#Twig) | Element you like to filter |
+| element | [<code>Twig</code>](#Twig) | Element you like to filter |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="UnsupportedParser"></a>
@@ -1359,6 +1361,8 @@ Generic error for unsupported data types
 <a name="Root"></a>
 
 ## Root : <code>RootHandler</code>
+`
+
 **Kind**: global constant  
 <a name="Any"></a>
 
@@ -1377,7 +1381,7 @@ Create a new Twig parser
 
 | Param | Type | Description |
 | --- | --- | --- |
-| handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Function or array of function to handle elements |
+| handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Object or array of element specification and function to handle elements |
 | options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 
 <a name="ParserOptions"></a>
@@ -1404,15 +1408,22 @@ Optional settings for the Twig parser
 <a name="TwigHandler"></a>
 
 ## TwigHandler
-Reference to handler functions for Twig objects.<br> Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`
+Reference to handler functions for Twig objects.<br> Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`<br> You can specify a `function` or a `event` name
 
 **Kind**: global typedef  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| element | <code>string</code> \| <code>RegExp</code> \| [<code>Root</code>](#Root) \| [<code>Any</code>](#Any) \| [<code>HandlerCondition</code>](#HandlerCondition) | Element specification |
-| HandlerFunction | <code>function</code> | Definition of handler function, either anonymous or explicit function |
+| tag | [<code>HandlerCondition</code>](#HandlerCondition) | Element specification |
+| function | [<code>HandlerFunction</code>](#HandlerFunction) | Definition of handler function, either anonymous or explicit function |
+| event | <code>string</code> | Type of the event to be emitted |
 
+<a name="HandlerCondition"></a>
+
+## HandlerCondition : <code>string</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| <code>RootHandler</code> \| <code>AnyHandler</code>
+Condition to specify when handler shall be called<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`- Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached- Use `Twig.Any` to call the handler on every element
+
+**Kind**: global typedef  
 <a name="HandlerFunction"></a>
 
 ## HandlerFunction
@@ -1424,12 +1435,6 @@ Handler function for Twig objects, i.e. the way you like to use the XML element.
 | --- | --- | --- |
 | elt | [<code>Twig</code>](#Twig) | The current Twig element on which the function was called. |
 
-<a name="HandlerCondition"></a>
-
-## HandlerCondition : <code>string</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| [<code>Root</code>](#Root) \| [<code>Any</code>](#Any)
-Condition to specify when handler shall be called<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [HandlerConditionFilter](#HandlerConditionFilter) then the element must filter function - Use `Twig.Root` to specify the root element- Use `Twig.Any` to call the handler on every element
-
-**Kind**: global typedef  
 <a name="HandlerConditionFilter"></a>
 
 ## HandlerConditionFilter : <code>function</code>
@@ -1444,20 +1449,20 @@ Custom filter function to specify when handler shall be called
 <a name="ElementCondition"></a>
 
 ## ElementCondition : <code>string</code> \| <code>RegExp</code> \| [<code>ElementConditionFilter</code>](#ElementConditionFilter) \| [<code>Twig</code>](#Twig)
-Optional condition to get elements<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [ElementConditionFilter](#ElementConditionFilter) then the element must filter function - Use [Twig](#Twig) object to find a specific element
+Optional condition to get elements<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [ElementConditionFilter](#ElementConditionFilter) then function must return `true`- Use [Twig](#Twig) object to find a specific element
 
 **Kind**: global typedef  
 <a name="ElementConditionFilter"></a>
 
 ## ElementConditionFilter : <code>function</code>
-Custom filter function to get desired elements
+Custom filter function to select desired elements
 
 **Kind**: global typedef  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | Name of the element |
-| elt | [<code>Twig</code>](#Twig) | The full Twig object |
+| elt | [<code>Twig</code>](#Twig) | The Twig object |
 
 <a name="AttributeCondition"></a>
 
