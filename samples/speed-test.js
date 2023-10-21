@@ -1,11 +1,12 @@
 const { DateTime } = require('luxon');
 const startTime = DateTime.now();
 const fs = require('fs');
+const twig = require('xml-twig');
 
 let NE = 0;
 console.log('Starting...')
-let parser = require('xml-twig').createParser([{ name: 'subsession', function: anyHandler }], { method: 'expat' })
-let reader = fs.createReadStream(`${__dirname}/../samples/20231019015552.1-MSRAN.xml`);
+let parser = twig.createParser([{ tag: 'subsession', function: anyHandler }], { method: 'expat' })
+let reader = fs.createReadStream(`${__dirname}/20231019015552.1-MSRAN.xml`);
 reader.pipe(parser);
 
 function anyHandler(elt) {
