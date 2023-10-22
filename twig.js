@@ -199,7 +199,7 @@ function createParser(handler, options) {
          }
       })
       parser.on("cdata", function (str) {
-         current.setTextRaw(current.text ?? '' + str);
+         current.text = current.text ?? '' + str;
       })
 
       let hndl = Array.isArray(handler) ? handler : [handler];
@@ -320,7 +320,7 @@ function createParser(handler, options) {
 
    // Common events
    parser.on('text', function (str) {
-      current.setTextRaw(current.text ?? '' + options.trim ? str.trim() : str);
+      current.text = current.text ?? '' + options.trim ? str.trim() : str;
    })
 
    parser.on("comment", function (str) {
@@ -598,21 +598,12 @@ class Twig {
    */
    set text(value) {
       if (typeof value === 'string')
-         this.#text = escapeEntity(value)
+         this.#text = value
       else if (['number', 'bigint', 'boolean'].includes(typeof value))
-         this.#text = escapeEntity(value.toString())
+         this.#text = value.toString()
       else
          throw new UnsupportedType(value);
    }
-
-   /**
-   * Set the text of the element. Special characters are not escaped
-   * @param {string} value - New text of the element
-   */
-   setTextRaw = function (text) {
-      this.#text = text;
-   }
-
 
    /**
    * Pins the current element. Used for partial reading.
@@ -1100,46 +1091,26 @@ class Twig {
       return null;
    }
 
-   // Update elements:
-
    /**
-   * Insert a new element as child in current element
-   * @param {name|number} position - Position name 'first', 'last' or the position 
+   * Add a new element in the current element
    * @param {string} name - The tag name
    * @param {?string} text - Text of the element
    * @param {?object} attributes - Element attributes
-   * @returns {Twig} - The inserted element
+   * @param {name|number} position - Position name 'first', 'last' or the position in the `children`
+   * @returns {Twig} - The appended element
    */
-   addChild = function (position, name, text, attributes) {
-      let pos = position;
-      if (!this.hasChildren)
-         pos = 'last';
-      let twig = new Twig(name, this, attributes, pos);
-      twig.#text = escapeEntity(text) ?? null;
+   addElement = function (name, text, attributes, position) {
+      let twig = new Twig(name, this, attributes ?? {}, position ?? 'last');
+      twig.#text = text ?? null;
       twig.close();
       return twig;
    }
 
    /**
-   * Add a new sibling element to the current element
-   * @param {name|number} position - Position name 'first', 'last', 'before', 'after' or the position in the current `children` array
-   * @param {string} name - The tag name
-   * @param {?string} text - Text of the element
-   * @param {?object} attributes - Element attributes
-   * @returns {Twig} - The appended element
+   * Deletes the current element from tree, same as `purge()`. The root object cannot be deleted.
    */
-   addSibling = function (position, name, text, attributes) {
-      let pos = position;
-      if (position === 'before') {
-         pos = this.index;
-      } else if (position === 'after') {
-         pos = this.index + 1;
-      }
-      let twig = new Twig(name, this.parent, attributes, pos);
-      twig.#text = escapeEntity(text) ?? null;
-      twig.close();
-
-      return twig;
+   delete = function () {
+      this.purge();
    }
 
 
