@@ -17,6 +17,9 @@
 <dt><a href="#UnsupportedCondition">UnsupportedCondition</a></dt>
 <dd><p>Generic error for unsupported data types</p>
 </dd>
+<dt><a href="#InvalidPosition">InvalidPosition</a></dt>
+<dd><p>Error for invalid children position</p>
+</dd>
 </dl>
 
 ## Constants
@@ -111,7 +114,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, parent, attributes, [position])](#new_Twig_new)
+    * [new Twig(name, parent, attributes, index)](#new_Twig_new)
     * [.attributes](#Twig+attributes) ℗
     * [.text](#Twig+text) ℗
     * [.name](#Twig+name) ℗
@@ -130,7 +133,6 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
-    * [.setTextRaw](#Twig+setTextRaw)
     * [.pin](#Twig+pin)
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
     * [.close](#Twig+close)
@@ -162,8 +164,8 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.nextSibling](#Twig+nextSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.prevSibling](#Twig+prevSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.find](#Twig+find) ⇒ [<code>Twig</code>](#Twig)
-    * [.insertElement](#Twig+insertElement) ⇒ [<code>Twig</code>](#Twig)
-    * [.addSibling](#Twig+addSibling) ⇒ [<code>Twig</code>](#Twig)
+    * [.addElement](#Twig+addElement) ⇒ [<code>Twig</code>](#Twig)
+    * [.delete](#Twig+delete)
     * [.setRoot(name)](#Twig+setRoot) ℗
     * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
     * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
@@ -175,16 +177,16 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, parent, attributes, [position])
+### new Twig(name, parent, attributes, index)
 Create a new Twig object
 
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| name | <code>string</code> |  | The name of the XML element |
-| parent | [<code>Twig</code>](#Twig) |  | The parent object |
-| attributes | <code>object</code> |  | Attribute object |
-| [position] | <code>string</code> \| <code>number</code> | <code>&quot;&#x27;last&#x27;&quot;</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array.<>  Defaults to 'last' |
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The name of the XML element |
+| parent | [<code>Twig</code>](#Twig) | The parent object |
+| attributes | <code>object</code> | Attribute object |
+| index | <code>string</code> \| <code>number</code> | Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last' |
 
 <a name="Twig+attributes"></a>
 
@@ -350,17 +352,6 @@ Update the text of the element
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New text of the element |
-
-<a name="Twig+setTextRaw"></a>
-
-### twig.setTextRaw
-Set the text of the element. Special characters are not escaped
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| value | <code>string</code> | New text of the element |
 
 <a name="Twig+pin"></a>
 
@@ -694,35 +685,27 @@ Find a specific element within current element. Same as `.descendant(condition)[
 | --- | --- | --- |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | Find condition |
 
-<a name="Twig+insertElement"></a>
+<a name="Twig+addElement"></a>
 
-### twig.insertElement ⇒ [<code>Twig</code>](#Twig)
-Insert a new element as child in current element
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: [<code>Twig</code>](#Twig) - - The inserted element  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | The tag name |
-| text | <code>string</code> | Text of the element |
-| attributes | <code>object</code> | Element attributes |
-
-<a name="Twig+addSibling"></a>
-
-### twig.addSibling ⇒ [<code>Twig</code>](#Twig)
-Add a new sibling element to the current element
+### twig.addElement ⇒ [<code>Twig</code>](#Twig)
+Add a new element in the current element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: [<code>Twig</code>](#Twig) - - The appended element  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array |
 | name | <code>string</code> | The tag name |
 | text | <code>string</code> | Text of the element |
 | attributes | <code>object</code> | Element attributes |
+| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last' or the position in the `children` |
 
+<a name="Twig+delete"></a>
+
+### twig.delete
+Deletes the current element from tree, same as `purge()`. The root object cannot be deleted.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
 <a name="Twig+setRoot"></a>
 
 ### twig.setRoot(name) ℗
@@ -768,7 +751,7 @@ Common function to filter Twig element
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, parent, attributes, [position])](#new_Twig_new)
+    * [new Twig(name, parent, attributes, index)](#new_Twig_new)
     * [.attributes](#Twig+attributes) ℗
     * [.text](#Twig+text) ℗
     * [.name](#Twig+name) ℗
@@ -787,7 +770,6 @@ Common function to filter Twig element
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
-    * [.setTextRaw](#Twig+setTextRaw)
     * [.pin](#Twig+pin)
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
     * [.close](#Twig+close)
@@ -819,8 +801,8 @@ Common function to filter Twig element
     * [.nextSibling](#Twig+nextSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.prevSibling](#Twig+prevSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.find](#Twig+find) ⇒ [<code>Twig</code>](#Twig)
-    * [.insertElement](#Twig+insertElement) ⇒ [<code>Twig</code>](#Twig)
-    * [.addSibling](#Twig+addSibling) ⇒ [<code>Twig</code>](#Twig)
+    * [.addElement](#Twig+addElement) ⇒ [<code>Twig</code>](#Twig)
+    * [.delete](#Twig+delete)
     * [.setRoot(name)](#Twig+setRoot) ℗
     * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
     * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
@@ -832,16 +814,16 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, parent, attributes, [position])
+### new Twig(name, parent, attributes, index)
 Create a new Twig object
 
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| name | <code>string</code> |  | The name of the XML element |
-| parent | [<code>Twig</code>](#Twig) |  | The parent object |
-| attributes | <code>object</code> |  | Attribute object |
-| [position] | <code>string</code> \| <code>number</code> | <code>&quot;&#x27;last&#x27;&quot;</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array.<>  Defaults to 'last' |
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The name of the XML element |
+| parent | [<code>Twig</code>](#Twig) | The parent object |
+| attributes | <code>object</code> | Attribute object |
+| index | <code>string</code> \| <code>number</code> | Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last' |
 
 <a name="Twig+attributes"></a>
 
@@ -1007,17 +989,6 @@ Update the text of the element
 | Param | Type | Description |
 | --- | --- | --- |
 | value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New text of the element |
-
-<a name="Twig+setTextRaw"></a>
-
-### twig.setTextRaw
-Set the text of the element. Special characters are not escaped
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| value | <code>string</code> | New text of the element |
 
 <a name="Twig+pin"></a>
 
@@ -1351,35 +1322,27 @@ Find a specific element within current element. Same as `.descendant(condition)[
 | --- | --- | --- |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | Find condition |
 
-<a name="Twig+insertElement"></a>
+<a name="Twig+addElement"></a>
 
-### twig.insertElement ⇒ [<code>Twig</code>](#Twig)
-Insert a new element as child in current element
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Returns**: [<code>Twig</code>](#Twig) - - The inserted element  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | The tag name |
-| text | <code>string</code> | Text of the element |
-| attributes | <code>object</code> | Element attributes |
-
-<a name="Twig+addSibling"></a>
-
-### twig.addSibling ⇒ [<code>Twig</code>](#Twig)
-Add a new sibling element to the current element
+### twig.addElement ⇒ [<code>Twig</code>](#Twig)
+Add a new element in the current element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: [<code>Twig</code>](#Twig) - - The appended element  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array |
 | name | <code>string</code> | The tag name |
 | text | <code>string</code> | Text of the element |
 | attributes | <code>object</code> | Element attributes |
+| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last' or the position in the `children` |
 
+<a name="Twig+delete"></a>
+
+### twig.delete
+Deletes the current element from tree, same as `purge()`. The root object cannot be deleted.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
 <a name="Twig+setRoot"></a>
 
 ### twig.setRoot(name) ℗
@@ -1478,6 +1441,25 @@ Generic error for unsupported data types
 | --- | --- | --- |
 | condition | <code>\*</code> | The condition value |
 | t | <code>Array.&lt;string&gt;</code> | List of supported data types |
+
+<a name="InvalidPosition"></a>
+
+## InvalidPosition
+Error for invalid children position
+
+**Kind**: global class  
+<a name="new_InvalidPosition_new"></a>
+
+### new InvalidPosition(p, values)
+**Throws**:
+
+- InvalidPosition
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| p | <code>\*</code> | The position value |
+| values | <code>Array.&lt;string&gt;</code> | The position index |
 
 <a name="Root"></a>
 

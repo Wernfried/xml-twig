@@ -1168,20 +1168,6 @@ class UnsupportedCondition extends TypeError {
    }
 }
 
-/**
- * Error for invalid children position
- * @exception InvalidPosition
- */
-class InvalidPosition extends TypeError {
-   /**
-   * @param {*} p The position value
-   * @param {string[]} values The position index
-   */
-   constructor(position, valid) {
-      super(`Position ${position} not valid. must be a number or one of ${valid.map(x => `'${x}'`).join(' or ')}`);
-   }
-}
-
 
 module.exports = { createParser, Twig, Any, Root };
 
