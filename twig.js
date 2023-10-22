@@ -1,6 +1,5 @@
 const SAX = 'sax';
 const EXPAT = 'expat';
-const entities = require("entities");
 
 let tree;
 let current;
@@ -353,7 +352,6 @@ function createParser(handler, options) {
    return parser;
 }
 
-
 /**
  * Generic class modeling a XML Node
  * @class Twig
@@ -461,7 +459,7 @@ class Twig {
    /**
    * Purges the current, typically used after element has been processed.<br>The root object cannot be purged.
    */
-   purge() {
+   purge = function () {
       if (!this.isRoot)
          this.#parent.#children = this.#parent.#children.filter(x => !Object.is(this, x));
    }
@@ -471,7 +469,7 @@ class Twig {
    * @param {Twig} elt - Up to this element the tree will be purged. The `elt` object itself is not purged.<br>
    * If `undefined` then the current element is purged (i.e. `purge()`)
    */
-   purgeUpTo(elt) {
+   purgeUpTo = function (elt) {
       if (elt === undefined) {
          this.purge();
       } else {
@@ -485,6 +483,19 @@ class Twig {
             purgeThis = prev;
          }
       }
+   }
+
+   /**
+   * Escapes special XML characters. According W3C specification these are only `&, <, >, ", '` - this is a XML parser, not HTML!
+   * @param {string} text - Input text to be escaped
+   */
+   escape = function (text) {
+      return text
+         .replaceAll("&", "&amp;")
+         .replaceAll("<", "&lt;")
+         .replaceAll(">", "&gt;")
+         .replaceAll('"', "&quot;")
+         .replaceAll("'", "&apos;");
    }
 
    /**
@@ -575,9 +586,9 @@ class Twig {
    */
    set text(value) {
       if (typeof value === 'string')
-         this.#text = entities.escapeUTF8(value)
+         this.#text = escape(value)
       else if (['number', 'bigint', 'boolean'].includes(typeof value))
-         this.#text = entities.escapeUTF8(value.toString())
+         this.#text = escape(value.toString())
       else
          throw new UnsupportedType(value);
    }
@@ -1088,7 +1099,7 @@ class Twig {
    */
    insertElement = function (name, text, attributes) {
       let twig = new Twig(name, this, attributes);
-      twig.#text = entities.escapeUTF8(text) ?? null;
+      twig.#text = escape(text) ?? null;
       twig.close();
       return twig;
    }
@@ -1102,7 +1113,7 @@ class Twig {
    */
    appendElement = function (name, text, attributes) {
       let twig = new Twig(name, this.parent, attributes);
-      twig.#text = entities.escapeUTF8(text) ?? null;
+      twig.#text = escape(text) ?? null;
       twig.close();
       return twig;
    }
