@@ -1,5 +1,6 @@
 const SAX = 'sax';
 const EXPAT = 'expat';
+const entities = require("entities");
 
 let tree;
 let current;
@@ -199,7 +200,7 @@ function createParser(handler, options) {
          }
       })
       parser.on("cdata", function (str) {
-         current.text = current.text ?? '' + str;
+         current.setTextRaw(current.text ?? '' + str);
       })
 
       let hndl = Array.isArray(handler) ? handler : [handler];
@@ -320,7 +321,7 @@ function createParser(handler, options) {
 
    // Common events
    parser.on('text', function (str) {
-      current.text = current.text ?? '' + options.trim ? str.trim() : str;
+      current.setTextRaw(current.text ?? '' + options.trim ? str.trim() : str);
    })
 
    parser.on("comment", function (str) {
@@ -568,19 +569,27 @@ class Twig {
    }
 
    /**
-   * Modifies the text of the element
+   * Update the text of the element
    * @param {string|number|bigint|boolean} value - New text of the element
-   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<![CDATA[ ... ]]>' or '<!-- ... -->'
    * @throws {UnsupportedType} - If value is not a string, boolean or numeric type
    */
    set text(value) {
       if (typeof value === 'string')
-         this.#text = value
+         this.#text = entities.escapeUTF8(value)
       else if (['number', 'bigint', 'boolean'].includes(typeof value))
-         this.#text = value.toString()
+         this.#text = entities.escapeUTF8(value.toString())
       else
          throw new UnsupportedType(value);
    }
+
+   /**
+   * Set the text of the element. Special characters are not escaped
+   * @param {string} value - New text of the element
+   */
+   setTextRaw = function (text) {
+      this.#text = text;
+   }
+
 
    /**
    * Pins the current element. Used for partial reading.
@@ -1076,11 +1085,10 @@ class Twig {
    * @param {?string} text - Text of the element
    * @param {?object} attributes - Element attributes
    * @returns {Twig} - The inserted element
-   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<![CDATA[ ... ]]>' or '<!-- ... -->'
    */
    insertElement = function (name, text, attributes) {
       let twig = new Twig(name, this, attributes);
-      twig.#text = text ?? null;
+      twig.#text = entities.escapeUTF8(text) ?? null;
       twig.close();
       return twig;
    }
@@ -1091,11 +1099,10 @@ class Twig {
    * @param {?string} text - Text of the element
    * @param {?object} attributes - Element attributes
    * @returns {Twig} - The appended element
-   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<![CDATA[ ... ]]>' or '<!-- ... -->'
    */
    appendElement = function (name, text, attributes) {
       let twig = new Twig(name, this.parent, attributes);
-      twig.#text = text ?? null;
+      twig.#text = entities.escapeUTF8(text) ?? null;
       twig.close();
       return twig;
    }
