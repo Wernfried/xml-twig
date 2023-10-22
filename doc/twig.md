@@ -17,9 +17,6 @@
 <dt><a href="#UnsupportedCondition">UnsupportedCondition</a></dt>
 <dd><p>Generic error for unsupported data types</p>
 </dd>
-<dt><a href="#InvalidPosition">InvalidPosition</a></dt>
-<dd><p>Error for invalid children position</p>
-</dd>
 </dl>
 
 ## Constants
@@ -1441,25 +1438,6 @@ Generic error for unsupported data types
 | --- | --- | --- |
 | condition | <code>\*</code> | The condition value |
 | t | <code>Array.&lt;string&gt;</code> | List of supported data types |
-
-<a name="InvalidPosition"></a>
-
-## InvalidPosition
-Error for invalid children position
-
-**Kind**: global class  
-<a name="new_InvalidPosition_new"></a>
-
-### new InvalidPosition(p, values)
-**Throws**:
-
-- InvalidPosition
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| p | <code>\*</code> | The position value |
-| values | <code>Array.&lt;string&gt;</code> | The position index |
 
 <a name="Root"></a>
 
