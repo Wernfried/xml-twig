@@ -434,9 +434,12 @@ class Twig {
    * @param {string} name - The name of the XML element
    * @param {Twig} parent - The parent object
    * @param {?object} attributes - Attribute object
+   * @param {string|number} index - Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last'
    */
-   constructor(name, parent, attributes) {
-      current = this;
+   constructor(name, parent, attributes, index) {
+      if (index === undefined)
+         current = this;
+
       if (name === null) {
          // Root element not available yet
          tree = this;
@@ -451,7 +454,16 @@ class Twig {
             this.#parent = parent;
             if (this.#parent.#pinned)
                this.#pinned = true;
-            parent.#children.push(this);
+            if (index === 'last' || index === undefined) {
+               parent.#children.push(this);
+            } else if (index === 'first') {
+               parent.#children.unshift(this);
+            } else if (typeof index === 'number') {
+               parent.#children = parent.#children.slice(0, index).concat(this, parent.#children.slice(index));
+            } else {
+               parent.#children.push(this);
+            }
+
          }
       }
    }
@@ -489,7 +501,7 @@ class Twig {
    * Escapes special XML characters. According W3C specification these are only `&, <, >, ", '` - this is a XML parser, not HTML!
    * @param {string} text - Input text to be escaped
    */
-   escape = function (text) {
+   escapeEntity = function (text) {
       return text
          .replaceAll("&", "&amp;")
          .replaceAll("<", "&lt;")
@@ -586,9 +598,9 @@ class Twig {
    */
    set text(value) {
       if (typeof value === 'string')
-         this.#text = escape(value)
+         this.#text = escapeEntity(value)
       else if (['number', 'bigint', 'boolean'].includes(typeof value))
-         this.#text = escape(value.toString())
+         this.#text = escapeEntity(value.toString())
       else
          throw new UnsupportedType(value);
    }
@@ -1092,31 +1104,44 @@ class Twig {
 
    /**
    * Insert a new element as child in current element
+   * @param {name|number} position - Position name 'first', 'last' or the position 
    * @param {string} name - The tag name
    * @param {?string} text - Text of the element
    * @param {?object} attributes - Element attributes
    * @returns {Twig} - The inserted element
    */
-   insertElement = function (name, text, attributes) {
-      let twig = new Twig(name, this, attributes);
-      twig.#text = escape(text) ?? null;
+   addChild = function (position, name, text, attributes) {
+      let pos = position;
+      if (!this.hasChildren)
+         pos = 'last';
+      let twig = new Twig(name, this, attributes, pos);
+      twig.#text = escapeEntity(text) ?? null;
       twig.close();
       return twig;
    }
 
    /**
-   * Appends a new element to the current parent, i.e. add a new sibling
+   * Add a new sibling element to the current element
+   * @param {name|number} position - Position name 'first', 'last', 'before', 'after' or the position in the current `children` array
    * @param {string} name - The tag name
    * @param {?string} text - Text of the element
    * @param {?object} attributes - Element attributes
    * @returns {Twig} - The appended element
    */
-   appendElement = function (name, text, attributes) {
-      let twig = new Twig(name, this.parent, attributes);
-      twig.#text = escape(text) ?? null;
+   addSibling = function (position, name, text, attributes) {
+      let pos = position;
+      if (position === 'before') {
+         pos = this.index;
+      } else if (position === 'after') {
+         pos = this.index + 1;
+      }
+      let twig = new Twig(name, this.parent, attributes, pos);
+      twig.#text = escapeEntity(text) ?? null;
       twig.close();
+
       return twig;
    }
+
 
 }
 
@@ -1145,7 +1170,6 @@ class UnsupportedParser extends TypeError {
    }
 }
 
-
 /**
  * Generic error for unsupported data types
  * @exception UnsupportedType
@@ -1172,6 +1196,21 @@ class UnsupportedCondition extends TypeError {
       super(`Condition '${JSON.stringify(condition)}' must be a ${t.map(x => `'${x}'`).join(' or ')}`);
    }
 }
+
+/**
+ * Error for invalid children position
+ * @exception InvalidPosition
+ */
+class InvalidPosition extends TypeError {
+   /**
+   * @param {*} p The position value
+   * @param {string[]} values The position index
+   */
+   constructor(position, valid) {
+      super(`Position ${position} not valid. must be a number or one of ${valid.map(x => `'${x}'`).join(' or ')}`);
+   }
+}
+
 
 module.exports = { createParser, Twig, Any, Root };
 

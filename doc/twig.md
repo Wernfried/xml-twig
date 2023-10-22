@@ -5,6 +5,9 @@
 <dd></dd>
 <dt><a href="#Twig">Twig</a></dt>
 <dd></dd>
+<dt><a href="#NotImplementedYet">NotImplementedYet</a></dt>
+<dd><p>Generic error for non implemented feature</p>
+</dd>
 <dt><a href="#UnsupportedParser">UnsupportedParser</a></dt>
 <dd><p>Error for unsupported data types</p>
 </dd>
@@ -108,13 +111,16 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, parent, attributes)](#new_Twig_new)
+    * [new Twig(name, parent, attributes, [position])](#new_Twig_new)
     * [.attributes](#Twig+attributes) ℗
     * [.text](#Twig+text) ℗
     * [.name](#Twig+name) ℗
     * [.children](#Twig+children) ℗
     * [.parent](#Twig+parent) ℗
     * [.pinned](#Twig+pinned) ℗
+    * [.purge](#Twig+purge)
+    * [.purgeUpTo](#Twig+purgeUpTo)
+    * [.escapeEntity](#Twig+escapeEntity)
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
@@ -124,9 +130,9 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
+    * [.setTextRaw](#Twig+setTextRaw)
     * [.pin](#Twig+pin)
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
-    * [.text](#Twig+text)
     * [.close](#Twig+close)
     * [.addChild](#Twig+addChild) ℗
     * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
@@ -134,6 +140,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.attributes](#Twig+attributes) ⇒ <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
+    * [.deleteAttribute](#Twig+deleteAttribute)
     * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
     * [.self](#Twig+self) ⇒ [<code>Twig</code>](#Twig)
@@ -155,8 +162,8 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.nextSibling](#Twig+nextSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.prevSibling](#Twig+prevSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.find](#Twig+find) ⇒ [<code>Twig</code>](#Twig)
-    * [.purge()](#Twig+purge)
-    * [.purgeUpTo(elt)](#Twig+purgeUpTo)
+    * [.insertElement](#Twig+insertElement) ⇒ [<code>Twig</code>](#Twig)
+    * [.addSibling](#Twig+addSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.setRoot(name)](#Twig+setRoot) ℗
     * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
     * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
@@ -168,15 +175,16 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, parent, attributes)
+### new Twig(name, parent, attributes, [position])
 Create a new Twig object
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | The name of the XML element |
-| parent | [<code>Twig</code>](#Twig) | The parent object |
-| attributes | <code>object</code> | Attribute object |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | The name of the XML element |
+| parent | [<code>Twig</code>](#Twig) |  | The parent object |
+| attributes | <code>object</code> |  | Attribute object |
+| [position] | <code>string</code> \| <code>number</code> | <code>&quot;&#x27;last&#x27;&quot;</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array.<>  Defaults to 'last' |
 
 <a name="Twig+attributes"></a>
 
@@ -244,6 +252,34 @@ Create a new Twig object
 | --- | --- | --- |
 | #pinned | <code>boolean</code> | Determines whether twig is needed in partial load |
 
+<a name="Twig+purge"></a>
+
+### twig.purge
+Purges the current, typically used after element has been processed.<br>The root object cannot be purged.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+<a name="Twig+purgeUpTo"></a>
+
+### twig.purgeUpTo
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elt | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+
+<a name="Twig+escapeEntity"></a>
+
+### twig.escapeEntity
+Escapes special XML characters. According W3C specification these are only `&, <, >, ", '` - this is a XML parser, not HTML!
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| text | <code>string</code> | Input text to be escaped |
+
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
@@ -303,17 +339,28 @@ The text of the element. No matter if given as text or CDATA entity
 <a name="Twig+text"></a>
 
 ### twig.text
-Modifies the text of the element
+Update the text of the element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Throws**:
 
-- [<code>UnsupportedType</code>](#UnsupportedType) - If value is not a string or numeric type
+- [<code>UnsupportedType</code>](#UnsupportedType) - If value is not a string, boolean or numeric type
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| value | <code>string</code> | New value of the attribute |
+| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New text of the element |
+
+<a name="Twig+setTextRaw"></a>
+
+### twig.setTextRaw
+Set the text of the element. Special characters are not escaped
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>string</code> | New text of the element |
 
 <a name="Twig+pin"></a>
 
@@ -328,21 +375,6 @@ Checks if element is pinned
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - `true` when the element is pinned  
-<a name="Twig+text"></a>
-
-### twig.text
-Modifies the text of the element
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Throws**:
-
-- [<code>UnsupportedType</code>](#UnsupportedType) - If value is not a string or numeric type
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| value | <code>string</code> | New value of the attribute |
-
 <a name="Twig+close"></a>
 
 ### twig.close
@@ -407,20 +439,35 @@ Check if the attribute exist or not
 <a name="Twig+attribute"></a>
 
 ### twig.attribute ⇒ <code>object</code>
-Retrieve or update XML attribute.
+Retrieve or update XML attribute. For update, the condition must be a string, i.e. must match to one attribute only.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>object</code> - Attributes or `null` if no matching attribute found  
+**Todo**
+
+- [ ] Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<!-- ... -->'
+
 
 | Param | Type | Description |
 | --- | --- | --- |
 | condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
-| text | <code>string</code> \| <code>number</code> | New value of the attribute |
+| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attriubtes is returned. |
 
 **Example**  
 ```js
 attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
 ```
+<a name="Twig+deleteAttribute"></a>
+
+### twig.deleteAttribute
+Delete the attribute
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The attribute name |
+
 <a name="Twig+root"></a>
 
 ### twig.root ⇒ [<code>Twig</code>](#Twig)
@@ -647,22 +694,34 @@ Find a specific element within current element. Same as `.descendant(condition)[
 | --- | --- | --- |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | Find condition |
 
-<a name="Twig+purge"></a>
+<a name="Twig+insertElement"></a>
 
-### twig.purge()
-Purges the current, typically used after element has been processed.<br>The root object cannot be purged.
+### twig.insertElement ⇒ [<code>Twig</code>](#Twig)
+Insert a new element as child in current element
 
-**Kind**: instance method of [<code>Twig</code>](#Twig)  
-<a name="Twig+purgeUpTo"></a>
-
-### twig.purgeUpTo(elt)
-Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
-
-**Kind**: instance method of [<code>Twig</code>](#Twig)  
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - - The inserted element  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elt | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+| name | <code>string</code> | The tag name |
+| text | <code>string</code> | Text of the element |
+| attributes | <code>object</code> | Element attributes |
+
+<a name="Twig+addSibling"></a>
+
+### twig.addSibling ⇒ [<code>Twig</code>](#Twig)
+Add a new sibling element to the current element
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - - The appended element  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array |
+| name | <code>string</code> | The tag name |
+| text | <code>string</code> | Text of the element |
+| attributes | <code>object</code> | Element attributes |
 
 <a name="Twig+setRoot"></a>
 
@@ -709,13 +768,16 @@ Common function to filter Twig element
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, parent, attributes)](#new_Twig_new)
+    * [new Twig(name, parent, attributes, [position])](#new_Twig_new)
     * [.attributes](#Twig+attributes) ℗
     * [.text](#Twig+text) ℗
     * [.name](#Twig+name) ℗
     * [.children](#Twig+children) ℗
     * [.parent](#Twig+parent) ℗
     * [.pinned](#Twig+pinned) ℗
+    * [.purge](#Twig+purge)
+    * [.purgeUpTo](#Twig+purgeUpTo)
+    * [.escapeEntity](#Twig+escapeEntity)
     * [.isEmpty](#Twig+isEmpty) ⇒ <code>boolean</code>
     * [.level](#Twig+level) ⇒ <code>number</code>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
@@ -725,9 +787,9 @@ Common function to filter Twig element
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
     * [.text](#Twig+text)
+    * [.setTextRaw](#Twig+setTextRaw)
     * [.pin](#Twig+pin)
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
-    * [.text](#Twig+text)
     * [.close](#Twig+close)
     * [.addChild](#Twig+addChild) ℗
     * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
@@ -735,6 +797,7 @@ Common function to filter Twig element
     * [.attributes](#Twig+attributes) ⇒ <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
     * [.attribute](#Twig+attribute) ⇒ <code>object</code>
+    * [.deleteAttribute](#Twig+deleteAttribute)
     * [.root](#Twig+root) ⇒ [<code>Twig</code>](#Twig)
     * [.parent](#Twig+parent) ⇒ [<code>Twig</code>](#Twig)
     * [.self](#Twig+self) ⇒ [<code>Twig</code>](#Twig)
@@ -756,8 +819,8 @@ Common function to filter Twig element
     * [.nextSibling](#Twig+nextSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.prevSibling](#Twig+prevSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.find](#Twig+find) ⇒ [<code>Twig</code>](#Twig)
-    * [.purge()](#Twig+purge)
-    * [.purgeUpTo(elt)](#Twig+purgeUpTo)
+    * [.insertElement](#Twig+insertElement) ⇒ [<code>Twig</code>](#Twig)
+    * [.addSibling](#Twig+addSibling) ⇒ [<code>Twig</code>](#Twig)
     * [.setRoot(name)](#Twig+setRoot) ℗
     * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
     * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
@@ -769,15 +832,16 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, parent, attributes)
+### new Twig(name, parent, attributes, [position])
 Create a new Twig object
 
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | The name of the XML element |
-| parent | [<code>Twig</code>](#Twig) | The parent object |
-| attributes | <code>object</code> | Attribute object |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | The name of the XML element |
+| parent | [<code>Twig</code>](#Twig) |  | The parent object |
+| attributes | <code>object</code> |  | Attribute object |
+| [position] | <code>string</code> \| <code>number</code> | <code>&quot;&#x27;last&#x27;&quot;</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array.<>  Defaults to 'last' |
 
 <a name="Twig+attributes"></a>
 
@@ -845,6 +909,34 @@ Create a new Twig object
 | --- | --- | --- |
 | #pinned | <code>boolean</code> | Determines whether twig is needed in partial load |
 
+<a name="Twig+purge"></a>
+
+### twig.purge
+Purges the current, typically used after element has been processed.<br>The root object cannot be purged.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+<a name="Twig+purgeUpTo"></a>
+
+### twig.purgeUpTo
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| elt | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+
+<a name="Twig+escapeEntity"></a>
+
+### twig.escapeEntity
+Escapes special XML characters. According W3C specification these are only `&, <, >, ", '` - this is a XML parser, not HTML!
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| text | <code>string</code> | Input text to be escaped |
+
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
@@ -904,17 +996,28 @@ The text of the element. No matter if given as text or CDATA entity
 <a name="Twig+text"></a>
 
 ### twig.text
-Modifies the text of the element
+Update the text of the element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Throws**:
 
-- [<code>UnsupportedType</code>](#UnsupportedType) - If value is not a string or numeric type
+- [<code>UnsupportedType</code>](#UnsupportedType) - If value is not a string, boolean or numeric type
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| value | <code>string</code> | New value of the attribute |
+| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New text of the element |
+
+<a name="Twig+setTextRaw"></a>
+
+### twig.setTextRaw
+Set the text of the element. Special characters are not escaped
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>string</code> | New text of the element |
 
 <a name="Twig+pin"></a>
 
@@ -929,21 +1032,6 @@ Checks if element is pinned
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - `true` when the element is pinned  
-<a name="Twig+text"></a>
-
-### twig.text
-Modifies the text of the element
-
-**Kind**: instance property of [<code>Twig</code>](#Twig)  
-**Throws**:
-
-- [<code>UnsupportedType</code>](#UnsupportedType) - If value is not a string or numeric type
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| value | <code>string</code> | New value of the attribute |
-
 <a name="Twig+close"></a>
 
 ### twig.close
@@ -1008,20 +1096,35 @@ Check if the attribute exist or not
 <a name="Twig+attribute"></a>
 
 ### twig.attribute ⇒ <code>object</code>
-Retrieve or update XML attribute.
+Retrieve or update XML attribute. For update, the condition must be a string, i.e. must match to one attribute only.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>object</code> - Attributes or `null` if no matching attribute found  
+**Todo**
+
+- [ ] Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<!-- ... -->'
+
 
 | Param | Type | Description |
 | --- | --- | --- |
 | condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
-| text | <code>string</code> \| <code>number</code> | New value of the attribute |
+| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attriubtes is returned. |
 
 **Example**  
 ```js
 attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
 ```
+<a name="Twig+deleteAttribute"></a>
+
+### twig.deleteAttribute
+Delete the attribute
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The attribute name |
+
 <a name="Twig+root"></a>
 
 ### twig.root ⇒ [<code>Twig</code>](#Twig)
@@ -1248,22 +1351,34 @@ Find a specific element within current element. Same as `.descendant(condition)[
 | --- | --- | --- |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | Find condition |
 
-<a name="Twig+purge"></a>
+<a name="Twig+insertElement"></a>
 
-### twig.purge()
-Purges the current, typically used after element has been processed.<br>The root object cannot be purged.
+### twig.insertElement ⇒ [<code>Twig</code>](#Twig)
+Insert a new element as child in current element
 
-**Kind**: instance method of [<code>Twig</code>](#Twig)  
-<a name="Twig+purgeUpTo"></a>
-
-### twig.purgeUpTo(elt)
-Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
-
-**Kind**: instance method of [<code>Twig</code>](#Twig)  
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - - The inserted element  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elt | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+| name | <code>string</code> | The tag name |
+| text | <code>string</code> | Text of the element |
+| attributes | <code>object</code> | Element attributes |
+
+<a name="Twig+addSibling"></a>
+
+### twig.addSibling ⇒ [<code>Twig</code>](#Twig)
+Add a new sibling element to the current element
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: [<code>Twig</code>](#Twig) - - The appended element  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last', 'before', 'after' or the position in the current `children` array |
+| name | <code>string</code> | The tag name |
+| text | <code>string</code> | Text of the element |
+| attributes | <code>object</code> | Element attributes |
 
 <a name="Twig+setRoot"></a>
 
@@ -1303,6 +1418,12 @@ Common function to filter Twig element
 | element | [<code>Twig</code>](#Twig) | Element you like to filter |
 | condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
+<a name="NotImplementedYet"></a>
+
+## NotImplementedYet
+Generic error for non implemented feature
+
+**Kind**: global class  
 <a name="UnsupportedParser"></a>
 
 ## UnsupportedParser

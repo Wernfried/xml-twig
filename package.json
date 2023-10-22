@@ -11,7 +11,6 @@
     "doc": "doc"
   },
   "devDependencies": {
-    "jsdoc-to-markdown": "^8.0.0",
     "luxon": "^2.1.1",
     "node-expat": "^2.4.0"
   },
