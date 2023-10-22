@@ -199,7 +199,7 @@ function createParser(handler, options) {
          }
       })
       parser.on("cdata", function (str) {
-         current.text = str;
+         current.text = current.text ?? '' + str;
       })
 
       let hndl = Array.isArray(handler) ? handler : [handler];
@@ -320,7 +320,7 @@ function createParser(handler, options) {
 
    // Common events
    parser.on('text', function (str) {
-      current.text = options.trim ? str.trim() : str;
+      current.text = current.text ?? '' + options.trim ? str.trim() : str;
    })
 
    parser.on("comment", function (str) {
@@ -569,13 +569,17 @@ class Twig {
 
    /**
    * Modifies the text of the element
-   * @param {string} value - New value of the attribute
-   * @throws {UnsupportedType} - If value is not a string or numeric type
+   * @param {string|number|bigint|boolean} value - New text of the element
+   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<![CDATA[ ... ]]>' or '<!-- ... -->'
+   * @throws {UnsupportedType} - If value is not a string, boolean or numeric type
    */
    set text(value) {
-      if (!['string', 'number', 'bigint'].includes(typeof value))
+      if (typeof value === 'string')
+         this.#text = value
+      else if (['number', 'bigint', 'boolean'].includes(typeof value))
+         this.#text = value.toString()
+      else
          throw new UnsupportedType(value);
-      this.#text = this.#text ?? '' + value;
    }
 
    /**
@@ -592,18 +596,6 @@ class Twig {
    get pinned() {
       return this.#pinned;
    }
-
-   /**
-   * Modifies the text of the element
-   * @param {string} value - New value of the attribute
-   * @throws {UnsupportedType} - If value is not a string or numeric type
-   */
-   set text(value) {
-      if (!['string', 'number', 'bigint'].includes(typeof value))
-         throw new UnsupportedType(value);
-      this.#text = this.#text ?? '' + value;
-   }
-
 
    /**
    * Closes the element
@@ -681,17 +673,18 @@ class Twig {
    }
 
    /**
-   * Retrieve or update XML attribute.
+   * Retrieve or update XML attribute. For update, the condition must be a string, i.e. must match to one attribute only.
    * @param {?AttributeCondition} condition - Optional condition to select attributes
-   * @param {?string|number} text - New value of the attribute
+   * @param {?string|number|bigint|boolean} value - New value of the attribute.<br>If `undefined` then existing attriubtes is returned.
    * @returns {object} Attributes or `null` if no matching attribute found
+   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<!-- ... -->'
    * @example attribute((name, val) => { return name === 'age' && val > 50})
    * attribute((name) => { return ['firstName', 'lastName'].includes(name) })
    * attribute('firstName')
    * attribute(/name/i)
    */
-   attribute = function (condition, text) {
-      if (text === undefined) {
+   attribute = function (condition, value) {
+      if (value === undefined) {
          let attr;
          if (condition === undefined) {
             attr = this.#attributes;
@@ -707,17 +700,24 @@ class Twig {
             return this.attribute();
          }
          return attr === null || Object.keys(attr).length == 0 ? null : attr;
+      } else if (typeof condition === 'string') {
+         if (typeof value === 'string')
+            this.#attributes[condition] = value
+         else if (['number', 'bigint', 'boolean'].includes(typeof value))
+            this.#attributes[condition] = value.toString()
+         else
+            throw new UnsupportedType(value);
       } else {
-         if (text === null) {
-            delete this.#attributes[condition];
-         } else {
-            if (!['string', 'number', 'bigint'].includes(typeof text))
-               throw new UnsupportedType(text);
-            if (typeof condition !== 'string')
-               throw new UnsupportedCondition(condition, ['string']);
-            this.#attributes[condition] = text;
-         }
+         console.warn('Condition must be a `string` if you like to update an attribute');
       }
+   }
+
+   /**
+   * Delete the attribute
+   * @param {string} name - The attribute name
+   */
+   deleteAttribute = function (name) {
+      delete this.#attributes[name];
    }
 
    /**
@@ -1068,6 +1068,49 @@ class Twig {
       return null;
    }
 
+   // Update elements:
+
+   /**
+   * Insert a new element as child in current element
+   * @param {string} name - The tag name
+   * @param {?string} text - Text of the element
+   * @param {?object} attributes - Element attributes
+   * @returns {Twig} - The inserted element
+   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<![CDATA[ ... ]]>' or '<!-- ... -->'
+   */
+   insertElement = function (name, text, attributes) {
+      let twig = new Twig(name, this, attributes);
+      twig.#text = text ?? null;
+      twig.close();
+      return twig;
+   }
+
+   /**
+   * Appends a new element to the current parent, i.e. add a new sibling
+   * @param {string} name - The tag name
+   * @param {?string} text - Text of the element
+   * @param {?object} attributes - Element attributes
+   * @returns {Twig} - The appended element
+   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<![CDATA[ ... ]]>' or '<!-- ... -->'
+   */
+   appendElement = function (name, text, attributes) {
+      let twig = new Twig(name, this.parent, attributes);
+      twig.#text = text ?? null;
+      twig.close();
+      return twig;
+   }
+
+}
+
+
+/**
+ * Generic error for non implemented feature
+ * @exception NotImplementedYet
+ */
+class NotImplementedYet extends TypeError {
+   constructor() {
+      super(`Net yet implemented`);
+   }
 }
 
 
