@@ -431,15 +431,11 @@ Retrieve or update XML attribute. For update, the condition must be a string, i.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>object</code> - Attributes or `null` if no matching attribute found  
-**Todo**
-
-- [ ] Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<!-- ... -->'
-
 
 | Param | Type | Description |
 | --- | --- | --- |
 | condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
-| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attriubtes is returned. |
+| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attributes is returned. |
 
 **Example**  
 ```js
@@ -1068,15 +1064,11 @@ Retrieve or update XML attribute. For update, the condition must be a string, i.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>object</code> - Attributes or `null` if no matching attribute found  
-**Todo**
-
-- [ ] Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<!-- ... -->'
-
 
 | Param | Type | Description |
 | --- | --- | --- |
 | condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
-| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attriubtes is returned. |
+| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attributes is returned. |
 
 **Example**  
 ```js

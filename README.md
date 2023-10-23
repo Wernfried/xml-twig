@@ -80,7 +80,7 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
   
   The key feature of this module is to read and process XML files in chunks. You need to create handler functions for elements you like to process.<br>
   The most notable difference to other parsers is the `purge()` and `purgeUpTo()` method. The parser reads the element and you decide how long you need to keep it in the memory. 
-  In many cases you will purge it immediatly after you have used it but in some cases you may keep the element for later use. The parser knows the element position in the XML-Tree. 
+  In many cases you will purge it immediately after you have used it but in some cases you may keep the element for later use. The parser knows the element position in the XML-Tree. 
 
 
    ```
@@ -303,20 +303,16 @@ You can specify condition on above methods. You can filter elements by following
 
 - If `undefined`, then all elements are returned.
 
-- If `string` then the element name must be equal to the string
-
+- If `string` then the element name must be equal to the string<br> 
   Example: `"book"`
 
-- If `RegExp` then the element name must match the Regular Expression
-
+- If `RegExp` then the element name must match the Regular Expression<br> 
   Example: `/book$/i`
 
 - With `ElementConditionFilter` you can specify any custom filter function.<br>
-
   Example: `(name, elt) => { return name === 'book' && elt.children().length > 1 }`
 
-- With a `Twig` object, you can specify the element directly. Apart from `purgeUpTo(elt)`, it is rarely used, because when you know the element then there is no reason to find it again.
-
+- With a `Twig` object, you can specify the element directly. Apart from `purgeUpTo(elt)`, it is rarely used, because when you know the element then there is no reason to find it again.<br> 
   Example: `elt.children()[2]`
 
 
@@ -341,7 +337,7 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 `.isLastChild` - **boolean**: `true` if the element is the last child in the parent
 
-`.index` - **integer**: The postion (starting at 0) of the element within the parent. The root element returns always 0
+`.index` - **integer**: The position (starting at 0) of the element within the parent. The root element returns always 0
 
 `.name` - **string**: Name of the element/tag
 
@@ -353,17 +349,37 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 `.comment` - **string|string[]**: Comments or array of comments inside the element
 
-`.declaration` - **object**: The XML-Declaration object, exist only on `root`. 
-
+`.declaration` - **object**: The XML-Declaration object, exist only on `root`.<br>
    Example  `{version: '1.0', encoding: 'UTF-8'}`. 
 
-`.PI` - **object**: Processing Instruction, exist only on `root`. 
-
+`.PI` - **object**: Processing Instruction, exist only on `root`.<br>
    Example `{ target: 'xml-stylesheet', data: 'type="text/xsl" href="style.xsl"' }`. 
 
-`.namespace` - **object**: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`. 
-
+`.namespace` - **object**: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`.<br>
    Example `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
+
+
+#### Update XML Elements
+
+To update the XML, use these methods. These methods modify the XML tree in the memory, not the input XML file. Use `writer()` to print modified XML or save it to a file.
+
+
+`.attribute(name, value)`: Updates an attribute.<br>
+   `name`: Name of the attribute. Regular Expression or other conditions are not supported<br>
+   `value`: Then new value
+
+`.deleteAttribute(name)`: Deletes the attribute.<br>
+   `name`: Name of the attribute. Regular Expression or other conditions are not supported
+
+`.text(value)`: Update the text (PCDATA) of current element<br>
+   `value`: The new text or `null` to remove any text
+
+`.addElement(name, text, attributes, position)`: Adds a new child element to the current element<br>
+   `name`: The name/tag of the new element<br>
+   `text`: The text (PCDATA) of the element or `null`<br>
+   `attributes`: Object of XML attributes, example: `{ id: 1, lang="en" }` or `null`<br>
+   `position`: The position in `children()` array where you like to add new child. You can also specify `'first'` or `'last'`
+
 
 
 ## Limitations

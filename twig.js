@@ -123,7 +123,6 @@ function createParser(handler, options) {
          enumerable: true,
          get() { return parser._parser.column + 1 }
       });
-      parser.underlyingParser = parser._parser;
 
       closeEvent = "closetag";
       parser.on("opentagstart", function (node) {
@@ -221,7 +220,6 @@ function createParser(handler, options) {
          enumerable: true,
          get() { return parser.parser.getCurrentColumnNumber() }
       });
-      parser.underlyingParser = parser.parser;
       closeEvent = "endElement";
 
       parser.on("startElement", function (name, attrs) {
@@ -698,9 +696,8 @@ class Twig {
    /**
    * Retrieve or update XML attribute. For update, the condition must be a string, i.e. must match to one attribute only.
    * @param {?AttributeCondition} condition - Optional condition to select attributes
-   * @param {?string|number|bigint|boolean} value - New value of the attribute.<br>If `undefined` then existing attriubtes is returned.
+   * @param {?string|number|bigint|boolean} value - New value of the attribute.<br>If `undefined` then existing attributes is returned.
    * @returns {object} Attributes or `null` if no matching attribute found
-   * @todo Handle special entities, e.g. `<,>,&,",'` -> `&lt; &gt; &amp; &quot; &apops;` or '<!-- ... -->'
    * @example attribute((name, val) => { return name === 'age' && val > 50})
    * attribute((name) => { return ['firstName', 'lastName'].includes(name) })
    * attribute('firstName')
