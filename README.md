@@ -366,13 +366,13 @@ To update the XML, use these methods. These methods modify the XML tree in the m
 
 `.attribute(name, value)`: Updates an attribute.
 - `name`: Name of the attribute. Regular Expression or other conditions are not supported
-- `value`: Then new value
+- `value`: The new value
 
 `.deleteAttribute(name)`: Deletes the attribute.<br>
 - `name`: Name of the attribute. Regular Expression or other conditions are not supported
 
 `.text(value)`: Update the text (PCDATA) of current element<br>
-- `value`: The new text or `null` to remove any text
+- `value`: The new text or `null` to remove existing text
 
 `.addElement(name, text, attributes, position)`: Adds a new child element to the current element<br>
 - `name`: The name/tag of the new element<br>
