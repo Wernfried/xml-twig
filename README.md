@@ -364,21 +364,21 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 To update the XML, use these methods. These methods modify the XML tree in the memory, not the input XML file. Use `writer()` to print modified XML or save it to a file.
 
 
-`.attribute(name, value)`: Updates an attribute.<br>
-   `name`: Name of the attribute. Regular Expression or other conditions are not supported<br>
-   `value`: Then new value
+`.attribute(name, value)`: Updates an attribute.
+- `name`: Name of the attribute. Regular Expression or other conditions are not supported
+- `value`: Then new value
 
 `.deleteAttribute(name)`: Deletes the attribute.<br>
-   `name`: Name of the attribute. Regular Expression or other conditions are not supported
+- `name`: Name of the attribute. Regular Expression or other conditions are not supported
 
 `.text(value)`: Update the text (PCDATA) of current element<br>
-   `value`: The new text or `null` to remove any text
+- `value`: The new text or `null` to remove any text
 
 `.addElement(name, text, attributes, position)`: Adds a new child element to the current element<br>
-   `name`: The name/tag of the new element<br>
-   `text`: The text (PCDATA) of the element or `null`<br>
-   `attributes`: Object of XML attributes, example: `{ id: 1, lang="en" }` or `null`<br>
-   `position`: The position in `children()` array where you like to add new child. You can also specify `'first'` or `'last'`
+- `name`: The name/tag of the new element<br>
+- `text`: The text (PCDATA) of the element or `null`<br>
+- `attributes`: Object of XML attributes, example: `{ id: 1, lang="en" }` or `null`<br>
+- `position`: The position in `children()` array where you like to add new child. You can also specify `'first'` or `'last'`
 
 
 
