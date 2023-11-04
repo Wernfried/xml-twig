@@ -37,7 +37,7 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
 
 ## How to use it
 
-API Documentation: see [Twig]](./doc/twig.md)
+API Documentation: see [Twig](./doc/twig.md)
 
 ### Read XML Document
 
