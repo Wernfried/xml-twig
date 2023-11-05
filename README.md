@@ -329,7 +329,7 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 #### Twig Properties
 
-`.isEmpty` - **boolean**: `true` if empty. An empty element ha no text nor any child elements, however empty elements can have attributes.
+`.isEmpty` - **boolean**: `true` if empty. An empty element has no text nor any child elements, however empty elements can have attributes.
 
 `.level` - **integer**: The level of the element. Root element has 0, children have 1, grand-children 2 and so on
 
