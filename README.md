@@ -25,7 +25,7 @@ XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [
 ## Installation
 
 Install module like any other node module and optionally `node-expat`:
-```
+```bash
 npm install xml-twig
 
 # and optionally 
@@ -45,7 +45,7 @@ API Documentation: see [Twig](./doc/twig.md)
 
   This module is designed to read huge XML-Files. Of course, it works also well for small files. First create the Twig parser. Then create a Stream and pipe it to the parser.
 
-   ```
+   ```js
    const fs = require('fs')
    const twig = require('xml-twig')
 
@@ -68,7 +68,7 @@ API Documentation: see [Twig](./doc/twig.md)
 
    If you prefer [events](https://nodejs.org/api/events.html), then use `event` property instead of `function` in handler declaration:
 
-   ```
+   ```js
    const parser = twig.createParser({ tag: twig.Root, event: 'rootElement' }, { method: 'sax' })
    fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
@@ -85,7 +85,7 @@ API Documentation: see [Twig](./doc/twig.md)
   In many cases you will purge it immediately after you have used it but in some cases you may keep the element for later use. The parser knows the element position in the XML-Tree. 
 
 
-   ```
+   ```js
    function bookHandler(elt) {
       console.log(`${elt.attr("category")} ${elt.name} at line ${parser.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
@@ -125,7 +125,7 @@ API Documentation: see [Twig](./doc/twig.md)
 
 - **Read every element from XML Document**
   
-   ```
+   ```js
    function anyHandler(elt) {
       console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${parser.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
@@ -163,7 +163,7 @@ Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `
 
    This sample program reads the `root` element and `<ebook>` elements (include their children elements), and the branches to reach the element.
 
-   ```
+   ```js
    const handle_ebook = [
       { tag: 'ebook', function: ebookHandler },
       { tag: twig.Root, function: rootHandler }
