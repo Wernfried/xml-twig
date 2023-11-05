@@ -233,7 +233,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    Let's assume an XML element like this: `<person firstName="Jean-Luc", lastName="Picard", age="59" />` 
 
 Here are some examples the get attribute and values:
-```
+```js
 .hasAttribute('foo')                                                   => false
 .hasAttribute('age')                                                   => true
 
