@@ -230,8 +230,10 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 `.attribute(condition)`: Get attributes as object or `null` if no matching attribute was found. If `condition` is `undefined`, then all attributes are returned.
 
    Specify attribute name or regular expression or custom condition. For details see [AttributeCondition](./doc/twig.md#AttributeCondition).<br>
-   Let's assume an XML element like this: `<person firstName="Jean-Luc", lastName="Picard", age="59" />` 
-
+   Let's assume an XML element like this: 
+```js   
+   <person firstName="Jean-Luc", lastName="Picard", age="59" />
+```
 Here are some examples the get attribute and values:
 ```js
 .hasAttribute('foo')                                                   => false
