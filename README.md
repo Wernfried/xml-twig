@@ -25,7 +25,7 @@ XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [
 ## Installation
 
 Install module like any other node module and optionally `node-expat`:
-```
+```bash
 npm install xml-twig
 
 # and optionally 
@@ -37,13 +37,15 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
 
 ## How to use it
 
+API Documentation: see [Twig](./doc/twig.md)
+
 ### Read XML Document
 
 - **Read entire XML file at once**
 
   This module is designed to read huge XML-Files. Of course, it works also well for small files. First create the Twig parser. Then create a Stream and pipe it to the parser.
 
-   ```
+   ```js
    const fs = require('fs')
    const twig = require('xml-twig')
 
@@ -66,7 +68,7 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
 
    If you prefer [events](https://nodejs.org/api/events.html), then use `event` property instead of `function` in handler declaration:
 
-   ```
+   ```js
    const parser = twig.createParser({ tag: twig.Root, event: 'rootElement' }, { method: 'sax' })
    fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
@@ -83,7 +85,7 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
   In many cases you will purge it immediately after you have used it but in some cases you may keep the element for later use. The parser knows the element position in the XML-Tree. 
 
 
-   ```
+   ```js
    function bookHandler(elt) {
       console.log(`${elt.attr("category")} ${elt.name} at line ${parser.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
@@ -123,7 +125,7 @@ In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times
 
 - **Read every element from XML Document**
   
-   ```
+   ```js
    function anyHandler(elt) {
       console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${parser.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
@@ -161,7 +163,7 @@ Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `
 
    This sample program reads the `root` element and `<ebook>` elements (include their children elements), and the branches to reach the element.
 
-   ```
+   ```js
    const handle_ebook = [
       { tag: 'ebook', function: ebookHandler },
       { tag: twig.Root, function: rootHandler }
@@ -228,10 +230,12 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
 `.attribute(condition)`: Get attributes as object or `null` if no matching attribute was found. If `condition` is `undefined`, then all attributes are returned.
 
    Specify attribute name or regular expression or custom condition. For details see [AttributeCondition](./doc/twig.md#AttributeCondition).<br>
-   Let's assume an XML element like this: `<person firstName="Jean-Luc", lastName="Picard", age="59" />` 
-
-Here are some examples the get attribute and values:
+   Let's assume an XML element like this: 
+```js   
+<person firstName="Jean-Luc", lastName="Picard", age="59" />
 ```
+Here are some examples the get attribute and values:
+```js
 .hasAttribute('foo')                                                   => false
 .hasAttribute('age')                                                   => true
 
@@ -325,7 +329,7 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 
 #### Twig Properties
 
-`.isEmpty` - **boolean**: `true` if empty. An empty element ha no text nor any child elements, however empty elements can have attributes.
+`.isEmpty` - **boolean**: `true` if empty. An empty element has no text nor any child elements, however empty elements can have attributes.
 
 `.level` - **integer**: The level of the element. Root element has 0, children have 1, grand-children 2 and so on
 
