@@ -26,12 +26,12 @@ const Any = new AnyHandler();
 /**
 * Optional settings for the Twig parser
 * @typedef ParserOptions 
-* @param {string} method - The underlying parser. Either `'sax'` or `'expat'`.
-* @param {string} encoding - Encoding of the XML File. Applies only to `expat` parser.
-* @param {boolean} xmlns - If `true`, then namespaces are accessible by `namespace` property.
-* @param {boolean} trim - If `true`, then turn any whitespace into a single space. Text and comments are trimmed.
-* @param {boolean} resumeAfterError - If `true` then parser continues reading after an error. Otherwise it throws exception.
-* @param {boolean} partial - It `true` then unhandled elements are purged.
+* @property {string} [method] - The underlying parser. Either `'sax'` or `'expat'`.
+* @property {string} [encoding] - Encoding of the XML File. Applies only to `expat` parser.
+* @property {boolean} [xmlns] - If `true`, then namespaces are accessible by `namespace` property.
+* @property {boolean} [trim] - If `true`, then turn any whitespace into a single space. Text and comments are trimmed.
+* @property {boolean} [resumeAfterError] - If `true` then parser continues reading after an error. Otherwise it throws exception.
+* @property {boolean} [partial] - It `true` then unhandled elements are purged.
 * @example { encoding: 'UTF-8', xmlns: true }
 * @default  { method: 'sax', encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }
 */
@@ -41,9 +41,9 @@ const Any = new AnyHandler();
 * Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`<br> 
 * You can specify a `function` or a `event` name
 * @typedef TwigHandler 
-* @param {HandlerCondition} tag - Element specification
-* @param {?HandlerFunction} function - Definition of handler function, either anonymous or explicit function
-* @param {?string} event - Type of the event to be emitted
+* @property {HandlerCondition} tag - Element specification
+* @property {?HandlerFunction} function - Definition of handler function, either anonymous or explicit function
+* @property {?string} event - Type of the event to be emitted
 */
 
 /**
@@ -54,23 +54,21 @@ const Any = new AnyHandler();
 * - If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`
 * - Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached
 * - Use `Twig.Any` to call the handler on every element
-* @typedef {string|RegExp|HandlerConditionFilter|RootHandler|AnyHandler} HandlerCondition 
+* @typedef {string|RegExp|HandlerConditionFilter|RootHandler|AnyHandler|undefined} HandlerCondition 
 */
 
 /**
 * Handler function for Twig objects, i.e. the way you like to use the XML element.
 * @typedef HandlerFunction 
-* @param {Twig} elt - The current Twig element on which the function was called.
+* @property {Twig} elt - The current Twig element on which the function was called.
 */
 
 /**
 * Custom filter function to specify when handler shall be called
 * @typedef {function} HandlerConditionFilter 
 * @param {string} name - Name of the element
+* @returns {boolean} If the function returns `true`, then it is included in the filter
 */
-
-
-
 
 /**
 * Optional condition to get elements<br> 
@@ -79,7 +77,7 @@ const Any = new AnyHandler();
 * - If `RegExp` then the element name must match the Regular Expression
 * - If [ElementConditionFilter](#ElementConditionFilter) then function must return `true`
 * - Use [Twig](#Twig) object to find a specific element
-* @typedef {string|RegExp|ElementConditionFilter|Twig} ElementCondition 
+* @typedef {string|RegExp|ElementConditionFilter|Twig|undefined} ElementCondition 
 */
 
 /**
@@ -87,6 +85,7 @@ const Any = new AnyHandler();
 * @typedef {function} ElementConditionFilter 
 * @param {string} name - Name of the element
 * @param {Twig} elt - The Twig object
+* @returns {boolean} If the function returns `true`, then it is included in the filter
 */
 
 
@@ -94,11 +93,11 @@ const Any = new AnyHandler();
 /**
 * Create a new Twig parser
 * @param {TwigHandler|TwigHandler[]} handler - Object or array of element specification and function to handle elements
-* @param {?ParserOptions} options - Object of optional options 
+* @param {ParserOptions} [options] - Object of optional options 
 * @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` and `sax` (default) are supported.
 */
 function createParser(handler, options) {
-   options = Object.assign({ method: SAX, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }, options)
+   options = Object.assign({ method: SAX, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }, options);
    let parser;
    let namespaces = {};
    let closeEvent;
@@ -117,11 +116,11 @@ function createParser(handler, options) {
 
       Object.defineProperty(parser, 'currentLine', {
          enumerable: true,
-         get() { return parser._parser.line + 1 }
+         get() { return parser._parser.line + 1; }
       });
       Object.defineProperty(parser, 'currentColumn', {
          enumerable: true,
-         get() { return parser._parser.column + 1 }
+         get() { return parser._parser.column + 1; }
       });
 
       closeEvent = "closetag";
@@ -161,7 +160,7 @@ function createParser(handler, options) {
                }
             }
          }
-      })
+      });
 
       parser.on("processinginstruction", function (pi) {
          if (pi.name === 'xml') {
@@ -184,7 +183,7 @@ function createParser(handler, options) {
                enumerable: true
             });
          }
-      })
+      });
 
       parser.on("attribute", function (attr) {
          current.attribute(attr.name, attr.value);
@@ -196,17 +195,17 @@ function createParser(handler, options) {
                enumerable: true
             });
          }
-      })
+      });
       parser.on("cdata", function (str) {
          current.text = current.text ?? '' + str;
-      })
+      });
 
       let hndl = Array.isArray(handler) ? handler : [handler];
       let rootHandler = hndl.find(x => x.tag instanceof RootHandler);
       parser.on("end", function () {
          if (typeof rootHandler?.function === 'function') rootHandler.function(tree);
          if (typeof rootHandler?.event === 'string') parser.emit(rootHandler.event, tree);
-      })
+      });
 
    } else if (options.method === EXPAT) {
       parser = require("node-expat").createParser();
@@ -214,11 +213,11 @@ function createParser(handler, options) {
 
       Object.defineProperty(parser, 'currentLine', {
          enumerable: true,
-         get() { return parser.parser.getCurrentLineNumber() }
+         get() { return parser.parser.getCurrentLineNumber(); }
       });
       Object.defineProperty(parser, 'currentColumn', {
          enumerable: true,
-         get() { return parser.parser.getCurrentColumnNumber() }
+         get() { return parser.parser.getCurrentColumnNumber(); }
       });
       closeEvent = "endElement";
 
@@ -260,7 +259,7 @@ function createParser(handler, options) {
                }
             }
          }
-      })
+      });
 
       parser.on('xmlDecl', function (version, encoding, standalone) {
          tree = new Twig(null);
@@ -273,11 +272,11 @@ function createParser(handler, options) {
             writable: false,
             enumerable: true
          });
-      })
+      });
 
       parser.on('processingInstruction', function (target, data) {
          tree.PI = { target: target, data: data };
-      })
+      });
    } else {
       throw new UnsupportedParser(options.method);
    }
@@ -314,17 +313,17 @@ function createParser(handler, options) {
          current.purge();
       current = current.parent();
 
-   })
+   });
 
    // Common events
    parser.on('text', function (str) {
       current.text = current.text ?? '' + options.trim ? str.trim() : str;
-   })
+   });
 
    parser.on("comment", function (str) {
       if (current.hasOwnProperty('comment')) {
          if (typeof current.comment === 'string') {
-            current.comment = [current.comment, str.trim()]
+            current.comment = [current.comment, str.trim()];
          } else {
             current.comment.push(str.trim());
          }
@@ -337,7 +336,7 @@ function createParser(handler, options) {
          });
       }
 
-   })
+   });
 
    parser.on('error', function (err) {
       console.error(`error at line [${parser.currentLine}], column [${parser.currentColumn}]`, err);
@@ -429,10 +428,10 @@ class Twig {
 
    /**
    * Create a new Twig object
-   * @param {string} name - The name of the XML element
-   * @param {Twig} parent - The parent object
-   * @param {?object} attributes - Attribute object
-   * @param {string|number} index - Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last'
+   * @param {?string} name - The name of the XML element
+   * @param {Twig} [parent] - The parent object
+   * @param {object} [attributes] - Attribute object
+   * @param {string|number} [index] - Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last'
    */
    constructor(name, parent, attributes, index) {
       if (index === undefined)
@@ -472,11 +471,11 @@ class Twig {
    purge = function () {
       if (!this.isRoot)
          this.#parent.#children = this.#parent.#children.filter(x => !Object.is(this, x));
-   }
+   };
 
    /**
    * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
-   * @param {Twig} elt - Up to this element the tree will be purged. The `elt` object itself is not purged.<br>
+   * @param {Twig} [elt] - Up to this element the tree will be purged. The `elt` object itself is not purged.<br>
    * If `undefined` then the current element is purged (i.e. `purge()`)
    */
    purgeUpTo = function (elt) {
@@ -493,7 +492,7 @@ class Twig {
             purgeThis = prev;
          }
       }
-   }
+   };
 
    /**
    * Escapes special XML characters. According W3C specification these are only `&, <, >, ", '` - this is a XML parser, not HTML!
@@ -506,7 +505,7 @@ class Twig {
          .replaceAll(">", "&gt;")
          .replaceAll('"', "&quot;")
          .replaceAll("'", "&apos;");
-   }
+   };
 
    /**
    * Sets the name of root element. In some cases the root is created before the XML-Root element is available<br>
@@ -596,9 +595,9 @@ class Twig {
    */
    set text(value) {
       if (typeof value === 'string')
-         this.#text = value
+         this.#text = value;
       else if (['number', 'bigint', 'boolean'].includes(typeof value))
-         this.#text = value.toString()
+         this.#text = value.toString();
       else
          throw new UnsupportedType(value);
    }
@@ -608,7 +607,7 @@ class Twig {
    */
    pin = function () {
       this.#pinned = true;
-   }
+   };
 
    /**
    * Checks if element is pinned
@@ -623,12 +622,12 @@ class Twig {
    */
    close = function () {
       Object.seal(this);
-   }
+   };
 
    /**
    * Internal recursive function used by `writer()`
    * @param {XMLWriter} xw - The writer object
-   * @param {Twig[]} children - Array of child elements
+   * @param {Twig[]} childArray - Array of child elements
    */
    #addChild = function (xw, childArray) {
       for (let elt of childArray) {
@@ -640,7 +639,7 @@ class Twig {
          this.#addChild(xw, elt.children());
       }
       xw.endElement();
-   }
+   };
 
 
    /**
@@ -660,13 +659,13 @@ class Twig {
       this.#addChild(xw, this.#children);
       xw.endElement();
       return xw;
-   }
+   };
 
    /**
    * Returns attribute value or `null` if not found.<br>
    * If more than one  matches the condition, then it returns object as [attribute()](#attribute)
-   * @param {?AttributeCondition} condition - Optional condition to select attribute
-   * @returns {string|number|object} - The value of the attribute or `null` if the  does not exist
+   * @param {AttributeCondition} [condition] - Optional condition to select attribute
+   * @returns {?string|number|object} - The value of the attribute or `null` if the  does not exist
    */
    attr = function (condition) {
       let attr = this.attribute(condition);
@@ -674,7 +673,7 @@ class Twig {
          return null;
 
       return Object.keys(attr).length === 1 ? attr[Object.keys(attr)[0]] : attr;
-   }
+   };
 
    /**
    * Returns all attributes of the element
@@ -691,12 +690,12 @@ class Twig {
    */
    hasAttribute = function (name) {
       return this.#attributes[name] !== undefined;
-   }
+   };
 
    /**
    * Retrieve or update XML attribute. For update, the condition must be a string, i.e. must match to one attribute only.
-   * @param {?AttributeCondition} condition - Optional condition to select attributes
-   * @param {?string|number|bigint|boolean} value - New value of the attribute.<br>If `undefined` then existing attributes is returned.
+   * @param {AttributeCondition} [condition] - Optional condition to select attributes
+   * @param {string|number|bigint|boolean} [value] - New value of the attribute.<br>If `undefined` then existing attributes is returned.
    * @returns {object} Attributes or `null` if no matching attribute found
    * @example attribute((name, val) => { return name === 'age' && val > 50})
    * attribute((name) => { return ['firstName', 'lastName'].includes(name) })
@@ -711,9 +710,9 @@ class Twig {
          } else if (typeof condition === 'function') {
             attr = Object.fromEntries(Object.entries(this.#attributes).filter(([key, val]) => condition(key, val)));
          } else if (typeof condition === 'string') {
-            attr = this.attribute(key => { return key === condition });
+            attr = this.attribute(key => key === condition);
          } else if (condition instanceof RegExp) {
-            attr = this.attribute(key => { return condition.test(key) });
+            attr = this.attribute(key => condition.test(key));
          } else if (condition instanceof Twig) {
             throw new UnsupportedCondition(condition, ['string', 'RegEx', 'function']);
          } else {
@@ -722,15 +721,15 @@ class Twig {
          return attr === null || Object.keys(attr).length == 0 ? null : attr;
       } else if (typeof condition === 'string') {
          if (typeof value === 'string')
-            this.#attributes[condition] = value
+            this.#attributes[condition] = value;
          else if (['number', 'bigint', 'boolean'].includes(typeof value))
-            this.#attributes[condition] = value.toString()
+            this.#attributes[condition] = value.toString();
          else
             throw new UnsupportedType(value);
       } else {
          console.warn('Condition must be a `string` if you like to update an attribute');
       }
-   }
+   };
 
    /**
    * Delete the attribute
@@ -738,7 +737,7 @@ class Twig {
    */
    deleteAttribute = function (name) {
       delete this.#attributes[name];
-   }
+   };
 
    /**
    * Returns the root object
@@ -754,7 +753,7 @@ class Twig {
          }
          return ret;
       }
-   }
+   };
 
    /**
    * Returns the parent element or null if root element
@@ -762,42 +761,44 @@ class Twig {
    */
    parent = function () {
       return this.isRoot ? null : this.#parent;
-   }
+   };
 
    /**
    * @returns {Twig} - The current element
    */
    self = function () {
       return this;
-   }
+   };
 
    /**
    * Common function to filter Twig elements from array
    * @param {Twig|Twig[]} elements - Array of elements you like to filter or a single element
-   * @param {?ElementCondition} condition - The filter condition
+   * @param {ElementCondition} [condition] - The filter condition
    * @returns {Twig[]} List of matching elements or empty array
    */
    filterElements(elements, condition) {
       if (!Array.isArray(elements))
-         return filterElements([elements], condition);
+         return this.filterElements([elements], condition);
 
-      if (condition === undefined) {
-         return elements;
-      } else if (typeof condition === 'string') {
-         return elements.filter(x => x.name === condition);
-      } else if (condition instanceof RegExp) {
-         return elements.filter(x => x.condition.test(x.name));
-      } else if (condition instanceof Twig) {
-         return elements.filter(x => Object.is(x, condition));
-      } else if (typeof condition === 'function') {
-         return elements.filter(x => condition(x.name, x));
+      if (condition !== undefined) {
+         if (typeof condition === 'string') {
+            return elements.filter(x => x.name === condition);
+         } else if (condition instanceof RegExp) {
+            return elements.filter(x => x.condition.test(x.name));
+         } else if (condition instanceof Twig) {
+            return elements.filter(x => Object.is(x, condition));
+         } else if (typeof condition === 'function') {
+            return elements.filter(x => condition(x.name, x));
+         }
       }
+
+      return elements;
    }
 
    /**
    * Common function to filter Twig element
    * @param {Twig} element - Element you like to filter
-   * @param {?ElementCondition} condition - The filter condition
+   * @param {ElementCondition} [condition] - The filter condition
    * @returns {boolean} `true` if the condition matches
    */
    testElement(element, condition) {
@@ -817,17 +818,17 @@ class Twig {
 
    /**
    * All children, optionally matching `condition` of the current element or empty array 
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} 
    */
    children = function (condition) {
       return this.filterElements(this.#children, condition);
-   }
+   };
 
    /**
    * Returns the next matching element. 
-   * @param {?ElementCondition} condition - Optional condition
-   * @returns {Twig} - The next element
+   * @param {ElementCondition} [condition] - Optional condition
+   * @returns {?Twig} - The next element
    * @see https://www.w3.org/TR/xpath-datamodel-31/#document-order
    */
    next = function (condition) {
@@ -848,12 +849,12 @@ class Twig {
          return null;
 
       return this.testElement(elt, condition) ? elt : elt.next(condition);
-   }
+   };
 
    /**
    * Returns the previous matching element. 
-   * @param {?ElementCondition} condition - Optional condition
-   * @returns {Twig} - The previous element
+   * @param {ElementCondition} [condition] - Optional condition
+   * @returns {?Twig} - The previous element
    * @see https://www.w3.org/TR/xpath-datamodel-31/#document-order
    */
    previous = function (condition) {
@@ -869,23 +870,23 @@ class Twig {
       }
 
       return this.testElement(elt, condition) ? elt : elt.previous(condition);
-   }
+   };
 
    /**
    * Returns the first matching element. This is usually the root element
-   * @param {?ElementCondition} condition - Optional condition
-   * @returns {Twig} - The first element
+   * @param {ElementCondition} [condition] - Optional condition
+   * @returns {?Twig} - The first element
    */
    first = function (condition) {
       if (this === null)
          return null;
       return this.testElement(this.root(), condition) ? this.root() : this.root().next(condition);
-   }
+   };
 
    /**
    * Returns the last matching element. 
-   * @param {?ElementCondition} condition - Optional condition
-   * @returns {Twig} - The last element
+   * @param {ElementCondition} [condition] - Optional condition
+   * @returns {?Twig} - The last element
    */
    last = function (condition) {
       if (this === null)
@@ -899,7 +900,7 @@ class Twig {
       }
 
       return this.testElement(elt, condition) ? elt : elt.previous(condition);
-   }
+   };
 
    /**
    * Check if the element is the first child of the parent
@@ -909,7 +910,7 @@ class Twig {
       if (this.isRoot) {
          return false;
       } else {
-         return this.index === 0
+         return this.index === 0;
       }
    }
 
@@ -927,7 +928,7 @@ class Twig {
 
    /**
    * Returns descendants (children, grandchildren, etc.) of the current element
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of descendants or empty array 
    */
    descendant = function (condition) {
@@ -937,11 +938,11 @@ class Twig {
          elts = elts.concat(c.descendant());
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns descendants (children, grandchildren, etc.) of the current element and the current element itself
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of descendants or empty array 
    */
    descendantOrSelf = function (condition) {
@@ -951,11 +952,11 @@ class Twig {
          elts = elts.concat(c.descendant());
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns ancestors (parent, grandparent, etc.)  of the current element
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of ancestors or empty array 
    */
    ancestor = function (condition) {
@@ -969,11 +970,11 @@ class Twig {
          }
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns ancestors (parent, grandparent, etc.)  of the current element and the current element itself
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of ancestors or empty array 
    */
    ancestorOrSelf = function (condition) {
@@ -987,11 +988,11 @@ class Twig {
          }
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns all sibling element of the current element
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of sibling or empty array 
    */
    sibling = function (condition) {
@@ -1000,11 +1001,11 @@ class Twig {
          elts = this.#parent.#children.filter(x => !Object.is(x, this));
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns all sibling element of the current element and the current element itself
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of sibling or empty array 
    */
    siblingOrSelf = function (condition) {
@@ -1013,11 +1014,11 @@ class Twig {
          elts = this.#parent.#children;
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns all following sibling element of the current element
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of sibling or empty array 
    */
    followingSibling = function (condition) {
@@ -1026,11 +1027,11 @@ class Twig {
          elts = this.#parent.#children.slice(this.index + 1);
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns all preceding sibling element of the current element
-   * @param {?ElementCondition} condition - Optional condition
+   * @param {ElementCondition} [condition] - Optional condition
    * @returns {Twig[]} - Array of sibling or empty array 
    */
    precedingSibling = function (condition) {
@@ -1039,12 +1040,12 @@ class Twig {
          elts = this.#parent.#children.slice(0, this.index);
       }
       return this.filterElements(elts, condition);
-   }
+   };
 
    /**
    * Returns next sibling element of the current element
-   * @param {?ElementCondition} condition - Optional condition
-   * @returns {Twig} - The next sibling or `null`
+   * @param {ElementCondition} [condition] - Optional condition
+   * @returns {?Twig} - The next sibling or `null`
    */
    nextSibling = function (condition) {
       let elt;
@@ -1054,12 +1055,12 @@ class Twig {
          return null;
 
       return this.testElement(elt, condition) ? elt : elt.nextSibling(condition);
-   }
+   };
 
    /**
    * Returns previous sibling element of the current element
-   * @param {?ElementCondition} condition - Optional condition
-   * @returns {Twig} - The previous sibling or `null`
+   * @param {ElementCondition} [condition] - Optional condition
+   * @returns {?Twig} - The previous sibling or `null`
    */
    prevSibling = function (condition) {
       if (!this.isRoot && this.index > 0) {
@@ -1068,12 +1069,12 @@ class Twig {
       } else {
          return null;
       }
-   }
+   };
 
    /**
    * Find a specific element within current element. Same as `.descendant(condition)[0]`
    * @param {ElementCondition} condition - Find condition
-   * @returns {Twig} - First matching element or `null`
+   * @returns {?Twig} - First matching element or `null`
    */
    find = function (condition) {
       let children = this.filterElements(this.#children, condition);
@@ -1086,14 +1087,14 @@ class Twig {
             return ret;
       }
       return null;
-   }
+   };
 
    /**
    * Add a new element in the current element
    * @param {string} name - The tag name
-   * @param {?string} text - Text of the element
-   * @param {?object} attributes - Element attributes
-   * @param {name|number} position - Position name 'first', 'last' or the position in the `children`
+   * @param {?string} [text] - Text of the element
+   * @param {?object} [attributes] - Element attributes
+   * @param {name|number} [position] - Position name 'first', 'last' or the position in the `children`
    * @returns {Twig} - The appended element
    */
    addElement = function (name, text, attributes, position) {
@@ -1101,14 +1102,14 @@ class Twig {
       twig.#text = text ?? null;
       twig.close();
       return twig;
-   }
+   };
 
    /**
    * Deletes the current element from tree, same as `purge()`. The root object cannot be deleted.
    */
    delete = function () {
       this.purge();
-   }
+   };
 
 
 }
@@ -1167,4 +1168,3 @@ class UnsupportedCondition extends TypeError {
 
 
 module.exports = { createParser, Twig, Any, Root };
-
