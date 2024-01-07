@@ -67,10 +67,8 @@ const Any = new AnyHandler();
 * Custom filter function to specify when handler shall be called
 * @typedef {function} HandlerConditionFilter 
 * @param {string} name - Name of the element
+* @returns {boolean} If the function returns `true`, then it is included in the filter
 */
-
-
-
 
 /**
 * Optional condition to get elements<br> 
@@ -87,6 +85,7 @@ const Any = new AnyHandler();
 * @typedef {function} ElementConditionFilter 
 * @param {string} name - Name of the element
 * @param {Twig} elt - The Twig object
+* @returns {boolean} If the function returns `true`, then it is included in the filter
 */
 
 
