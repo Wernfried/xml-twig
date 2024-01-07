@@ -32,7 +32,7 @@ npm install xml-twig
 npm install node-expat
 
 ```
-In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times faster than `sax` (node-expat: 2:20 Minutes, sax: 4:20 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parsers is not installed automatically. 
+In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times faster than `sax` (node-expat: 2:20 Minutes, sax: 4:20 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. 
 
 
 ## How to use it
