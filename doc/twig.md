@@ -32,7 +32,7 @@
 ## Functions
 
 <dl>
-<dt><a href="#createParser">createParser(handler, options)</a></dt>
+<dt><a href="#createParser">createParser(handler, [options])</a></dt>
 <dd><p>Create a new Twig parser</p>
 </dd>
 </dl>
@@ -48,7 +48,7 @@
 Element can be specified as string, Regular Expression, custom function, <code>Twig.Root</code> or <code>Twig.Any</code><br> 
 You can specify a <code>function</code> or a <code>event</code> name</p>
 </dd>
-<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code>RootHandler</code> | <code>AnyHandler</code></dt>
+<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code>RootHandler</code> | <code>AnyHandler</code> | <code>undefined</code></dt>
 <dd><p>Condition to specify when handler shall be called<br> </p>
 <ul>
 <li>If <code>undefined</code>, then all elements are returned.<br> </li>
@@ -62,10 +62,10 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 <dt><a href="#HandlerFunction">HandlerFunction</a></dt>
 <dd><p>Handler function for Twig objects, i.e. the way you like to use the XML element.</p>
 </dd>
-<dt><a href="#HandlerConditionFilter">HandlerConditionFilter</a> : <code>function</code></dt>
+<dt><a href="#HandlerConditionFilter">HandlerConditionFilter</a> ⇒ <code>boolean</code></dt>
 <dd><p>Custom filter function to specify when handler shall be called</p>
 </dd>
-<dt><a href="#ElementCondition">ElementCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#ElementConditionFilter">ElementConditionFilter</a></code> | <code><a href="#Twig">Twig</a></code></dt>
+<dt><a href="#ElementCondition">ElementCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#ElementConditionFilter">ElementConditionFilter</a></code> | <code><a href="#Twig">Twig</a></code> | <code>undefined</code></dt>
 <dd><p>Optional condition to get elements<br> </p>
 <ul>
 <li>If <code>undefined</code>, then all elements are returned.<br> </li>
@@ -75,7 +75,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 <li>Use <a href="#Twig">Twig</a> object to find a specific element</li>
 </ul>
 </dd>
-<dt><a href="#ElementConditionFilter">ElementConditionFilter</a> : <code>function</code></dt>
+<dt><a href="#ElementConditionFilter">ElementConditionFilter</a> ⇒ <code>boolean</code></dt>
 <dd><p>Custom filter function to select desired elements</p>
 </dd>
 <dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
@@ -111,7 +111,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, parent, attributes, index)](#new_Twig_new)
+    * [new Twig(name, [parent], [attributes], [index])](#new_Twig_new)
     * [.attributes](#Twig+attributes) ℗
     * [.text](#Twig+text) ℗
     * [.name](#Twig+name) ℗
@@ -164,8 +164,8 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.addElement](#Twig+addElement) ⇒ [<code>Twig</code>](#Twig)
     * [.delete](#Twig+delete)
     * [.setRoot(name)](#Twig+setRoot) ℗
-    * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
-    * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
+    * [.filterElements(elements, [condition])](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+    * [.testElement(element, [condition])](#Twig+testElement) ⇒ <code>boolean</code>
 
 <a name="new_Twig_new"></a>
 
@@ -174,16 +174,16 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, parent, attributes, index)
+### new Twig(name, [parent], [attributes], [index])
 Create a new Twig object
 
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | The name of the XML element |
-| parent | [<code>Twig</code>](#Twig) | The parent object |
-| attributes | <code>object</code> | Attribute object |
-| index | <code>string</code> \| <code>number</code> | Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last' |
+| [parent] | [<code>Twig</code>](#Twig) | The parent object |
+| [attributes] | <code>object</code> | Attribute object |
+| [index] | <code>string</code> \| <code>number</code> | Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last' |
 
 <a name="Twig+attributes"></a>
 
@@ -266,7 +266,7 @@ Purges up to the elt element. This allows you to keep part of the tree in memory
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elt | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+| [elt] | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
 
 <a name="Twig+escapeEntity"></a>
 
@@ -380,7 +380,7 @@ Internal recursive function used by `writer()`
 | Param | Type | Description |
 | --- | --- | --- |
 | xw | <code>XMLWriter</code> | The writer object |
-| children | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
+| childArray | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
 
 <a name="Twig+writer"></a>
 
@@ -403,7 +403,7 @@ Returns attribute value or `null` if not found.<br>If more than one  matches th
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attribute |
+| [condition] | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attribute |
 
 <a name="Twig+attributes"></a>
 
@@ -434,8 +434,8 @@ Retrieve or update XML attribute. For update, the condition must be a string, i.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
-| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attributes is returned. |
+| [condition] | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
+| [value] | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attributes is returned. |
 
 **Example**  
 ```js
@@ -480,7 +480,7 @@ All children, optionally matching `condition` of the current element or empty ar
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+next"></a>
 
@@ -493,7 +493,7 @@ Returns the next matching element.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+previous"></a>
 
@@ -506,7 +506,7 @@ Returns the previous matching element.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+first"></a>
 
@@ -518,7 +518,7 @@ Returns the first matching element. This is usually the root element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+last"></a>
 
@@ -530,7 +530,7 @@ Returns the last matching element.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+isFirstChild"></a>
 
@@ -556,7 +556,7 @@ Returns descendants (children, grandchildren, etc.) of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+descendantOrSelf"></a>
 
@@ -568,7 +568,7 @@ Returns descendants (children, grandchildren, etc.) of the current element and t
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+ancestor"></a>
 
@@ -580,7 +580,7 @@ Returns ancestors (parent, grandparent, etc.)  of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+ancestorOrSelf"></a>
 
@@ -592,7 +592,7 @@ Returns ancestors (parent, grandparent, etc.)  of the current element and the cu
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+sibling"></a>
 
@@ -604,7 +604,7 @@ Returns all sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+siblingOrSelf"></a>
 
@@ -616,7 +616,7 @@ Returns all sibling element of the current element and the current element itsel
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+followingSibling"></a>
 
@@ -628,7 +628,7 @@ Returns all following sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+precedingSibling"></a>
 
@@ -640,7 +640,7 @@ Returns all preceding sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+nextSibling"></a>
 
@@ -652,7 +652,7 @@ Returns next sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+prevSibling"></a>
 
@@ -664,7 +664,7 @@ Returns previous sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+find"></a>
 
@@ -689,9 +689,9 @@ Add a new element in the current element
 | Param | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | The tag name |
-| text | <code>string</code> | Text of the element |
-| attributes | <code>object</code> | Element attributes |
-| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last' or the position in the `children` |
+| [text] | <code>string</code> | Text of the element |
+| [attributes] | <code>object</code> | Element attributes |
+| [position] | <code>name</code> \| <code>number</code> | Position name 'first', 'last' or the position in the `children` |
 
 <a name="Twig+delete"></a>
 
@@ -713,7 +713,7 @@ Sets the name of root element. In some cases the root is created before the XML-
 
 <a name="Twig+filterElements"></a>
 
-### twig.filterElements(elements, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+### twig.filterElements(elements, [condition]) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 Common function to filter Twig elements from array
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -722,11 +722,11 @@ Common function to filter Twig elements from array
 | Param | Type | Description |
 | --- | --- | --- |
 | elements | [<code>Twig</code>](#Twig) \| [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter or a single element |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="Twig+testElement"></a>
 
-### twig.testElement(element, condition) ⇒ <code>boolean</code>
+### twig.testElement(element, [condition]) ⇒ <code>boolean</code>
 Common function to filter Twig element
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -735,7 +735,7 @@ Common function to filter Twig element
 | Param | Type | Description |
 | --- | --- | --- |
 | element | [<code>Twig</code>](#Twig) | Element you like to filter |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="Twig"></a>
 
@@ -744,7 +744,7 @@ Common function to filter Twig element
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, parent, attributes, index)](#new_Twig_new)
+    * [new Twig(name, [parent], [attributes], [index])](#new_Twig_new)
     * [.attributes](#Twig+attributes) ℗
     * [.text](#Twig+text) ℗
     * [.name](#Twig+name) ℗
@@ -797,8 +797,8 @@ Common function to filter Twig element
     * [.addElement](#Twig+addElement) ⇒ [<code>Twig</code>](#Twig)
     * [.delete](#Twig+delete)
     * [.setRoot(name)](#Twig+setRoot) ℗
-    * [.filterElements(elements, condition)](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
-    * [.testElement(element, condition)](#Twig+testElement) ⇒ <code>boolean</code>
+    * [.filterElements(elements, [condition])](#Twig+filterElements) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+    * [.testElement(element, [condition])](#Twig+testElement) ⇒ <code>boolean</code>
 
 <a name="new_Twig_new"></a>
 
@@ -807,16 +807,16 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, parent, attributes, index)
+### new Twig(name, [parent], [attributes], [index])
 Create a new Twig object
 
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | The name of the XML element |
-| parent | [<code>Twig</code>](#Twig) | The parent object |
-| attributes | <code>object</code> | Attribute object |
-| index | <code>string</code> \| <code>number</code> | Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last' |
+| [parent] | [<code>Twig</code>](#Twig) | The parent object |
+| [attributes] | <code>object</code> | Attribute object |
+| [index] | <code>string</code> \| <code>number</code> | Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last' |
 
 <a name="Twig+attributes"></a>
 
@@ -899,7 +899,7 @@ Purges up to the elt element. This allows you to keep part of the tree in memory
 
 | Param | Type | Description |
 | --- | --- | --- |
-| elt | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+| [elt] | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
 
 <a name="Twig+escapeEntity"></a>
 
@@ -1013,7 +1013,7 @@ Internal recursive function used by `writer()`
 | Param | Type | Description |
 | --- | --- | --- |
 | xw | <code>XMLWriter</code> | The writer object |
-| children | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
+| childArray | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
 
 <a name="Twig+writer"></a>
 
@@ -1036,7 +1036,7 @@ Returns attribute value or `null` if not found.<br>If more than one  matches th
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attribute |
+| [condition] | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attribute |
 
 <a name="Twig+attributes"></a>
 
@@ -1067,8 +1067,8 @@ Retrieve or update XML attribute. For update, the condition must be a string, i.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
-| value | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attributes is returned. |
+| [condition] | [<code>AttributeCondition</code>](#AttributeCondition) | Optional condition to select attributes |
+| [value] | <code>string</code> \| <code>number</code> \| <code>bigint</code> \| <code>boolean</code> | New value of the attribute.<br>If `undefined` then existing attributes is returned. |
 
 **Example**  
 ```js
@@ -1113,7 +1113,7 @@ All children, optionally matching `condition` of the current element or empty ar
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+next"></a>
 
@@ -1126,7 +1126,7 @@ Returns the next matching element.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+previous"></a>
 
@@ -1139,7 +1139,7 @@ Returns the previous matching element.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+first"></a>
 
@@ -1151,7 +1151,7 @@ Returns the first matching element. This is usually the root element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+last"></a>
 
@@ -1163,7 +1163,7 @@ Returns the last matching element.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+isFirstChild"></a>
 
@@ -1189,7 +1189,7 @@ Returns descendants (children, grandchildren, etc.) of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+descendantOrSelf"></a>
 
@@ -1201,7 +1201,7 @@ Returns descendants (children, grandchildren, etc.) of the current element and t
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+ancestor"></a>
 
@@ -1213,7 +1213,7 @@ Returns ancestors (parent, grandparent, etc.)  of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+ancestorOrSelf"></a>
 
@@ -1225,7 +1225,7 @@ Returns ancestors (parent, grandparent, etc.)  of the current element and the cu
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+sibling"></a>
 
@@ -1237,7 +1237,7 @@ Returns all sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+siblingOrSelf"></a>
 
@@ -1249,7 +1249,7 @@ Returns all sibling element of the current element and the current element itsel
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+followingSibling"></a>
 
@@ -1261,7 +1261,7 @@ Returns all following sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+precedingSibling"></a>
 
@@ -1273,7 +1273,7 @@ Returns all preceding sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+nextSibling"></a>
 
@@ -1285,7 +1285,7 @@ Returns next sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+prevSibling"></a>
 
@@ -1297,7 +1297,7 @@ Returns previous sibling element of the current element
 
 | Param | Type | Description |
 | --- | --- | --- |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | Optional condition |
 
 <a name="Twig+find"></a>
 
@@ -1322,9 +1322,9 @@ Add a new element in the current element
 | Param | Type | Description |
 | --- | --- | --- |
 | name | <code>string</code> | The tag name |
-| text | <code>string</code> | Text of the element |
-| attributes | <code>object</code> | Element attributes |
-| position | <code>name</code> \| <code>number</code> | Position name 'first', 'last' or the position in the `children` |
+| [text] | <code>string</code> | Text of the element |
+| [attributes] | <code>object</code> | Element attributes |
+| [position] | <code>name</code> \| <code>number</code> | Position name 'first', 'last' or the position in the `children` |
 
 <a name="Twig+delete"></a>
 
@@ -1346,7 +1346,7 @@ Sets the name of root element. In some cases the root is created before the XML-
 
 <a name="Twig+filterElements"></a>
 
-### twig.filterElements(elements, condition) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
+### twig.filterElements(elements, [condition]) ⇒ [<code>Array.&lt;Twig&gt;</code>](#Twig)
 Common function to filter Twig elements from array
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -1355,11 +1355,11 @@ Common function to filter Twig elements from array
 | Param | Type | Description |
 | --- | --- | --- |
 | elements | [<code>Twig</code>](#Twig) \| [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of elements you like to filter or a single element |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="Twig+testElement"></a>
 
-### twig.testElement(element, condition) ⇒ <code>boolean</code>
+### twig.testElement(element, [condition]) ⇒ <code>boolean</code>
 Common function to filter Twig element
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
@@ -1368,7 +1368,7 @@ Common function to filter Twig element
 | Param | Type | Description |
 | --- | --- | --- |
 | element | [<code>Twig</code>](#Twig) | Element you like to filter |
-| condition | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
+| [condition] | [<code>ElementCondition</code>](#ElementCondition) | The filter condition |
 
 <a name="NotImplementedYet"></a>
 
@@ -1443,7 +1443,7 @@ Generic error for unsupported data types
 **Kind**: global constant  
 <a name="createParser"></a>
 
-## createParser(handler, options)
+## createParser(handler, [options])
 Create a new Twig parser
 
 **Kind**: global function  
@@ -1455,7 +1455,7 @@ Create a new Twig parser
 | Param | Type | Description |
 | --- | --- | --- |
 | handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Object or array of element specification and function to handle elements |
-| options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
+| [options] | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 
 <a name="ParserOptions"></a>
 
@@ -1464,15 +1464,16 @@ Optional settings for the Twig parser
 
 **Kind**: global typedef  
 **Default**: <code>{ method: &#x27;sax&#x27;, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
+**Properties**
 
-| Param | Type | Description |
+| Name | Type | Description |
 | --- | --- | --- |
-| method | <code>string</code> | The underlying parser. Either `'sax'` or `'expat'`. |
-| encoding | <code>string</code> | Encoding of the XML File. Applies only to `expat` parser. |
-| xmlns | <code>boolean</code> | If `true`, then namespaces are accessible by `namespace` property. |
-| trim | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
-| resumeAfterError | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
-| partial | <code>boolean</code> | It `true` then unhandled elements are purged. |
+| [method] | <code>string</code> | The underlying parser. Either `'sax'` or `'expat'`. |
+| [encoding] | <code>string</code> | Encoding of the XML File. Applies only to `expat` parser. |
+| [xmlns] | <code>boolean</code> | If `true`, then namespaces are accessible by `namespace` property. |
+| [trim] | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
+| [resumeAfterError] | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
+| [partial] | <code>boolean</code> | It `true` then unhandled elements are purged. |
 
 **Example**  
 ```js
@@ -1484,8 +1485,9 @@ Optional settings for the Twig parser
 Reference to handler functions for Twig objects.<br> Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`<br> You can specify a `function` or a `event` name
 
 **Kind**: global typedef  
+**Properties**
 
-| Param | Type | Description |
+| Name | Type | Description |
 | --- | --- | --- |
 | tag | [<code>HandlerCondition</code>](#HandlerCondition) | Element specification |
 | function | [<code>HandlerFunction</code>](#HandlerFunction) | Definition of handler function, either anonymous or explicit function |
@@ -1493,7 +1495,7 @@ Reference to handler functions for Twig objects.<br> Element can be specified a
 
 <a name="HandlerCondition"></a>
 
-## HandlerCondition : <code>string</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| <code>RootHandler</code> \| <code>AnyHandler</code>
+## HandlerCondition : <code>string</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| <code>RootHandler</code> \| <code>AnyHandler</code> \| <code>undefined</code>
 Condition to specify when handler shall be called<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`- Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached- Use `Twig.Any` to call the handler on every element
 
 **Kind**: global typedef  
@@ -1503,17 +1505,19 @@ Condition to specify when handler shall be called<br> - If `undefined`, then al
 Handler function for Twig objects, i.e. the way you like to use the XML element.
 
 **Kind**: global typedef  
+**Properties**
 
-| Param | Type | Description |
+| Name | Type | Description |
 | --- | --- | --- |
 | elt | [<code>Twig</code>](#Twig) | The current Twig element on which the function was called. |
 
 <a name="HandlerConditionFilter"></a>
 
-## HandlerConditionFilter : <code>function</code>
+## HandlerConditionFilter ⇒ <code>boolean</code>
 Custom filter function to specify when handler shall be called
 
 **Kind**: global typedef  
+**Returns**: <code>boolean</code> - If the function returns `true`, then it is included in the filter  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1521,16 +1525,17 @@ Custom filter function to specify when handler shall be called
 
 <a name="ElementCondition"></a>
 
-## ElementCondition : <code>string</code> \| <code>RegExp</code> \| [<code>ElementConditionFilter</code>](#ElementConditionFilter) \| [<code>Twig</code>](#Twig)
+## ElementCondition : <code>string</code> \| <code>RegExp</code> \| [<code>ElementConditionFilter</code>](#ElementConditionFilter) \| [<code>Twig</code>](#Twig) \| <code>undefined</code>
 Optional condition to get elements<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [ElementConditionFilter](#ElementConditionFilter) then function must return `true`- Use [Twig](#Twig) object to find a specific element
 
 **Kind**: global typedef  
 <a name="ElementConditionFilter"></a>
 
-## ElementConditionFilter : <code>function</code>
+## ElementConditionFilter ⇒ <code>boolean</code>
 Custom filter function to select desired elements
 
 **Kind**: global typedef  
+**Returns**: <code>boolean</code> - If the function returns `true`, then it is included in the filter  
 
 | Param | Type | Description |
 | --- | --- | --- |
