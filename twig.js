@@ -665,7 +665,7 @@ class Twig {
    * Returns attribute value or `null` if not found.<br>
    * If more than one  matches the condition, then it returns object as [attribute()](#attribute)
    * @param {AttributeCondition} [condition] - Optional condition to select attribute
-   * @returns {string|number|object} - The value of the attribute or `null` if the  does not exist
+   * @returns {?string|number|object} - The value of the attribute or `null` if the  does not exist
    */
    attr = function (condition) {
       let attr = this.attribute(condition);
