@@ -40,10 +40,10 @@ const Any = new AnyHandler();
 * Reference to handler functions for Twig objects.<br> 
 * Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`<br> 
 * You can specify a `function` or a `event` name
-* @typedef TwigHandler 
+* @typedef TwigHandler
 * @property {HandlerCondition} tag - Element specification
-* @property {?HandlerFunction} function - Definition of handler function, either anonymous or explicit function
-* @property {?string} event - Type of the event to be emitted
+* @property {HandlerFunction} [function] - Definition of handler function, either anonymous or explicit function
+* @property {string} [event] - Type of the event to be emitted
 */
 
 /**
@@ -59,8 +59,8 @@ const Any = new AnyHandler();
 
 /**
 * Handler function for Twig objects, i.e. the way you like to use the XML element.
-* @typedef HandlerFunction 
-* @property {Twig} elt - The current Twig element on which the function was called.
+* @typedef {function} HandlerFunction 
+* @param {Twig} elt - The current Twig element on which the function was called.
 */
 
 /**
