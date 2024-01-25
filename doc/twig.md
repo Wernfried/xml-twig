@@ -59,7 +59,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 <li>Use <code>Twig.Any</code> to call the handler on every element</li>
 </ul>
 </dd>
-<dt><a href="#HandlerFunction">HandlerFunction</a> : <code>function</code></dt>
+<dt><a href="#HandlerFunction">HandlerFunction</a></dt>
 <dd><p>Handler function for Twig objects, i.e. the way you like to use the XML element.</p>
 </dd>
 <dt><a href="#HandlerConditionFilter">HandlerConditionFilter</a> ⇒ <code>boolean</code></dt>
@@ -1490,8 +1490,8 @@ Reference to handler functions for Twig objects.<br> Element can be specified a
 | Name | Type | Description |
 | --- | --- | --- |
 | tag | [<code>HandlerCondition</code>](#HandlerCondition) | Element specification |
-| [function] | [<code>HandlerFunction</code>](#HandlerFunction) | Definition of handler function, either anonymous or explicit function |
-| [event] | <code>string</code> | Type of the event to be emitted |
+| function | [<code>HandlerFunction</code>](#HandlerFunction) | Definition of handler function, either anonymous or explicit function |
+| event | <code>string</code> | Type of the event to be emitted |
 
 <a name="HandlerCondition"></a>
 
@@ -1501,12 +1501,13 @@ Condition to specify when handler shall be called<br> - If `undefined`, then al
 **Kind**: global typedef  
 <a name="HandlerFunction"></a>
 
-## HandlerFunction : <code>function</code>
+## HandlerFunction
 Handler function for Twig objects, i.e. the way you like to use the XML element.
 
 **Kind**: global typedef  
+**Properties**
 
-| Param | Type | Description |
+| Name | Type | Description |
 | --- | --- | --- |
 | elt | [<code>Twig</code>](#Twig) | The current Twig element on which the function was called. |
 
