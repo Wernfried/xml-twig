@@ -26,7 +26,7 @@ const Any = new AnyHandler();
 /**
 * Optional settings for the Twig parser
 * @typedef ParserOptions 
-* @property {string} [method] - The underlying parser. Either `'sax'` or `'expat'`.
+* @property {'sax' | 'expat'} [method] - The underlying parser. Either `'sax'` or `'expat'`.
 * @property {string} [encoding] - Encoding of the XML File. Applies only to `expat` parser.
 * @property {boolean} [xmlns] - If `true`, then namespaces are accessible by `namespace` property.
 * @property {boolean} [trim] - If `true`, then turn any whitespace into a single space. Text and comments are trimmed.
@@ -103,8 +103,8 @@ function createParser(handler, options) {
    let closeEvent;
 
    if (options.partial) {
-      let hndl = Array.isArray(handler) ? handler : [handler];
-      let any = hndl.find(x => x.tag instanceof AnyHandler);
+      const handle1 = Array.isArray(handler) ? handler : [handler];
+      let any = handle1.find(x => x.tag instanceof AnyHandler);
       if (any !== undefined)
          console.warn(`Using option '{ partial: true }' and handler '{ tag: Any, function: ${any.function.toString()} }' does not make much sense`);
    }
@@ -391,38 +391,38 @@ class Twig {
    */
 
    /**
-   * @property {?object} #attributes - XML attribute `{ <attribute 1>: <value 1>, <attribute 2>: <value 2>, ... }`
-   * @private
+    * XML attribute `{ <attribute 1>: <value 1>, <attribute 2>: <value 2>, ... }`
+   * @type {?object}
    */
    #attributes = {};
 
    /**
-   * @property {?string|number} #text - Content of XML Element
-   * @private
+    * Content of XML Element
+   * @type {?string|number}
    */
    #text = null;
 
    /**
-   * @property {string} #name - The XML tag name
-   * @private
+    * The XML tag name
+   * @type {string} 
    */
    #name;
 
    /**
-   * @property {?Twig[]} #children - Child XML Elements
-   * @private
+    * Child XML Elements
+   * @type {Twig[]}
    */
    #children = [];
 
    /**
-   * @property {?Twig} #parent - The parent object. Undefined on root element
-   * @private
+    * The parent object. Undefined on root element
+   * @type {Twig | undefined} 
    */
    #parent;
 
    /**
-   * @property {boolean} #pinned - Determines whether twig is needed in partial load
-   * @private
+    * Determines whether twig is needed in partial load
+   * @type {boolean}
    */
    #pinned = false;
 
@@ -482,14 +482,14 @@ class Twig {
       if (elt === undefined) {
          this.purge();
       } else {
-         let purgeThis = this.descendantOrSelf();
-         purgeThis = purgeThis[purgeThis.length - 1];
-         let stopAt = elt.descendantOrSelf();
-         stopAt = stopAt[stopAt.length - 1];
-         while (purgeThis !== null && !Object.is(purgeThis, stopAt)) {
-            let prev = purgeThis.previous();
-            purgeThis.purge();
-            purgeThis = prev;
+         const purgeThis = this.descendantOrSelf();
+         let toPurge = purgeThis[purgeThis.length - 1];
+         const descendantOrSelf = elt.descendantOrSelf();
+         const stopAt = descendantOrSelf[descendantOrSelf.length - 1];
+         while (toPurge !== null && !Object.is(toPurge, stopAt)) {
+            const prev = toPurge.previous();
+            toPurge.purge();
+            toPurge = prev;
          }
       }
    };
