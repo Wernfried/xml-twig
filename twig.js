@@ -784,7 +784,7 @@ class Twig {
          if (typeof condition === 'string') {
             return elements.filter(x => x.name === condition);
          } else if (condition instanceof RegExp) {
-            return elements.filter(x => x.condition.test(x.name));
+            return elements.filter(x => condition.test(x.name));
          } else if (condition instanceof Twig) {
             return elements.filter(x => Object.is(x, condition));
          } else if (typeof condition === 'function') {
