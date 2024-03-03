@@ -112,12 +112,12 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
     * [new Twig(name, [parent], [attributes], [index])](#new_Twig_new)
-    * [.attributes](#Twig+attributes) ℗
-    * [.text](#Twig+text) ℗
-    * [.name](#Twig+name) ℗
-    * [.children](#Twig+children) ℗
-    * [.parent](#Twig+parent) ℗
-    * [.pinned](#Twig+pinned) ℗
+    * [.attributes](#Twig+attributes) : <code>object</code> ℗
+    * [.text](#Twig+text) : <code>string</code> \| <code>number</code> ℗
+    * [.name](#Twig+name) : <code>string</code> ℗
+    * [.children](#Twig+children) : [<code>Array.&lt;Twig&gt;</code>](#Twig) ℗
+    * [.parent](#Twig+parent) : [<code>Twig</code>](#Twig) \| <code>undefined</code> ℗
+    * [.pinned](#Twig+pinned) : <code>boolean</code> ℗
     * [.purge](#Twig+purge)
     * [.purgeUpTo](#Twig+purgeUpTo)
     * [.escapeEntity](#Twig+escapeEntity)
@@ -187,70 +187,46 @@ Create a new Twig object
 
 <a name="Twig+attributes"></a>
 
-### twig.attributes ℗
+### twig.attributes : <code>object</code> ℗
+XML attribute `{ <attribute 1>: <value 1>, <attribute 2>: <value 2>, ... }`
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #attributes | <code>object</code> | XML attribute `{ <attribute 1>: <value 1>, <attribute 2>: <value 2>, ... }` |
-
 <a name="Twig+text"></a>
 
-### twig.text ℗
+### twig.text : <code>string</code> \| <code>number</code> ℗
+Content of XML Element
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #text | <code>string</code> \| <code>number</code> | Content of XML Element |
-
 <a name="Twig+name"></a>
 
-### twig.name ℗
+### twig.name : <code>string</code> ℗
+The XML tag name
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #name | <code>string</code> | The XML tag name |
-
 <a name="Twig+children"></a>
 
-### twig.children ℗
+### twig.children : [<code>Array.&lt;Twig&gt;</code>](#Twig) ℗
+Child XML Elements
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #children | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Child XML Elements |
-
 <a name="Twig+parent"></a>
 
-### twig.parent ℗
+### twig.parent : [<code>Twig</code>](#Twig) \| <code>undefined</code> ℗
+The parent object. Undefined on root element
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #parent | [<code>Twig</code>](#Twig) | The parent object. Undefined on root element |
-
 <a name="Twig+pinned"></a>
 
-### twig.pinned ℗
+### twig.pinned : <code>boolean</code> ℗
+Determines whether twig is needed in partial load
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #pinned | <code>boolean</code> | Determines whether twig is needed in partial load |
-
 <a name="Twig+purge"></a>
 
 ### twig.purge
@@ -745,12 +721,12 @@ Common function to filter Twig element
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
     * [new Twig(name, [parent], [attributes], [index])](#new_Twig_new)
-    * [.attributes](#Twig+attributes) ℗
-    * [.text](#Twig+text) ℗
-    * [.name](#Twig+name) ℗
-    * [.children](#Twig+children) ℗
-    * [.parent](#Twig+parent) ℗
-    * [.pinned](#Twig+pinned) ℗
+    * [.attributes](#Twig+attributes) : <code>object</code> ℗
+    * [.text](#Twig+text) : <code>string</code> \| <code>number</code> ℗
+    * [.name](#Twig+name) : <code>string</code> ℗
+    * [.children](#Twig+children) : [<code>Array.&lt;Twig&gt;</code>](#Twig) ℗
+    * [.parent](#Twig+parent) : [<code>Twig</code>](#Twig) \| <code>undefined</code> ℗
+    * [.pinned](#Twig+pinned) : <code>boolean</code> ℗
     * [.purge](#Twig+purge)
     * [.purgeUpTo](#Twig+purgeUpTo)
     * [.escapeEntity](#Twig+escapeEntity)
@@ -820,70 +796,46 @@ Create a new Twig object
 
 <a name="Twig+attributes"></a>
 
-### twig.attributes ℗
+### twig.attributes : <code>object</code> ℗
+XML attribute `{ <attribute 1>: <value 1>, <attribute 2>: <value 2>, ... }`
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #attributes | <code>object</code> | XML attribute `{ <attribute 1>: <value 1>, <attribute 2>: <value 2>, ... }` |
-
 <a name="Twig+text"></a>
 
-### twig.text ℗
+### twig.text : <code>string</code> \| <code>number</code> ℗
+Content of XML Element
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #text | <code>string</code> \| <code>number</code> | Content of XML Element |
-
 <a name="Twig+name"></a>
 
-### twig.name ℗
+### twig.name : <code>string</code> ℗
+The XML tag name
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #name | <code>string</code> | The XML tag name |
-
 <a name="Twig+children"></a>
 
-### twig.children ℗
+### twig.children : [<code>Array.&lt;Twig&gt;</code>](#Twig) ℗
+Child XML Elements
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #children | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Child XML Elements |
-
 <a name="Twig+parent"></a>
 
-### twig.parent ℗
+### twig.parent : [<code>Twig</code>](#Twig) \| <code>undefined</code> ℗
+The parent object. Undefined on root element
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #parent | [<code>Twig</code>](#Twig) | The parent object. Undefined on root element |
-
 <a name="Twig+pinned"></a>
 
-### twig.pinned ℗
+### twig.pinned : <code>boolean</code> ℗
+Determines whether twig is needed in partial load
+
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Access**: private  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| #pinned | <code>boolean</code> | Determines whether twig is needed in partial load |
-
 <a name="Twig+purge"></a>
 
 ### twig.purge
@@ -1468,7 +1420,7 @@ Optional settings for the Twig parser
 
 | Name | Type | Description |
 | --- | --- | --- |
-| [method] | <code>string</code> | The underlying parser. Either `'sax'` or `'expat'`. |
+| [method] | <code>&#x27;sax&#x27;</code> \| <code>&#x27;expat&#x27;</code> | The underlying parser. Either `'sax'` or `'expat'`. |
 | [encoding] | <code>string</code> | Encoding of the XML File. Applies only to `expat` parser. |
 | [xmlns] | <code>boolean</code> | If `true`, then namespaces are accessible by `namespace` property. |
 | [trim] | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
