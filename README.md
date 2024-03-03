@@ -392,7 +392,7 @@ This `xml-twig` module focus on reading a XML files. In principle it would be po
 
 Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more an [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
 
-Despite [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) ("All XML processors MUST be able to read entities in both the UTF-8 and UTF-16 encodings"), the `sax` parser does not support UTF-16 encodings. When you have a XML-File encoded in UF-16, then you must use the `expat` parser. 
+Despite [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) ("All XML processors MUST be able to read entities in both the UTF-8 and UTF-16 encodings"), the `sax` parser does not support UTF-16 encodings. When you have a XML-File encoded in UTF-16, then you must use the `expat` parser. 
 
 
 
