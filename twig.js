@@ -27,13 +27,12 @@ const Any = new AnyHandler();
 * Optional settings for the Twig parser
 * @typedef ParserOptions 
 * @property {'sax' | 'expat'} [method] - The underlying parser. Either `'sax'` or `'expat'`.
-* @property {string} [encoding] - Encoding of the XML File. Applies only to `expat` parser.
 * @property {boolean} [xmlns] - If `true`, then namespaces are accessible by `namespace` property.
 * @property {boolean} [trim] - If `true`, then turn any whitespace into a single space. Text and comments are trimmed.
 * @property {boolean} [resumeAfterError] - If `true` then parser continues reading after an error. Otherwise it throws exception.
-* @property {boolean} [partial] - It `true` then unhandled elements are purged.
-* @example { encoding: 'UTF-8', xmlns: true }
-* @default  { method: 'sax', encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }
+* @property {boolean} [partial] - If `true` then unhandled elements are purged.
+* @example { method: 'expat', xmlns: true }
+* @default  { method: 'sax', xmlns: false, trim: true, resumeAfterError: false, partial: false }
 */
 
 /**
@@ -96,8 +95,8 @@ const Any = new AnyHandler();
 * @param {ParserOptions} [options] - Object of optional options 
 * @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` and `sax` (default) are supported.
 */
-function createParser(handler, options) {
-   options = Object.assign({ method: SAX, encoding: 'UTF-8', xmlns: false, trim: true, resumeAfterError: false, partial: false }, options);
+function createParser(handler, options = {}) {
+   options = Object.assign({ method: SAX, xmlns: false, trim: true, resumeAfterError: false, partial: false }, options);
    let parser;
    let namespaces = {};
    let closeEvent;
@@ -187,7 +186,7 @@ function createParser(handler, options) {
 
       parser.on("attribute", function (attr) {
          current.attribute(attr.name, attr.value);
-         if (attr.uri !== undefined && attr.uri !== '') {
+         if ((attr.uri ?? '') !== '' && attr.local !== undefined) {
             namespaces[attr.local] = attr.uri;
             Object.defineProperty(current, 'namespace', {
                value: { local: attr.local, uri: attr.uri },
@@ -200,7 +199,7 @@ function createParser(handler, options) {
          current.text = current.text ?? '' + str;
       });
 
-      let hndl = Array.isArray(handler) ? handler : [handler];
+      const hndl = Array.isArray(handler) ? handler : [handler];
       let rootHandler = hndl.find(x => x.tag instanceof RootHandler);
       parser.on("end", function () {
          if (typeof rootHandler?.function === 'function') rootHandler.function(tree);
@@ -209,8 +208,6 @@ function createParser(handler, options) {
 
    } else if (options.method === EXPAT) {
       parser = require("node-expat").createParser();
-      parser.encoding = options.encoding;
-
       Object.defineProperty(parser, 'currentLine', {
          enumerable: true,
          get() { return parser.parser.getCurrentLineNumber(); }
@@ -245,6 +242,8 @@ function createParser(handler, options) {
                }
             }
          }
+         for (let attr in attrs)
+            current.attribute(attr, attrs[attr]);
          if (options.xmlns) {
             for (let key of Object.keys(attrs).filter(x => x.startsWith('xmlns:')))
                namespaces[key.split(':')[1]] = attrs[key];

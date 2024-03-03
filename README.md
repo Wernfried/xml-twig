@@ -217,7 +217,7 @@ The [Twig](./doc/twig.md#Twig) Class models a "some-kind" Element tree.  I try t
 #### XML-Namespaces
 
 When the XML-Files uses [Namespaces](https://www.w3schools.com/xml/xml_namespaces.asp) then you can address the elements as they appear in the file, for example `cd:data`. 
-With option `{ namespaces : true }` you will get access to the `.namespace` property.
+With option `{ xmlns : true }` you will get access to the `.namespace` property.
 
 ### Access elements and attributes
 
@@ -232,7 +232,7 @@ With option `{ namespaces : true }` you will get access to the `.namespace` prop
    Specify attribute name or regular expression or custom condition. For details see [AttributeCondition](./doc/twig.md#AttributeCondition).<br>
    Let's assume an XML element like this: 
 ```js   
-<person firstName="Jean-Luc", lastName="Picard", age="59" />
+<person firstName="Jean-Luc" lastName="Picard" age="59" />
 ```
 Here are some examples the get attribute and values:
 ```js
@@ -392,7 +392,7 @@ This `xml-twig` module focus on reading a XML files. In principle it would be po
 
 Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more an [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
 
-
+Despite [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) ("All XML processors MUST be able to read entities in both the UTF-8 and UTF-16 encodings"), the `sax` parser does not support UTF-16 encodings. When you have a XML-File encoded in UF-16, then you must use the `expat` parser. 
 
 
 
