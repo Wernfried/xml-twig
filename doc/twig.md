@@ -1415,21 +1415,20 @@ Create a new Twig parser
 Optional settings for the Twig parser
 
 **Kind**: global typedef  
-**Default**: <code>{ method: &#x27;sax&#x27;, encoding: &#x27;UTF-8&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
+**Default**: <code>{ method: &#x27;sax&#x27;, xmlns: false, trim: true, resumeAfterError: false, partial: false }</code>  
 **Properties**
 
 | Name | Type | Description |
 | --- | --- | --- |
 | [method] | <code>&#x27;sax&#x27;</code> \| <code>&#x27;expat&#x27;</code> | The underlying parser. Either `'sax'` or `'expat'`. |
-| [encoding] | <code>string</code> | Encoding of the XML File. Applies only to `expat` parser. |
 | [xmlns] | <code>boolean</code> | If `true`, then namespaces are accessible by `namespace` property. |
 | [trim] | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
 | [resumeAfterError] | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
-| [partial] | <code>boolean</code> | It `true` then unhandled elements are purged. |
+| [partial] | <code>boolean</code> | If `true` then unhandled elements are purged. |
 
 **Example**  
 ```js
-{ encoding: 'UTF-8', xmlns: true }
+{ method: 'expat', xmlns: true }
 ```
 <a name="TwigHandler"></a>
 
