@@ -23,8 +23,7 @@
 
 <dl>
 <dt><a href="#Root">Root</a> : <code>RootHandler</code></dt>
-<dd><p>`</p>
-</dd>
+<dd></dd>
 <dt><a href="#Any">Any</a> : <code>AnyHandler</code></dt>
 <dd></dd>
 </dl>
@@ -32,7 +31,7 @@
 ## Functions
 
 <dl>
-<dt><a href="#createParser">createParser(handler, [options])</a></dt>
+<dt><a href="#createParser">createParser(handler, [options])</a> ⇒ <code><a href="#Parser">Parser</a></code></dt>
 <dd><p>Create a new Twig parser</p>
 </dd>
 </dl>
@@ -48,7 +47,7 @@
 Element can be specified as string, Regular Expression, custom function, <code>Twig.Root</code> or <code>Twig.Any</code><br> 
 You can specify a <code>function</code> or a <code>event</code> name</p>
 </dd>
-<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code>RootHandler</code> | <code>AnyHandler</code> | <code>undefined</code></dt>
+<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code><a href="#Root">Root</a></code> | <code><a href="#Any">Any</a></code> | <code>undefined</code></dt>
 <dd><p>Condition to specify when handler shall be called<br> </p>
 <ul>
 <li>If <code>undefined</code>, then all elements are returned.<br> </li>
@@ -78,6 +77,8 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 <dt><a href="#ElementConditionFilter">ElementConditionFilter</a> ⇒ <code>boolean</code></dt>
 <dd><p>Custom filter function to select desired elements</p>
 </dd>
+<dt><a href="#Parser">Parser</a> ⇒ <code><a href="https://www.npmjs.com/package/sax">sax</a></code> | <code><a href="https://www.npmjs.com/package/node-expat">node-expat</a></code></dt>
+<dd></dd>
 <dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
 <dd><p>Optional condition to get attributes<br> </p>
 <ul>
@@ -134,7 +135,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
     * [.close](#Twig+close)
     * [.addChild](#Twig+addChild) ℗
-    * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
+    * [.writer](#Twig+writer) ⇒ [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.attributes](#Twig+attributes) ⇒ <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
@@ -355,19 +356,19 @@ Internal recursive function used by `writer()`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| xw | <code>XMLWriter</code> | The writer object |
+| xw | [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer) | The writer object |
 | childArray | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
 
 <a name="Twig+writer"></a>
 
-### twig.writer ⇒ <code>XMLWriter</code>
+### twig.writer ⇒ [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer)
 Creates xml-writer from current element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| par | <code>boolean</code> \| <code>string</code> \| <code>XMLWriter</code> | `true` or intention character or an already created XMLWriter |
+| par | <code>boolean</code> \| <code>string</code> \| [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer) | `true` or intention character or an already created XMLWriter |
 
 <a name="Twig+attr"></a>
 
@@ -743,7 +744,7 @@ Common function to filter Twig element
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
     * [.close](#Twig+close)
     * [.addChild](#Twig+addChild) ℗
-    * [.writer](#Twig+writer) ⇒ <code>XMLWriter</code>
+    * [.writer](#Twig+writer) ⇒ [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
     * [.attributes](#Twig+attributes) ⇒ <code>object</code>
     * [.hasAttribute](#Twig+hasAttribute) ⇒ <code>boolean</code>
@@ -964,19 +965,19 @@ Internal recursive function used by `writer()`
 
 | Param | Type | Description |
 | --- | --- | --- |
-| xw | <code>XMLWriter</code> | The writer object |
+| xw | [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer) | The writer object |
 | childArray | [<code>Array.&lt;Twig&gt;</code>](#Twig) | Array of child elements |
 
 <a name="Twig+writer"></a>
 
-### twig.writer ⇒ <code>XMLWriter</code>
+### twig.writer ⇒ [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer)
 Creates xml-writer from current element
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| par | <code>boolean</code> \| <code>string</code> \| <code>XMLWriter</code> | `true` or intention character or an already created XMLWriter |
+| par | <code>boolean</code> \| <code>string</code> \| [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer) | `true` or intention character or an already created XMLWriter |
 
 <a name="Twig+attr"></a>
 
@@ -1386,8 +1387,6 @@ Generic error for unsupported data types
 <a name="Root"></a>
 
 ## Root : <code>RootHandler</code>
-`
-
 **Kind**: global constant  
 <a name="Any"></a>
 
@@ -1395,10 +1394,11 @@ Generic error for unsupported data types
 **Kind**: global constant  
 <a name="createParser"></a>
 
-## createParser(handler, [options])
+## createParser(handler, [options]) ⇒ [<code>Parser</code>](#Parser)
 Create a new Twig parser
 
 **Kind**: global function  
+**Returns**: [<code>Parser</code>](#Parser) - The parser Object  
 **Throws**:
 
 - [<code>UnsupportedParser</code>](#UnsupportedParser) - For an unsupported parser. Currently `expat` and `sax` (default) are supported.
@@ -1446,7 +1446,7 @@ Reference to handler functions for Twig objects.<br> Element can be specified a
 
 <a name="HandlerCondition"></a>
 
-## HandlerCondition : <code>string</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| <code>RootHandler</code> \| <code>AnyHandler</code> \| <code>undefined</code>
+## HandlerCondition : <code>string</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| [<code>Root</code>](#Root) \| [<code>Any</code>](#Any) \| <code>undefined</code>
 Condition to specify when handler shall be called<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`- Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached- Use `Twig.Any` to call the handler on every element
 
 **Kind**: global typedef  
@@ -1491,6 +1491,18 @@ Custom filter function to select desired elements
 | --- | --- | --- |
 | name | <code>string</code> | Name of the element |
 | elt | [<code>Twig</code>](#Twig) | The Twig object |
+
+<a name="Parser"></a>
+
+## Parser ⇒ [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat)
+**Kind**: global typedef  
+**Returns**: [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) - The parser Object  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| [currentLine] | <code>number</code> | The currently processed line in the XML-File |
+| [currentColumn] | <code>number</code> | The currently processed column in the XML-File |
 
 <a name="AttributeCondition"></a>
 

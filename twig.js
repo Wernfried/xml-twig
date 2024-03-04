@@ -4,6 +4,20 @@ const EXPAT = 'expat';
 let tree;
 let current;
 
+/**
+* @external XMLWriter
+* @see {@link https://www.npmjs.com/package/xml-writer|xml-writer}
+*/
+
+/**
+* @external sax
+* @see {@link https://www.npmjs.com/package/sax|sax}
+*/
+
+/**
+* @external node-expat
+* @see {@link https://www.npmjs.com/package/node-expat|node-expat}
+*/
 
 
 class RootHandler { }
@@ -13,7 +27,7 @@ class AnyHandler { }
 /** 
 * @constant {RootHandler} Root
 * @type {RootHandler}
-`*/
+*/
 const Root = new RootHandler();
 
 /** 
@@ -53,7 +67,7 @@ const Any = new AnyHandler();
 * - If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`
 * - Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached
 * - Use `Twig.Any` to call the handler on every element
-* @typedef {string|RegExp|HandlerConditionFilter|RootHandler|AnyHandler|undefined} HandlerCondition 
+* @typedef {string|RegExp|HandlerConditionFilter|Root|Any|undefined} HandlerCondition 
 */
 
 /**
@@ -87,13 +101,19 @@ const Any = new AnyHandler();
 * @returns {boolean} If the function returns `true`, then it is included in the filter
 */
 
-
+/**
+* @typedef Parser
+* @property {number} [currentLine] - The currently processed line in the XML-File
+* @property {number} [currentColumn] - The currently processed column in the XML-File
+* @returns {external:sax|external:node-expat} The parser Object
+*/
 
 /**
 * Create a new Twig parser
 * @param {TwigHandler|TwigHandler[]} handler - Object or array of element specification and function to handle elements
 * @param {ParserOptions} [options] - Object of optional options 
 * @throws {UnsupportedParser} - For an unsupported parser. Currently `expat` and `sax` (default) are supported.
+* @returns {Parser} The parser Object
 */
 function createParser(handler, options = {}) {
    options = Object.assign({ method: SAX, xmlns: false, trim: true, resumeAfterError: false, partial: false }, options);
@@ -625,7 +645,7 @@ class Twig {
 
    /**
    * Internal recursive function used by `writer()`
-   * @param {XMLWriter} xw - The writer object
+   * @param {external:XMLWriter} xw - The writer object
    * @param {Twig[]} childArray - Array of child elements
    */
    #addChild = function (xw, childArray) {
@@ -640,11 +660,10 @@ class Twig {
       xw.endElement();
    };
 
-
    /**
    * Creates xml-writer from current element
-   * @param {?boolean|string|XMLWriter} par - `true` or intention character or an already created XMLWriter
-   * @returns {XMLWriter} 
+   * @param {?boolean|string|external:XMLWriter} par - `true` or intention character or an already created XMLWriter
+   * @returns {external:XMLWriter} 
    */
    writer = function (par) {
       const XMLWriter = require('xml-writer');
