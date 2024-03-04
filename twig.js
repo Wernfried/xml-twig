@@ -205,14 +205,15 @@ function createParser(handler, options = {}) {
       });
 
       parser.on("attribute", function (attr) {
-         current.attribute(attr.name, attr.value);
-         if ((attr.uri ?? '') !== '' && attr.local !== undefined) {
+         if (options.xmlns && (attr.uri ?? '') !== '' && attr.local !== undefined) {
             namespaces[attr.local] = attr.uri;
             Object.defineProperty(current, 'namespace', {
                value: { local: attr.local, uri: attr.uri },
                writable: false,
                enumerable: true
             });
+         } else {
+            current.attribute(attr.name, attr.value);
          }
       });
       parser.on("cdata", function (str) {
@@ -239,13 +240,18 @@ function createParser(handler, options = {}) {
       closeEvent = "endElement";
 
       parser.on("startElement", function (name, attrs) {
+         let attr = {};
+         if (options.xmlns) {
+            for (let key of Object.keys(attrs).filter(x => !x.startsWith('xmlns:')))
+               attr[key] = attrs[key];
+         }
          if (tree === undefined) {
-            tree = new Twig(name, current, attrs);
+            tree = new Twig(name, current, options.xmlns ? attr : attrs);
          } else {
             if (current.isRoot && current.name === undefined) {
                current.setRoot(name);
             } else {
-               let elt = new Twig(name, current, attrs);
+               let elt = new Twig(name, current, options.xmlns ? attr : attrs);
                if (options.partial) {
                   for (let hndl of Array.isArray(handler) ? handler : [handler]) {
                      if (typeof hndl.tag === 'string' && name === hndl.tag) {
@@ -262,8 +268,6 @@ function createParser(handler, options = {}) {
                }
             }
          }
-         for (let attr in attrs)
-            current.attribute(attr, attrs[attr]);
          if (options.xmlns) {
             for (let key of Object.keys(attrs).filter(x => x.startsWith('xmlns:')))
                namespaces[key.split(':')[1]] = attrs[key];
