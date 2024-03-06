@@ -483,6 +483,7 @@ function reset() {
    current = undefined;
 }
 
+let closeXMLWriterElement = true;
 
 /**
  * Generic class modeling a XML Node
@@ -761,20 +762,29 @@ class Twig {
    };
 
    /**
+   * XML-Twig for dummies :-)
+   * @returns {string} The XML-Tree which is currently available in RAM - no valid XML Structure
+   */
+   debug = function () {
+      return this.root().writer(true, this).output;
+   };
+
+   /**
    * Internal recursive function used by `writer()`
    * @param {external:XMLWriter} xw - The writer object
    * @param {Twig[]} childArray - Array of child elements
    */
-   #addChild = function (xw, childArray) {
+   #addChild = function (xw, childArray, startElement) {
       for (let elt of childArray) {
          xw.startElement(elt.name);
          for (let [key, val] of Object.entries(elt.attributes))
             xw.writeAttribute(key, val);
          if (elt.text !== null)
             xw.text(elt.text);
-         this.#addChild(xw, elt.children());
+         this.#addChild(xw, elt.children(), startElement);
+         if (elt === startElement) closeXMLWriterElement = false;
       }
-      xw.endElement();
+      if (closeXMLWriterElement) xw.endElement();
    };
 
    /**
@@ -782,17 +792,18 @@ class Twig {
    * @param {?boolean|string|external:XMLWriter} par - `true` or intention character or an already created XMLWriter
    * @returns {external:XMLWriter} 
    */
-   writer = function (par) {
+   writer = function (par, startElement) {
       const XMLWriter = require('xml-writer');
       let xw = par instanceof XMLWriter ? par : new XMLWriter(par);
+      closeXMLWriterElement = true
 
       xw.startElement(this.#name);
       for (let [key, val] of Object.entries(this.#attributes))
          xw.writeAttribute(key, val);
       if (this.#text !== null)
          xw.text(this.#text);
-      this.#addChild(xw, this.#children);
-      xw.endElement();
+      this.#addChild(xw, this.#children, startElement);
+      if (closeXMLWriterElement) xw.endElement();
       return xw;
    };
 
