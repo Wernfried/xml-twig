@@ -2,10 +2,10 @@ const fs = require('fs');
 const twig = require('./twig.js');
 
 
-//const parser = twig.createParser({ tag: twig.Any, function: anyHandler }, { method: "sax" });
+const parser = twig.createParser({ tag: twig.Any, function: anyHandler }, { method: "sax" });
 //const parser = twig.createParser({ tag: twig.Any, function: anyHandler }, { method: "expat" });
 //const parser = twig.createParser({ tag: twig.Any, function: anyHandler }, { method: "saxophone" });
-//fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
+fs.createReadStream(`${__dirname}/samples/bookstore.xml`).pipe(parser);
 //fs.createReadStream(`${__dirname}/samples/breakfast-menu.xml`).pipe(parser);
 
 //const parser = twig.createParser({ tag: twig.Any, function: nsHandler }, { method: "sax", xmlns: true });
