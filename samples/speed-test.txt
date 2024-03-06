@@ -1,0 +1,164 @@
+C:\Developing\Source\xml-twig\samples>node speed-test.js expat 
+Starting with expat...
+	25 NE in 00:15.36
+	50 NE in 00:33.382
+	75 NE in 00:50.253
+	100 NE in 01:13.944
+	125 NE in 01:42.205
+	150 NE in 02:13.746
+	175 NE in 02:35.650
+All done with expat in 02:52.676
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js expat 
+Starting with expat...
+	25 NE in 00:18.216
+	50 NE in 00:37.92
+	75 NE in 00:54.888
+	100 NE in 01:17.224
+	125 NE in 01:44.272
+	150 NE in 02:15.283
+	175 NE in 02:36.463
+All done with expat in 02:53.644
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js expat 
+Starting with expat...
+	25 NE in 00:18.639
+	50 NE in 00:39.182
+	75 NE in 00:59.446
+	100 NE in 01:19.566
+	125 NE in 01:46.400
+	150 NE in 02:16.608
+	175 NE in 02:37.242
+All done with expat in 02:54.894
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js expat 
+Starting with expat...
+	25 NE in 00:17.702
+	50 NE in 00:36.765
+	75 NE in 00:55.178
+	100 NE in 01:16.259
+	125 NE in 01:47.37
+	150 NE in 02:18.862
+	175 NE in 02:42.671
+All done with expat in 03:02.545
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js expat 
+Starting with expat...
+	25 NE in 00:18.746
+	50 NE in 00:38.461
+	75 NE in 00:56.901
+	100 NE in 01:17.314
+	125 NE in 01:44.938
+	150 NE in 02:26.995
+	175 NE in 02:58.149
+All done with expat in 03:23.34
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js sax 
+Starting with sax...
+	25 NE in 00:33.781
+	50 NE in 01:08.679
+	75 NE in 01:39.504
+	100 NE in 02:11.68
+	125 NE in 02:51.186
+	150 NE in 03:36.142
+	175 NE in 04:04.731
+All done with sax in 04:28.915
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js sax 
+Starting with sax...
+	25 NE in 00:25.21
+	50 NE in 00:52.164
+	75 NE in 01:17.550
+	100 NE in 01:51.854
+	125 NE in 02:30.192
+	150 NE in 03:11.461
+	175 NE in 03:39.338
+All done with sax in 04:05.760
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js sax 
+Starting with sax...
+	25 NE in 00:25.778
+	50 NE in 00:52.603
+	75 NE in 01:19.686
+	100 NE in 01:52.268
+	125 NE in 02:30.279
+	150 NE in 03:13.159
+	175 NE in 03:42.640
+All done with sax in 04:06.718
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js sax 
+Starting with sax...
+	25 NE in 00:24.549
+	50 NE in 00:50.774
+	75 NE in 01:14.500
+	100 NE in 01:44.116
+	125 NE in 02:22.861
+	150 NE in 03:03.357
+	175 NE in 03:39.237
+All done with sax in 04:03.962
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js sax 
+Starting with sax...
+	25 NE in 00:25.36
+	50 NE in 00:51.544
+	75 NE in 01:15.580
+	100 NE in 01:45.389
+	125 NE in 02:22.834
+	150 NE in 03:03.487
+	175 NE in 03:31.416
+All done with sax in 03:54.540
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js saxophone 
+Starting with saxophone...
+	25 NE in 00:14.96
+	50 NE in 00:31.316
+	75 NE in 00:44.478
+	100 NE in 01:00.580
+	125 NE in 01:21.74
+	150 NE in 01:43.881
+	175 NE in 01:59.119
+All done with saxophone in 02:12.565
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js saxophone 
+Starting with saxophone...
+	25 NE in 00:14.565
+	50 NE in 00:28.947
+	75 NE in 00:42.211
+	100 NE in 00:58.533
+	125 NE in 01:19.194
+	150 NE in 01:41.595
+	175 NE in 01:57.24
+All done with saxophone in 02:10.86
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js saxophone 
+Starting with saxophone...
+	25 NE in 00:13.307
+	50 NE in 00:27.849
+	75 NE in 00:41.466
+	100 NE in 00:59.190
+	125 NE in 01:22.230
+	150 NE in 01:44.605
+	175 NE in 02:00.299
+All done with saxophone in 02:13.447
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js saxophone 
+Starting with saxophone...
+	25 NE in 00:13.884
+	50 NE in 00:28.340
+	75 NE in 00:41.720
+	100 NE in 00:57.897
+	125 NE in 01:19.260
+	150 NE in 01:42.974
+	175 NE in 01:58.791
+All done with saxophone in 02:12.14
+
+C:\Developing\Source\xml-twig\samples>node speed-test.js saxophone 
+Starting with saxophone...
+	25 NE in 00:13.443
+	50 NE in 00:28.99
+	75 NE in 00:40.821
+	100 NE in 00:56.989
+	125 NE in 01:16.787
+	150 NE in 01:40.205
+	175 NE in 01:55.451
+All done with saxophone in 02:08.658

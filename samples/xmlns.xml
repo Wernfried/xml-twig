@@ -10,9 +10,9 @@
 		<f:width>80</f:width>
 		<f:length>120</f:length>
 	</f:table>
-	<book category="web">
+	<book xmlns:a="http://www.w3.org/" category="web">
 		<title lang="en">Learning XML</title>
-		<author>Erik T. Ray</author>
+		<a:author>Erik T. Ray</a:author>
 		<year>2003</year>
 		<price>39.95</price>
 	</book>	

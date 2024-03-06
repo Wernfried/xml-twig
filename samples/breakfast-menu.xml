@@ -19,8 +19,9 @@
 	<food>
 		<name>Berry-Berry Belgian Waffles</name>
 		<price>$8.95</price>
-		<description>
-			Belgian waffles covered with assorted fresh berries and whipped cream
+		<description><![CDATA[
+Belgian waffles covered with assorted <bold>fresh</bold> berries and whipped cream
+]]>
 		</description>
 		<calories>900</calories>
 	</food>
