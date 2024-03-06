@@ -18,22 +18,22 @@ When you need to read a XML file, then you have two principles:
 This module tries to combine both principles. The XML document can be read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
 
 ## Dependencies
-XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. More parser may be added in future releases. By default the `sax` parser is used.
+XML documents are read either with [sax](https://www.npmjs.com/package/sax), [node-expat](https://www.npmjs.com/package/node-expat) or [saxophone](https://www.npmjs.com/package/saxophone) parser. More parser may be added in future releases. By default the `sax` parser is used.
 
-**NOTE: The `node-expat` module is not automatically installed with this module. Install the parser by yourself, if you like to use it**
+**NOTE: The `node-expat` and `saxophone` modules are not automatically installed with this module. Install the parser by yourself, if you like to use it**
 
 ## Installation
 
-Install module like any other node module and optionally `node-expat`:
+Install module like any other node module and optionally `node-expat` and/or `saxophone`:
 ```bash
 npm install xml-twig
 
 # and optionally 
 npm install node-expat
+npm install saxophone
 
 ```
-In my tests I parsed a 750 MB big XML file, the `node-expat` is around two times faster than `sax` (node-expat: 2:20 Minutes, sax: 4:20 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. 
-
+In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:50 Minutes, sax: around 4:10 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. `saxophone` is even a little faster (around 2:10 Minutes) than `node-expat`, however `saxophone` lacks some functions and is not fully compliant to XML standards.
 
 ## How to use it
 
@@ -392,7 +392,7 @@ This `xml-twig` module focus on reading a XML files. In principle it would be po
 
 Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more an [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
 
-Despite [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) ("All XML processors MUST be able to read entities in both the UTF-8 and UTF-16 encodings"), the `sax` parser does not support UTF-16 encodings. When you have a XML-File encoded in UTF-16, then you must use the `expat` parser. 
+Despite [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) ("All XML processors MUST be able to read entities in both the UTF-8 and UTF-16 encodings"), the `sax` and `saxophone` parsers do not support UTF-16 encodings. When you have a XML-File encoded in UTF-16, then you must use the `expat` parser. 
 
 
 

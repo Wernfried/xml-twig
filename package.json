@@ -13,7 +13,8 @@
   "devDependencies": {
     "jsdoc-to-markdown": "^8.0.0",
     "luxon": "^2.1.1",
-    "node-expat": "^2.4.0"
+    "node-expat": "^2.4.0",
+    "saxophone": "^0.8.0"
   },
   "scripts": {
     "test": "node demo.js"

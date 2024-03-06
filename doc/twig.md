@@ -34,6 +34,15 @@
 <dt><a href="#createParser">createParser(handler, [options])</a> ⇒ <code><a href="#Parser">Parser</a></code></dt>
 <dd><p>Create a new Twig parser</p>
 </dd>
+<dt><a href="#onStart">onStart(binds, node, attrs)</a></dt>
+<dd><p>Common Event hanlder for starting tag</p>
+</dd>
+<dt><a href="#onClose">onClose(handler, options, name)</a></dt>
+<dd><p>Common Event hanlder for closing tag</p>
+</dd>
+<dt><a href="#reset">reset()</a></dt>
+<dd><p>Reset global variable if one like to parse multiple files</p>
+</dd>
 </dl>
 
 ## Typedefs
@@ -77,7 +86,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 <dt><a href="#ElementConditionFilter">ElementConditionFilter</a> ⇒ <code>boolean</code></dt>
 <dd><p>Custom filter function to select desired elements</p>
 </dd>
-<dt><a href="#Parser">Parser</a> ⇒ <code><a href="https://www.npmjs.com/package/sax">sax</a></code> | <code><a href="https://www.npmjs.com/package/node-expat">node-expat</a></code></dt>
+<dt><a href="#Parser">Parser</a> ⇒ <code><a href="https://www.npmjs.com/package/sax">sax</a></code> | <code><a href="https://www.npmjs.com/package/node-expat">node-expat</a></code> | <code><a href="https://www.npmjs.com/package/saxophone">saxophone</a></code></dt>
 <dd></dd>
 <dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
 <dd><p>Optional condition to get attributes<br> </p>
@@ -1409,6 +1418,38 @@ Create a new Twig parser
 | handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Object or array of element specification and function to handle elements |
 | [options] | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 
+<a name="onStart"></a>
+
+## onStart(binds, node, attrs)
+Common Event hanlder for starting tag
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| binds | <code>object</code> | Additional parameter object |
+| node | <code>object</code> \| <code>string</code> | Node or Node name |
+| attrs | <code>object</code> | Node Attributes |
+
+<a name="onClose"></a>
+
+## onClose(handler, options, name)
+Common Event hanlder for closing tag
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Object or array of element specification and function to handle elements |
+| options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
+| name | <code>string</code> | Event handler parameter |
+
+<a name="reset"></a>
+
+## reset()
+Reset global variable if one like to parse multiple files
+
+**Kind**: global function  
 <a name="ParserOptions"></a>
 
 ## ParserOptions
@@ -1420,7 +1461,7 @@ Optional settings for the Twig parser
 
 | Name | Type | Description |
 | --- | --- | --- |
-| [method] | <code>&#x27;sax&#x27;</code> \| <code>&#x27;expat&#x27;</code> | The underlying parser. Either `'sax'` or `'expat'`. |
+| [method] | <code>&#x27;sax&#x27;</code> \| <code>&#x27;expat&#x27;</code> \| <code>&#x27;saxophone&#x27;</code> | The underlying parser. Either `'sax'`, `'expat'` or `'saxophone'`. |
 | [xmlns] | <code>boolean</code> | If `true`, then namespaces are accessible by `namespace` property. |
 | [trim] | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
 | [resumeAfterError] | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
@@ -1494,15 +1535,15 @@ Custom filter function to select desired elements
 
 <a name="Parser"></a>
 
-## Parser ⇒ [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat)
+## Parser ⇒ [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) \| [<code>saxophone</code>](https://www.npmjs.com/package/saxophone)
 **Kind**: global typedef  
-**Returns**: [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) - The parser Object  
+**Returns**: [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) \| [<code>saxophone</code>](https://www.npmjs.com/package/saxophone) - The parser Object  
 **Properties**
 
 | Name | Type | Description |
 | --- | --- | --- |
-| [currentLine] | <code>number</code> | The currently processed line in the XML-File |
-| [currentColumn] | <code>number</code> | The currently processed column in the XML-File |
+| [currentLine] | <code>number</code> | The currently processed line in the XML-File.<br/>Not available on `saxophone` parser. |
+| [currentColumn] | <code>number</code> | The currently processed column in the XML-File.<br/>Not available on `saxophone` parser. |
 
 <a name="AttributeCondition"></a>
 
