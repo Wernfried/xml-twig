@@ -212,11 +212,11 @@ function createParser(handler, options = {}) {
          current.text = options.trim ? str.trim() : str;
       });
 
-      const hndl = Array.isArray(handler) ? handler : [handler];
-      let rootHandler = hndl.find(x => x.tag instanceof RootHandler);
-      parser.on("end", function () {
-         if (typeof rootHandler?.function === 'function') rootHandler.function(tree);
-         if (typeof rootHandler?.event === 'string') parser.emit(rootHandler.event, tree);
+      parser.on('end', function () {
+         tree = undefined;
+         current = undefined;
+         parser.emit("finish");
+         parser.emit("close");
       });
 
    } else if (options.method === EXPAT) {
@@ -252,6 +252,12 @@ function createParser(handler, options = {}) {
 
       parser.on('processingInstruction', function (target, data) {
          tree.PI = { target: target, data: data };
+      });
+
+      parser.on('end', function () {
+         tree = undefined;
+         current = undefined;
+         parser.emit("finish");
       });
 
    } else if (options.method === SAXOPHONE) {
@@ -304,6 +310,12 @@ function createParser(handler, options = {}) {
             });
          }
 
+      });
+
+      parser.on('finish', function () {
+         // saxophone parser does not emit 'end' Event
+         tree = undefined;
+         current = undefined;
       });
 
    } else {
@@ -389,9 +401,8 @@ function onStart(binds, node, attrs) {
       if (current.isRoot && current.name === undefined) {
          current.setRoot(name);
          if (attrs !== undefined) {
-            const att = options.xmlns ? attrNS : attrs;
-            for (let key of Object.keys(att))
-               current.attribute(key, att[key]);
+            for (let [key, val] of Object.entries(options.xmlns ? attrNS : attrs))
+               current.attribute(key, val);
          }
       } else {
          let elt = new Twig(name, current, options.xmlns ? attrNS : attrs);
@@ -449,7 +460,7 @@ function onClose(handler, options, name) {
          if (typeof hndl.function === 'function') hndl.function(current ?? tree);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
-      } else if (hndl.tag instanceof RootHandler && [EXPAT, SAXOPHONE].includes(options.method) && current.isRoot) {
+      } else if (hndl.tag instanceof RootHandler && current.isRoot) {
          if (typeof hndl.function === 'function') hndl.function(tree);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, tree);
          purge = false;
@@ -472,15 +483,6 @@ function onClose(handler, options, name) {
       current.purge();
    current = current.parent();
 
-}
-
-
-/**
-* Reset global variable if one like to parse multiple files
-*/
-function reset() {
-   tree = undefined;
-   current = undefined;
 }
 
 /**
@@ -779,7 +781,7 @@ class Twig {
             xw.writeAttribute(key, val);
          if (elt.text !== null)
             xw.text(elt.text);
-         this.#addChild(xw, elt.children(), elt, debug);         
+         this.#addChild(xw, elt.children(), elt, debug);
       }
       if (!debug || Object.isSealed(cur)) xw.endElement();
    };
@@ -1309,4 +1311,4 @@ class UnsupportedCondition extends TypeError {
 }
 
 
-module.exports = { createParser, Twig, Any, Root, reset };
+module.exports = { createParser, Twig, Any, Root };

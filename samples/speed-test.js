@@ -1,29 +1,45 @@
-const { DateTime } = require('luxon');
 const fs = require('fs');
+const path = require('path');
 const twig = require('../twig.js');
+const { pipeline } = require('stream/promises');
+const { DateTime } = require('luxon');
 
 let NE = 0;
-const startTime = DateTime.now();
-
-let parser = twig.createParser([{ tag: 'subsession', function: anyHandler }], { method: process.argv[2] })
-let reader = fs.createReadStream(`${__dirname}/20240304015234.9-MSRAN.xml`);
-console.log(`Starting with ${parser.method}...`)
-reader.pipe(parser);
+let startTime = DateTime.now();
+let printNE = true;
 
 function anyHandler(elt) {
    NE++;
-   if (NE % 25 === 0) {
+   if (printNE && NE % 25 === 0) {
       let d = DateTime.now().diff(startTime);
       console.log(`\t${NE} NE in ${d.toFormat('mm:ss.S')}`);
    }
    elt.purge();
 }
 
-reader.on('end', () => {
-   let d = DateTime.now().diff(startTime);
-   console.log(`All done with ${parser.method} in ${d.toFormat('mm:ss.S')}`);
-});
+async function parse(method) {
+   const parser = twig.createParser([{ tag: 'subsession', function: anyHandler }], { method: method })
+   const reader = fs.createReadStream(`${__dirname}/20240304015234.9-MSRAN.xml`);
 
+   NE = 0;
+   startTime = DateTime.now();
+   await pipeline(reader, parser);
+   let d = DateTime.now().diff(startTime);
+   console.log(`Finished with ${method} in ${d.toFormat('mm:ss.S')}`);
+   printNE = false;
+}
+
+const main = async () => {
+
+   for (let method of ["sax", "expat", "saxophone"]) {
+      console.log(`Running with ${method}...`);
+      printNE = true;
+      for (let i = 0; i <= 5; i++)
+         await parse(method);
+   }
+}
+
+main();
 
 
 /*
@@ -31,25 +47,61 @@ reader.on('end', () => {
 * Results
 **********************
 
-All done with expat in 02:52.676
-All done with expat in 02:53.644
-All done with expat in 02:54.894
-All done with expat in 03:02.545
-All done with expat in 03:23.34
+Running with sax...
+	25 NE in 00:21.260
+	50 NE in 00:46.36
+	75 NE in 01:08.314
+	100 NE in 01:36.5
+	125 NE in 02:11.869
+	150 NE in 02:49.940
+	175 NE in 03:15.653
+Finished with sax in 03:37.656
+Finished with sax in 03:41.884
+Finished with sax in 03:45.146
+Finished with sax in 03:42.84
+Finished with sax in 03:57.614
+Finished with sax in 03:42.634
 
-All done with sax in 04:28.915
-All done with sax in 04:05.760
-All done with sax in 04:06.718
-All done with sax in 04:03.962
-All done with sax in 03:54.540
+Running with expat...
+	25 NE in 00:15.746
+	50 NE in 00:33.605
+	75 NE in 00:48.993
+	100 NE in 01:07.777
+	125 NE in 01:32.327
+	150 NE in 01:59.544
+	175 NE in 02:17.560
+Finished with expat in 02:33.545
+Finished with expat in 02:32.371
+Finished with expat in 02:39.785
+Finished with expat in 02:33.270
+Finished with expat in 02:33.231
+Finished with expat in 02:38.269
 
-All done with saxophone in 02:12.565
-All done with saxophone in 02:10.86
-All done with saxophone in 02:13.447
-All done with saxophone in 02:12.14
-All done with saxophone in 02:08.658
+Running with saxophone...
+	25 NE in 00:12.874
+	50 NE in 00:27.736
+	75 NE in 00:41.591
+	100 NE in 00:58.430
+	125 NE in 01:20.685
+	150 NE in 01:43.568
+	175 NE in 01:58.438
+Finished with saxophone in 02:11.667
+Finished with saxophone in 02:07.623
+Finished with saxophone in 02:09.538
+Finished with saxophone in 02:09.965
+Finished with saxophone in 02:12.81
+Finished with saxophone in 02:09.792
+
 
 Good old Perl XML::Twig
-All done in 9:24
+	25 NE in 1:14
+	50 NE in 2:03
+	75 NE in 3:43
+	100 NE in 5:02
+	125 NE in 6:12
+	150 NE in 7:16
+	175 NE in 8:17
+	200 NE in 9:24
+Finished with perl in 9:24
 
 */

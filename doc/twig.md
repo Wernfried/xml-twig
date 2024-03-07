@@ -40,9 +40,6 @@
 <dt><a href="#onClose">onClose(handler, options, name)</a></dt>
 <dd><p>Common Event hanlder for closing tag</p>
 </dd>
-<dt><a href="#reset">reset()</a></dt>
-<dd><p>Reset global variable if one like to parse multiple files</p>
-</dd>
 </dl>
 
 ## Typedefs
@@ -1460,12 +1457,6 @@ Common Event hanlder for closing tag
 | options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 | name | <code>string</code> | Event handler parameter |
 
-<a name="reset"></a>
-
-## reset()
-Reset global variable if one like to parse multiple files
-
-**Kind**: global function  
 <a name="ParserOptions"></a>
 
 ## ParserOptions
