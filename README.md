@@ -322,7 +322,7 @@ You can specify condition on above methods. You can filter elements by following
 
 For details see [ElementCondition](./doc/twig.md#ElementCondition).
 
-For methods which return a **Twig[]** array, a call like `elt.siblings("book")` is equal to `elt.sibling().filter( x => x.name === "book" )`
+For methods which return a **Twig[]** array, a call like `elt.sibling("book")` is equal to `elt.sibling().filter( x => x.name === "book" )`
 
 For methods which return a single **Twig** element (e.g. `elt.next("book")`) the method is executed in a loop till a `<book>` element is found.
 
