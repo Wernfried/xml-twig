@@ -610,19 +610,17 @@ class Twig {
    };
 
    /**
-   * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
-   * @param {Twig} [elt] - Up to this element the tree will be purged. The `elt` object itself is not purged.<br>
+   * Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>
+   * The `elt` object is not purged. If you like to purge including `elt`, use `.purgeUpTo(elt.previous())`
+   * @param {Twig} [elt] - Up to this element the tree will be purged.
    * If `undefined` then the current element is purged (i.e. `purge()`)
    */
    purgeUpTo = function (elt) {
       if (elt === undefined) {
          this.purge();
       } else {
-         const purgeThis = this.descendantOrSelf();
-         let toPurge = purgeThis[purgeThis.length - 1];
-         const descendantOrSelf = elt.descendantOrSelf();
-         const stopAt = descendantOrSelf[descendantOrSelf.length - 1];
-         while (toPurge !== null && !Object.is(toPurge, stopAt)) {
+         let toPurge = this;
+         while (toPurge !== null && !Object.is(toPurge, elt)) {
             const prev = toPurge.previous();
             toPurge.purge();
             toPurge = prev;

@@ -244,13 +244,13 @@ Purges the current, typically used after element has been processed.<br>The root
 <a name="Twig+purgeUpTo"></a>
 
 ### twig.purgeUpTo
-Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The `elt` object is not purged. If you like to purge including `elt`, use `.purgeUpTo(elt.previous())`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [elt] | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+| [elt] | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. If `undefined` then the current element is purged (i.e. `purge()`) |
 
 <a name="Twig+escapeEntity"></a>
 
@@ -861,13 +861,13 @@ Purges the current, typically used after element has been processed.<br>The root
 <a name="Twig+purgeUpTo"></a>
 
 ### twig.purgeUpTo
-Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The `elt` object is not purged. If you like to purge including `elt`, use `.purgeUpTo(elt.previous())`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [elt] | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. The `elt` object itself is not purged.<br> If `undefined` then the current element is purged (i.e. `purge()`) |
+| [elt] | [<code>Twig</code>](#Twig) | Up to this element the tree will be purged. If `undefined` then the current element is purged (i.e. `purge()`) |
 
 <a name="Twig+escapeEntity"></a>
 
