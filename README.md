@@ -33,7 +33,7 @@ npm install node-expat
 npm install saxophone
 
 ```
-In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:50 Minutes, sax: around 4:10 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. `saxophone` is even a little faster (around 2:10 Minutes) than `node-expat`, however `saxophone` lacks some functions and is not fully compliant to XML standards.
+In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:30 Minutes, sax: around 3:40 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. `saxophone` is even a little faster (around 2:10 Minutes) than `node-expat`, however `saxophone` lacks some functions and is not fully compliant to XML standards.
 
 ## How to use it
 

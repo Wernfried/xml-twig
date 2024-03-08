@@ -29,7 +29,9 @@ let current;
 
 /**
 * @external libxmljs
-* @todo Not yet implemented, maybe later. Not sure if `WritableStream` is supported
+* Though module looks promising, it is not implemented, because it does not support Streams.
+* According to {@link https://github.com/libxmljs/libxmljs/issues/390|Stream Support} it was requested in 2016, i.e. 8 years ago. 
+* Apart from that, documentation is very sparse.
 * @see {@link https://www.npmjs.com/package/libxmljs|libxmljs}
 */
 
