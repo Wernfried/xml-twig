@@ -770,6 +770,14 @@ class Twig {
    };
 
    /**
+   * Returns XML string of the element
+   * @returns {string} The XML-Element as string
+   */
+   toString = function () {
+      return this.writer(true).toString();
+   };
+
+   /**
    * Internal recursive function used by `writer()`
    * @param {external:XMLWriter} xw - The writer object
    * @param {Twig[]} childArray - Array of child elements
