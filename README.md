@@ -9,7 +9,7 @@ When you need to read a XML file, then you have two principles:
 
 * The **Document Object Model (DOM)** style. These parser read the entire XML document into memory. Usually they provide easy methods to navigate in the document tree or make modifications. 
 
-   DOM parsers are perfect for rather small files, for example configuration files or (X-)HTML pages. However, for bigger XML files you may run into memory limits.
+   DOM parsers are perfect for rather small files, for example configuration files or (X-)HTML pages. However, for bigger XML files you may run into memory limits. When you parse a XML-File as DOM, then the footprint in RAM can be easily 10-20 times the size of the raw XML-String. If the XML-File is greater than [Buffer.constants.MAX_STRING_LENGTH`](https://nodejs.org/api/buffer.html#bufferconstantsmax_string_length) (typically 512 MiB), then a DOM parser may throw error "Cannot create a string longer than 0x1fffffe8 characters".
 
 * The **stream** or **event** based parsers. These parser read the XML file "line by line". The biggest advantage of such a parser is, there is no limit in the size of the XML file. You can read XML files having a size of many terabytes, because you read always just a single node. 
 
