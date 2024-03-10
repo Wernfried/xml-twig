@@ -2,25 +2,25 @@ const fs = require('fs');
 const process = require('process');
 const twig = require('xml-twig');
 
-let NE = 0;
-console.log('Starting...')
-let parser = twig.createParser([{ tag: 'subsession', function: anyHandler }], { method: 'expat' })
-let reader = fs.createReadStream(`${__dirname}/20231019015552.1-MSRAN.xml`);
+let Entry = 0;
+
+let parser = twig.createParser([{ tag: 'Entry', function: EntryHandler }], { method: 'expat' })
+// http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/SwissProt/SwissProt.xml.gz
+let reader = fs.createReadStream(`SwissProt.xml`);
 reader.pipe(parser);
 
-function anyHandler(elt) {
-   NE++;
-   if (NE % 5 === 0) {
+function EntryHandler(elt) {
+   Entry++;
+   if (Entry % 10000 === 0) {
+      console.log(`Entry ${Entry}`)
+      let len = elt.root().writer().toString().length;
+      len = Math.round((len / 1024 / 1024 + Number.EPSILON) * 100) / 100;
+      console.log(`Size of XML string: ${len} MiB`);
       for (const [key, value] of Object.entries(process.memoryUsage())) {
          console.log(`   Memory usage by ${key}, ${Math.round((value / 1024 / 1024 + Number.EPSILON) * 100) / 100} MiB`)
       }
-   }
-   //elt.purge();
+   }   
 }
-
-reader.on('end', () => {
-   console.log(`All done`);
-});
 
 
 
@@ -29,44 +29,48 @@ reader.on('end', () => {
 * Results
 **********************
 
+# Set memory limit to 4GiB for demonstration reasons:
 NODE_OPTIONS=--max-old-space-size=4096
 
-5 NE
-   Memory usage by rss, 1070.65 MiB
-   Memory usage by heapTotal, 1025.37 MiB
-   Memory usage by heapUsed, 989.72 MiB
-   Memory usage by external, 1.24 MiB
-   Memory usage by arrayBuffers, 0.83 MiB
-10 NE
-   Memory usage by rss, 2816.7 MiB
-   Memory usage by heapTotal, 2760.62 MiB
-   Memory usage by heapUsed, 2690.95 MiB
-   Memory usage by external, 1.42 MiB
-   Memory usage by arrayBuffers, 1.02 MiB
+Entry 10000
+Size of XML string: 21.08 MiB
+   Memory usage by rss, 1897.36 MiB
+   Memory usage by heapTotal, 1855.68 MiB
+   Memory usage by heapUsed, 1807.43 MiB
+   Memory usage by external, 1.13 MiB
+   Memory usage by arrayBuffers, 0.7 MiB
+
+Entry 20000
+Size of XML string: 40.86 MiB
+   Memory usage by rss, 3615.75 MiB
+   Memory usage by heapTotal, 3562.62 MiB
+   Memory usage by heapUsed, 3482.97 MiB
+   Memory usage by external, 0.63 MiB
+   Memory usage by arrayBuffers, 0.2 MiB
 
 <--- Last few GCs --->
 
-[6508:00000223570D04D0]    20692 ms: Scavenge 4034.0 (4122.1) -> 4032.4 (4135.1) MB, 13.7 / 0.0 ms  (average mu = 0.431, current mu = 0.348) allocation failure;
-[6508:00000223570D04D0]    23749 ms: Mark-sweep 4046.7 (4135.1) -> 4044.6 (4150.4) MB, 3030.4 / 0.0 ms  (average mu = 0.250, current mu = 0.055) allocation failure; scavenge might not succeed
+[18648:000001F930FC8F90]    13906 ms: Scavenge 4047.7 (4123.2) -> 4047.3 (4133.7) MB, 3.4 / 0.0 ms  (average mu = 0.332, current mu = 0.185) allocation failure;
+[18648:000001F930FC8F90]    13916 ms: Scavenge 4054.1 (4133.7) -> 4053.8 (4135.2) MB, 4.0 / 0.0 ms  (average mu = 0.332, current mu = 0.185) allocation failure;
+[18648:000001F930FC8F90]    13925 ms: Scavenge 4055.1 (4135.2) -> 4054.3 (4156.2) MB, 8.3 / 0.0 ms  (average mu = 0.332, current mu = 0.185) allocation failure;
 
 
 <--- JS stacktrace --->
 
 FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
- 1: 00007FF7BCDB9E7F node_api_throw_syntax_error+175967
- 2: 00007FF7BCD40C06 SSL_get_quiet_shutdown+65750
- 3: 00007FF7BCD41FC2 SSL_get_quiet_shutdown+70802
- 4: 00007FF7BD7DA214 v8::Isolate::ReportExternalAllocationLimitReached+116
- 5: 00007FF7BD7C5572 v8::Isolate::Exit+674
- 6: 00007FF7BD6473CC v8::internal::EmbedderStackStateScope::ExplicitScopeForTesting+124
- 7: 00007FF7BD6445EB v8::internal::Heap::CollectGarbage+3963
- 8: 00007FF7BD65A823 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath+2099
- 9: 00007FF7BD65B0CD v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath+93
-10: 00007FF7BD66A903 v8::internal::Factory::NewFillerObject+851
-11: 00007FF7BD35BEB5 v8::internal::DateCache::Weekday+1349
-12: 00007FF7BD8778B1 v8::internal::SetupIsolateDelegate::SetupHeap+558193
-13: 00007FF73D9F10A1
-
+ 1: 00007FF604481C7F node_api_throw_syntax_error+175855
+ 2: 00007FF604406476 EVP_MD_meth_get_input_blocksize+59654
+ 3: 00007FF604408160 EVP_MD_meth_get_input_blocksize+67056
+ 4: 00007FF604EB0434 v8::Isolate::ReportExternalAllocationLimitReached+116
+ 5: 00007FF604E9B7C2 v8::Isolate::Exit+674
+ 6: 00007FF604D1D65C v8::internal::EmbedderStackStateScope::ExplicitScopeForTesting+124
+ 7: 00007FF604D1A87B v8::internal::Heap::CollectGarbage+3963
+ 8: 00007FF604D30AB3 v8::internal::HeapAllocator::AllocateRawWithLightRetrySlowPath+2099
+ 9: 00007FF604D3135D v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath+93
+10: 00007FF604D40B20 v8::internal::Factory::NewFillerObject+816
+11: 00007FF604A31565 v8::internal::DateCache::Weekday+1349
+12: 00007FF604F4D961 v8::internal::SetupIsolateDelegate::SetupHeap+558193
+13: 00007FF5B03D1532
 
 */
 

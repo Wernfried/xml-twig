@@ -40,8 +40,6 @@ jspm_packages/
 .vscode
 
 # Huge XML sample files
-samples/*.tar
-samples/*SRAN.xml
-samples/subnet411_sdr_radio.xml
+samples/SwissProt.xml*
 
 package-lock.json
