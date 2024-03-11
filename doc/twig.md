@@ -53,11 +53,11 @@
 Element can be specified as string, Regular Expression, custom function, <code>Twig.Root</code> or <code>Twig.Any</code><br> 
 You can specify a <code>function</code> or a <code>event</code> name</p>
 </dd>
-<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code><a href="#Root">Root</a></code> | <code><a href="#Any">Any</a></code> | <code>undefined</code></dt>
+<dt><a href="#HandlerCondition">HandlerCondition</a> : <code>string</code> | <code>Array.&lt;string&gt;</code> | <code>RegExp</code> | <code><a href="#HandlerConditionFilter">HandlerConditionFilter</a></code> | <code><a href="#Root">Root</a></code> | <code><a href="#Any">Any</a></code></dt>
 <dd><p>Condition to specify when handler shall be called<br> </p>
 <ul>
-<li>If <code>undefined</code>, then all elements are returned.<br> </li>
 <li>If <code>string</code> then the element name must be equal to the string</li>
+<li>If <code>string[]</code> then the element name must be included in string array</li>
 <li>If <code>RegExp</code> then the element name must match the Regular Expression</li>
 <li>If <a href="#HandlerConditionFilter">HandlerConditionFilter</a> then function must return <code>true</code></li>
 <li>Use <code>Twig.Root</code> to call the handler on root element, i.e. when the end of document is reached</li>
@@ -1510,8 +1510,8 @@ Reference to handler functions for Twig objects.<br> Element can be specified a
 
 <a name="HandlerCondition"></a>
 
-## HandlerCondition : <code>string</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| [<code>Root</code>](#Root) \| [<code>Any</code>](#Any) \| <code>undefined</code>
-Condition to specify when handler shall be called<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`- Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached- Use `Twig.Any` to call the handler on every element
+## HandlerCondition : <code>string</code> \| <code>Array.&lt;string&gt;</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| [<code>Root</code>](#Root) \| [<code>Any</code>](#Any)
+Condition to specify when handler shall be called<br> - If `string` then the element name must be equal to the string- If `string[]` then the element name must be included in string array- If `RegExp` then the element name must match the Regular Expression- If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`- Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached- Use `Twig.Any` to call the handler on every element
 
 **Kind**: global typedef  
 <a name="HandlerFunction"></a>

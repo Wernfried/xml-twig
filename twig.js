@@ -1,5 +1,5 @@
 const SAX = 'sax';
-const EXPAT = 'expat';
+const EXPAT = ['expat', 'node-expat'];
 const SAXOPHONE = 'saxophone';
 
 let tree;
@@ -86,13 +86,13 @@ const Any = new AnyHandler();
 
 /**
 * Condition to specify when handler shall be called<br> 
-* - If `undefined`, then all elements are returned.<br> 
 * - If `string` then the element name must be equal to the string
+* - If `string[]` then the element name must be included in string array
 * - If `RegExp` then the element name must match the Regular Expression
 * - If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`
 * - Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached
 * - Use `Twig.Any` to call the handler on every element
-* @typedef {string|RegExp|HandlerConditionFilter|Root|Any|undefined} HandlerCondition 
+* @typedef {string|string[]|RegExp|HandlerConditionFilter|Root|Any} HandlerCondition 
 */
 
 /**
@@ -133,7 +133,6 @@ const Any = new AnyHandler();
 * @returns {external:sax|external:node-expat|external:saxophone} The parser Object
 */
 
-
 /**
 * Create a new Twig parser
 * @param {TwigHandler|TwigHandler[]} handler - Object or array of element specification and function to handle elements
@@ -146,12 +145,11 @@ function createParser(handler, options = {}) {
    let parser;
    let namespaces = {};
 
-   if (options.partial) {
-      const handle1 = Array.isArray(handler) ? handler : [handler];
-      let any = handle1.find(x => x.tag instanceof AnyHandler);
-      if (any !== undefined)
-         console.warn(`Using option '{ partial: true }' and handler '{ tag: Any, function: ${any.function.toString()} }' does not make much sense`);
-   }
+   const handlerCheck = Array.isArray(handler) ? handler : [handler];
+   if (handlerCheck.find(x => x.tag === undefined) != null || handlerCheck.find(x => x.tag.length == 0) != null)
+      throw new ReferenceError(`'handler.tag' is not defined`);
+   if (options.partial && handlerCheck.find(x => x.tag instanceof AnyHandler) != null)
+      console.warn(`Using option '{ partial: true }' and handler '{ tag: Any, function: ${any.function.toString()} }' does not make much sense`);
 
    // `parser.on("...", err =>  {...}` does not work, because I need access to 'this'
    if (options.method === SAX) {
@@ -224,7 +222,7 @@ function createParser(handler, options = {}) {
          parser.emit("close");
       });
 
-   } else if (options.method === EXPAT) {
+   } else if (EXPAT.includes(options.method)) {
       parser = require("node-expat").createParser();
       Object.defineProperty(parser, 'currentLine', {
          enumerable: true,
@@ -416,6 +414,9 @@ function onStart(binds, node, attrs) {
                if (typeof hndl.tag === 'string' && name === hndl.tag) {
                   elt.pin();
                   break;
+               } else if (typeof Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
+                  elt.pin();
+                  break;
                } else if (hndl.tag instanceof RegExp && hndl.tag.test(name)) {
                   elt.pin();
                   break;
@@ -429,7 +430,7 @@ function onStart(binds, node, attrs) {
    }
 
    if (options.xmlns) {
-      if ([EXPAT, SAXOPHONE].includes(options.method)) {
+      if (EXPAT.concat(SAXOPHONE).includes(options.method)) {
          for (let key of Object.keys(attrs).filter(x => x.startsWith('xmlns:')))
             namespaces[key.split(':')[1]] = attrs[key];
       }
@@ -468,6 +469,10 @@ function onClose(handler, options, name) {
       } else if (hndl.tag instanceof RootHandler && current.isRoot) {
          if (typeof hndl.function === 'function') hndl.function(tree);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, tree);
+         purge = false;
+      } else if (typeof Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
+         if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+         if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
       } else if (typeof hndl.tag === 'string' && name === hndl.tag) {
          if (typeof hndl.function === 'function') hndl.function(current ?? tree);

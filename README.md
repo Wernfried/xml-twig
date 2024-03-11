@@ -18,7 +18,7 @@ When you need to read a XML file, then you have two principles:
 This module tries to combine both principles. The XML document can be read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
 
 ## Dependencies
-XML documents are read either with [sax](https://www.npmjs.com/package/sax), [node-expat](https://www.npmjs.com/package/node-expat) or [saxophone](https://www.npmjs.com/package/saxophone) parser. More parser may be added in future releases. By default the `sax` parser is used.
+XML documents are read either with [sax](https://www.npmjs.com/package/sax), [node-expat](https://www.npmjs.com/package/node-expat) or [saxophone](https://www.npmjs.com/package/saxophone) parser. More parser may be added in future releases. By default the `sax` parser is used. However, I clearly recommend using the `node-expat` parser. All other parsers I tested, are not compliant to XML standards.
 
 **NOTE: The `node-expat` and `saxophone` modules are not automatically installed with this module. Install the parser by yourself, if you like to use it**
 
@@ -33,7 +33,7 @@ npm install node-expat
 npm install saxophone
 
 ```
-In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:30 Minutes, sax: around 3:40 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. `saxophone` is even a little faster (around 2:10 Minutes) than `node-expat`, however `saxophone` lacks some functions and is not fully compliant to XML standards.
+In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:30 Minutes, sax: around 3:40 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. `saxophone` is even a little faster (around 2:10 Minutes) than `node-expat`.
 
 ## How to use it
 
@@ -69,7 +69,7 @@ API Documentation: see [Twig](./doc/twig.md)
    If you prefer [events](https://nodejs.org/api/events.html), then use `event` property instead of `function` in handler declaration:
 
    ```js
-   const parser = twig.createParser({ tag: twig.Root, event: 'rootElement' }, { method: 'sax' })
+   const parser = twig.createParser({ tag: twig.Root, event: 'rootElement' }, { method: 'expat' })
    fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
    parser.on('rootElement', (elt) => {
@@ -96,6 +96,7 @@ API Documentation: see [Twig](./doc/twig.md)
       { tag: 'book', function: bookHandler },
       { tag: 'ebook', function: bookHandler }
    ];
+   handle_book = [ { tag: ['book', 'ebook'], function: bookHandler } ];
    handle_book = { tag: /book$/, function: bookHandler };
    handle_book = [{
       tag: function(name, elt) { return name.endsWith('book') },
@@ -392,7 +393,12 @@ This `xml-twig` module focus on reading a XML files. In principle it would be po
 
 Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more an [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
 
-Despite [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) ("All XML processors MUST be able to read entities in both the UTF-8 and UTF-16 encodings"), the `sax` and `saxophone` parsers do not support UTF-16 encodings. When you have a XML-File encoded in UTF-16, then you must use the `expat` parser. 
+As already mentioned above, I recommend the `expat` parser. The other parser may work for your purpose, however they have several limitations and bugs:
+
+- `sax` and `saxophone` do not support UTF-16 encoding. I did not test other encodings, because [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) defines only UTF-8 and UTF-16 as required
+- `sax` misinterpret character entities
+- `saxophone` fails on `<!DOCTYPE>` element
+- Properties `currentLine` and `currentColumn` are not available with `saxophone` 
 
 
 
