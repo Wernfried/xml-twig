@@ -141,6 +141,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
     * [.close](#Twig+close)
     * [.debug](#Twig+debug) ⇒ <code>string</code>
+    * [.toString](#Twig+toString) ⇒ <code>string</code>
     * [.addChild](#Twig+addChild) ℗
     * [.writer](#Twig+writer) ⇒ [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
@@ -360,6 +361,13 @@ XML-Twig for dummies :-)
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> - The XML-Tree which is currently available in RAM - no valid XML Structure  
+<a name="Twig+toString"></a>
+
+### twig.toString ⇒ <code>string</code>
+Returns XML string of the element
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>string</code> - The XML-Element as string  
 <a name="Twig+addChild"></a>
 
 ### twig.addChild ℗
@@ -758,6 +766,7 @@ Common function to filter Twig element
     * [.pinned](#Twig+pinned) ⇒ <code>boolean</code>
     * [.close](#Twig+close)
     * [.debug](#Twig+debug) ⇒ <code>string</code>
+    * [.toString](#Twig+toString) ⇒ <code>string</code>
     * [.addChild](#Twig+addChild) ℗
     * [.writer](#Twig+writer) ⇒ [<code>XMLWriter</code>](https://www.npmjs.com/package/xml-writer)
     * [.attr](#Twig+attr) ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
@@ -977,6 +986,13 @@ XML-Twig for dummies :-)
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> - The XML-Tree which is currently available in RAM - no valid XML Structure  
+<a name="Twig+toString"></a>
+
+### twig.toString ⇒ <code>string</code>
+Returns XML string of the element
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>string</code> - The XML-Element as string  
 <a name="Twig+addChild"></a>
 
 ### twig.addChild ℗
