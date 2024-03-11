@@ -6,6 +6,7 @@ let Entry = 0;
 
 let parser = twig.createParser([{ tag: 'Entry', function: EntryHandler }], { method: 'expat' })
 // http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/SwissProt/SwissProt.xml.gz
+// For more files see http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/www/repository.html
 let reader = fs.createReadStream(`SwissProt.xml`);
 reader.pipe(parser);
 
