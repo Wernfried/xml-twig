@@ -35,10 +35,13 @@ let current;
 * @see {@link https://www.npmjs.com/package/libxmljs|libxmljs}
 */
 
-/**
-* @external sax-wasm
-* @todo Not yet implemented, maybe later. Not sure if `WritableStream` is supported
-* @see {@link https://www.npmjs.com/package/sax-wasm|sax-wasm}
+/*
+* Other parsers I had a look at:
+* {@link https://www.npmjs.com/package/sax-wasm|sax-wasm}: not a 'stream.Writable'
+* {@link https://www.npmjs.com/package/@rubensworks/saxes|saxes}: not a 'stream.Writable'
+* {@link https://www.npmjs.com/package/node-xml-stream|node-xml-stream}: should work, but not implemented
+* {@link https://www.npmjs.com/package/saxes-stream|saxes-stream}: not a 'stream.Writable'
+* {@link https://www.npmjs.com/package/xml-streamer|xml-streamer}: based on 'node-expat', does not add any benefit
 */
 
 
