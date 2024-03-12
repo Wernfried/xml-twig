@@ -57,13 +57,6 @@ API Documentation: see [Twig](./doc/twig.md)
    fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
    // Output -> <bookstore> finished after 48 lines
-
-
-   // Or use a Parser object instead of a Stream - works only with 'expat'!
-   const parser = twig.createParser({ tag: twig.Root, function: rootHandler }, { method: 'expat' })
-   parser.write('<html><head><title>Hello World</title></head><body><p>Foobar</p></body></html>');
-
-   // Output -> xml finished after 1 lines
    ```
 
    If you prefer [events](https://nodejs.org/api/events.html), then use `event` property instead of `function` in handler declaration:
