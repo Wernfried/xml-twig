@@ -415,7 +415,7 @@ function onStart(binds, node, attrs) {
                if (typeof hndl.tag === 'string' && name === hndl.tag) {
                   elt.pin();
                   break;
-               } else if (typeof Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
+               } else if (Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
                   elt.pin();
                   break;
                } else if (hndl.tag instanceof RegExp && hndl.tag.test(name)) {
@@ -471,7 +471,7 @@ function onClose(handler, options, name) {
          if (typeof hndl.function === 'function') hndl.function(tree);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, tree);
          purge = false;
-      } else if (typeof Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
+      } else if (Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
          if (typeof hndl.function === 'function') hndl.function(current ?? tree);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
