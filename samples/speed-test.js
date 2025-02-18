@@ -31,7 +31,7 @@ async function parse(method) {
 
 const main = async () => {
 
-   for (let method of ["sax", "expat", "saxophone"]) {
+   for (let method of ["sax", "expat"]) {
       console.log(`Running with ${method}...`);
       printNE = true;
       for (let i = 0; i <= 5; i++)
@@ -76,21 +76,6 @@ Finished with expat in 02:39.785
 Finished with expat in 02:33.270
 Finished with expat in 02:33.231
 Finished with expat in 02:38.269
-
-Running with saxophone...
-	25 NE in 00:12.874
-	50 NE in 00:27.736
-	75 NE in 00:41.591
-	100 NE in 00:58.430
-	125 NE in 01:20.685
-	150 NE in 01:43.568
-	175 NE in 01:58.438
-Finished with saxophone in 02:11.667
-Finished with saxophone in 02:07.623
-Finished with saxophone in 02:09.538
-Finished with saxophone in 02:09.965
-Finished with saxophone in 02:12.81
-Finished with saxophone in 02:09.792
 
 
 Good old Perl XML::Twig

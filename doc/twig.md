@@ -83,7 +83,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 <dt><a href="#ElementConditionFilter">ElementConditionFilter</a> ⇒ <code>boolean</code></dt>
 <dd><p>Custom filter function to select desired elements</p>
 </dd>
-<dt><a href="#Parser">Parser</a> ⇒ <code><a href="https://www.npmjs.com/package/sax">sax</a></code> | <code><a href="https://www.npmjs.com/package/node-expat">node-expat</a></code> | <code><a href="https://www.npmjs.com/package/saxophone">saxophone</a></code></dt>
+<dt><a href="#Parser">Parser</a> ⇒ <code><a href="https://www.npmjs.com/package/sax">sax</a></code> | <code><a href="https://www.npmjs.com/package/node-expat">node-expat</a></code></dt>
 <dd></dd>
 <dt><a href="#AttributeCondition">AttributeCondition</a> : <code>string</code> | <code>RegExp</code> | <code><a href="#AttributeConditionFilter">AttributeConditionFilter</a></code></dt>
 <dd><p>Optional condition to get attributes<br> </p>
@@ -133,6 +133,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
     * [.index](#Twig+index) ⇒ <code>number</code>
+    * [.path](#Twig+path) ⇒ <code>string</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
@@ -299,6 +300,13 @@ The position in `#children` array. For root object 0
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - Position of element in parent  
+<a name="Twig+path"></a>
+
+### twig.path ⇒ <code>string</code>
+The X-Path position of the elementNOTE: Applies only to currently loaded elements.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>string</code> - X-Path  
 <a name="Twig+name"></a>
 
 ### twig.name ⇒ <code>string</code>
@@ -758,6 +766,7 @@ Common function to filter Twig element
     * [.isRoot](#Twig+isRoot) ⇒ <code>boolean</code>
     * [.hasChildren](#Twig+hasChildren) ⇒ <code>boolean</code>
     * [.index](#Twig+index) ⇒ <code>number</code>
+    * [.path](#Twig+path) ⇒ <code>string</code>
     * [.name](#Twig+name) ⇒ <code>string</code>
     * [.tag](#Twig+tag) ⇒ <code>string</code>
     * [.text](#Twig+text) ⇒ <code>string</code>
@@ -924,6 +933,13 @@ The position in `#children` array. For root object 0
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>number</code> - Position of element in parent  
+<a name="Twig+path"></a>
+
+### twig.path ⇒ <code>string</code>
+The X-Path position of the elementNOTE: Applies only to currently loaded elements.
+
+**Kind**: instance property of [<code>Twig</code>](#Twig)  
+**Returns**: <code>string</code> - X-Path  
 <a name="Twig+name"></a>
 
 ### twig.name ⇒ <code>string</code>
@@ -1484,7 +1500,7 @@ Optional settings for the Twig parser
 
 | Name | Type | Description |
 | --- | --- | --- |
-| [method] | <code>&#x27;sax&#x27;</code> \| <code>&#x27;expat&#x27;</code> \| <code>&#x27;saxophone&#x27;</code> | The underlying parser. Either `'sax'`, `'expat'` or `'saxophone'`. |
+| [method] | <code>&#x27;sax&#x27;</code> \| <code>&#x27;expat&#x27;</code> | The underlying parser. Either `'sax'`, `'expat'`. |
 | [xmlns] | <code>boolean</code> | If `true`, then namespaces are accessible by `namespace` property. |
 | [trim] | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
 | [resumeAfterError] | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
@@ -1558,15 +1574,15 @@ Custom filter function to select desired elements
 
 <a name="Parser"></a>
 
-## Parser ⇒ [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) \| [<code>saxophone</code>](https://www.npmjs.com/package/saxophone)
+## Parser ⇒ [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat)
 **Kind**: global typedef  
-**Returns**: [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) \| [<code>saxophone</code>](https://www.npmjs.com/package/saxophone) - The parser Object  
+**Returns**: [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) - The parser Object  
 **Properties**
 
 | Name | Type | Description |
 | --- | --- | --- |
-| [currentLine] | <code>number</code> | The currently processed line in the XML-File.<br/>Not available on `saxophone` parser. |
-| [currentColumn] | <code>number</code> | The currently processed column in the XML-File.<br/>Not available on `saxophone` parser. |
+| [currentLine] | <code>number</code> | The currently processed line in the XML-File. |
+| [currentColumn] | <code>number</code> | The currently processed column in the XML-File. |
 
 <a name="AttributeCondition"></a>
 

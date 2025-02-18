@@ -1,6 +1,5 @@
 const SAX = 'sax';
 const EXPAT = ['expat', 'node-expat'];
-const SAXOPHONE = 'saxophone';
 
 let tree;
 let current;
@@ -18,13 +17,6 @@ let current;
 /**
 * @external node-expat
 * @see {@link https://www.npmjs.com/package/node-expat|node-expat}
-*/
-
-/**
-* @external saxophone
-* @see {@link https://www.npmjs.com/package/saxophone|saxophone}
-* @see {@link https://www.npmjs.com/package/@alexbosworth/saxophone|@alexbosworth/saxophone}
-* @see {@link https://www.npmjs.com/package/@pirxpilot/saxophone|@pirxpilot/saxophone}
 */
 
 /**
@@ -66,7 +58,7 @@ const Any = new AnyHandler();
 /**
 * Optional settings for the Twig parser
 * @typedef ParserOptions 
-* @property {'sax' | 'expat' | 'saxophone'} [method] - The underlying parser. Either `'sax'`, `'expat'` or `'saxophone'`.
+* @property {'sax' | 'expat'} [method] - The underlying parser. Either `'sax'`, `'expat'`.
 * @property {boolean} [xmlns] - If `true`, then namespaces are accessible by `namespace` property.
 * @property {boolean} [trim] - If `true`, then turn any whitespace into a single space. Text and comments are trimmed.
 * @property {boolean} [resumeAfterError] - If `true` then parser continues reading after an error. Otherwise it throws exception.
@@ -129,9 +121,9 @@ const Any = new AnyHandler();
 
 /**
 * @typedef Parser
-* @property {number} [currentLine] - The currently processed line in the XML-File.<br/>Not available on `saxophone` parser.
-* @property {number} [currentColumn] - The currently processed column in the XML-File.<br/>Not available on `saxophone` parser.
-* @returns {external:sax|external:node-expat|external:saxophone} The parser Object
+* @property {number} [currentLine] - The currently processed line in the XML-File.
+* @property {number} [currentColumn] - The currently processed column in the XML-File.
+* @returns {external:sax|external:node-expat} The parser Object
 */
 
 /**
@@ -264,64 +256,6 @@ function createParser(handler, options = {}) {
          parser.emit("finish");
       });
 
-   } else if (options.method === SAXOPHONE) {
-      const Saxophone = require('saxophone');
-      //const Saxophone = require('@alexbosworth/saxophone');
-      //const Saxophone = require('@pirxpilot/saxophone');
-      parser = new Saxophone();
-
-      parser.on("tagclose", onClose.bind(null, handler, options));
-      parser.on("tagopen", onStart.bind(null, {
-         handler: Array.isArray(handler) ? handler : [handler],
-         options: options,
-         namespaces: namespaces,
-         parser: parser,
-         Saxophone: Saxophone
-      }));
-
-      parser.on("cdata", function (str) {
-         current.text = options.trim ? str.contents.trim() : str.contents;
-      });
-
-      parser.on('processinginstruction', function (pi) {
-         if (pi.contents.startsWith('xml ')) {
-            let declaration = {};
-            for (let item of pi.contents.split(' ')) {
-               let [k, v] = item.split('=');
-               if (k === 'xml') continue;
-               declaration[k] = v.replaceAll('"', '').replaceAll("'", '');
-            }
-            tree = new Twig(null);
-            Object.defineProperty(tree, 'declaration', {
-               value: declaration,
-               writable: false,
-               enumerable: true
-            });
-         } else if (tree.PI === undefined) {
-            let instruction = { body: {} };
-            for (let item of pi.contents.split(' ')) {
-               let [k, v] = item.split('=');
-               if (v === undefined) {
-                  instruction.name = k;
-               } else {
-                  instruction.body[k] = v.replaceAll('"', '').replaceAll("'", '');
-               }
-            }
-            Object.defineProperty(tree, 'PI', {
-               value: { target: instruction.name, data: instruction.body },
-               writable: false,
-               enumerable: true
-            });
-         }
-
-      });
-
-      parser.on('finish', function () {
-         // saxophone parser does not emit 'end' Event
-         tree = undefined;
-         current = undefined;
-      });
-
    } else {
       throw new UnsupportedParser(options.method);
    }
@@ -335,16 +269,10 @@ function createParser(handler, options = {}) {
    // Common events
    parser.on('text', function (str) {
       if (current === undefined || current === null) return;
-      if (options.method === SAXOPHONE) {
-         current.text = options.trim ? str.contents.trim() : str.contents;
-      } else {
-         current.text = options.trim ? str.trim() : str;
-      }
+      current.text = options.trim ? str.trim() : str;
    });
 
    parser.on("comment", function (str) {
-      if (options.method === SAXOPHONE)
-         str = str.contents;
       if (current.hasOwnProperty('comment')) {
          if (typeof current.comment === 'string') {
             current.comment = [current.comment, str.trim()];
@@ -362,14 +290,10 @@ function createParser(handler, options = {}) {
    });
 
    parser.on('error', function (err) {
-      if (options.method === SAXOPHONE) {
-         console.error(err);
-      } else {
-         console.error(`error at line [${parser.currentLine}], column [${parser.currentColumn}]`, err);
-         if (options.resumeAfterError) {
-            parser.underlyingParser.error = null;
-            parser.underlyingParser.resume();
-         }
+      console.error(`error at line [${parser.currentLine}], column [${parser.currentColumn}]`, err);
+      if (options.resumeAfterError) {
+         parser.underlyingParser.error = null;
+         parser.underlyingParser.resume();
       }
    });
 
@@ -389,9 +313,6 @@ function onStart(binds, node, attrs) {
    const handler = binds.handler;
    const options = binds.options;
    let namespaces = binds.namespaces;
-
-   if (attrs === undefined && options.method === SAXOPHONE)
-      attrs = binds.Saxophone.parseAttrs(node.attrs);
 
    let attrNS = {};
    if (options.xmlns && attrs !== undefined) {
@@ -431,7 +352,7 @@ function onStart(binds, node, attrs) {
    }
 
    if (options.xmlns) {
-      if (EXPAT.concat(SAXOPHONE).includes(options.method)) {
+      if (EXPAT.includes(options.method)) {
          for (let key of Object.keys(attrs).filter(x => x.startsWith('xmlns:')))
             namespaces[key.split(':')[1]] = attrs[key];
       }
@@ -446,8 +367,6 @@ function onStart(binds, node, attrs) {
          }
       }
    }
-   if (options.method === SAXOPHONE && node.isSelfClosing)
-      binds.parser.emit("tagclose", node);
 }
 
 /**
@@ -460,8 +379,6 @@ function onClose(handler, options, name) {
    current.close();
    let purge = true;
 
-   if (options.method === SAXOPHONE)
-      name = name.name;
    for (let hndl of Array.isArray(handler) ? handler : [handler]) {
       if (hndl.tag instanceof AnyHandler) {
          if (typeof hndl.function === 'function') hndl.function(current ?? tree);
@@ -708,6 +625,37 @@ class Twig {
    */
    get index() {
       return this.isRoot ? 0 : this.#parent.#children.indexOf(this);
+   }
+
+   /**
+   * The X-Path position of the element
+   * NOTE: Applies only to currently loaded elements. 
+   * @returns {string} X-Path 
+   */
+   get path() {
+      if (this.isRoot)
+         return `/${this.#name}`;
+
+      let ret = [];
+      if (this.#parent.children(this.#name).length > 1) {
+         let sameChildren = this.#parent.children(this.#name);
+         ret.unshift(`${this.#name}[${sameChildren.indexOf(this) + 1}]`);
+      } else {
+         ret.unshift(this.#name);
+      }
+      if (!this.isRoot) {
+         let parent = this.#parent;
+         while (!parent.isRoot) {
+            if (parent.#parent.children(parent.#name).length > 1) {
+               let sameChildren = parent.#parent.children(parent.#name);
+               ret.unshift(`${parent.#name}[${sameChildren.indexOf(parent) + 1}]`);
+            } else {
+               ret.unshift(parent.#name);
+            }
+            parent = parent.#parent;
+         }
+      }
+      return '/' + ret.join('/');
    }
 
    /**
@@ -1296,7 +1244,7 @@ class UnsupportedParser extends TypeError {
    * @param {string} t Parser type
    */
    constructor(t) {
-      super(`Parser '${t}' is not supported. Use 'expat', 'sax' (default) or 'saxophone'`);
+      super(`Parser '${t}' is not supported. Use 'expat', 'sax' (default)`);
    }
 }
 

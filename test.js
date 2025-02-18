@@ -35,14 +35,14 @@ function piHandler(elt) {
 const main = async () => {
 
    for (let file of ["bookstore", "breakfast-menu"]) {
-      for (let method of ["sax", "expat", "saxophone"])
+      for (let method of ["sax", "expat"])
          await parse(`${__dirname}/samples/${file}.xml`, { tag: twig.Any, function: anyHandler }, { method: method });
    }
 
-   for (let method of ["sax", "expat", "saxophone"])
+   for (let method of ["sax", "expat"])
       await parse(`${__dirname}/samples/xmlns.xml`, { tag: twig.Any, function: nsHandler }, { method: method, xmlns: true });
 
-   for (let method of ["sax", "expat", "saxophone"])
+   for (let method of ["sax", "expat"])
       await parse(`${__dirname}/samples/processingInstruction.xml`, { tag: twig.Root, function: piHandler }, { method: method });
 
 }

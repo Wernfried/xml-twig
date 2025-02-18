@@ -18,22 +18,21 @@ When you need to read a XML file, then you have two principles:
 This module tries to combine both principles. The XML document can be read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
 
 ## Dependencies
-XML documents are read either with [sax](https://www.npmjs.com/package/sax), [node-expat](https://www.npmjs.com/package/node-expat) or [saxophone](https://www.npmjs.com/package/saxophone) parser. More parser may be added in future releases. By default the `sax` parser is used. However, I clearly recommend using the `node-expat` parser. All other parsers I tested, are not compliant to XML standards.
+XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. More parser may be added in future releases. By default the `sax` parser is used. However, I clearly recommend using the `node-expat` parser. All other parsers I tested, are not compliant to XML standards.
 
-**NOTE: The `node-expat` and `saxophone` modules are not automatically installed with this module. Install the parser by yourself, if you like to use it**
+**NOTE: The `node-expat` module is not automatically installed with this module. Install the parser by yourself, if you like to use it**
 
 ## Installation
 
-Install module like any other node module and optionally `node-expat` and/or `saxophone`:
+Install module like any other node module and optionally `node-expat`:
 ```bash
 npm install xml-twig
 
 # and optionally 
 npm install node-expat
-npm install saxophone
 
 ```
-In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:30 Minutes, sax: around 3:40 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically. `saxophone` is even a little faster (around 2:10 Minutes) than `node-expat`.
+In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:30 Minutes, sax: around 3:40 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically.
 
 ## How to use it
 
@@ -388,10 +387,9 @@ Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is 
 
 As already mentioned above, I recommend the `expat` parser. The other parser may work for your purpose, however they have several limitations and bugs:
 
-- `sax` and `saxophone` do not support UTF-16 encoding. I did not test other encodings, because [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) defines only UTF-8 and UTF-16 as required
+- `sax` does not support UTF-16 encoding. I did not test other encodings, because [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) defines only UTF-8 and UTF-16 as required
 - `sax` misinterpret character entities
-- `saxophone` fails on `<!DOCTYPE>` element
-- Properties `currentLine` and `currentColumn` are not available with `saxophone` 
+
 
 
 
