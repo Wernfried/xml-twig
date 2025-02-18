@@ -1236,7 +1236,7 @@ class NotImplementedYet extends TypeError {
 
 
 /**
- * Error for unsupported data types
+ * Error for unsupported parser
  * @exception UnsupportedParser
  */
 class UnsupportedParser extends TypeError {
@@ -1249,7 +1249,7 @@ class UnsupportedParser extends TypeError {
 }
 
 /**
- * Generic error for unsupported data types
+ * Generic error for unsupported data type
  * @exception UnsupportedType
  */
 class UnsupportedType extends TypeError {
@@ -1262,7 +1262,7 @@ class UnsupportedType extends TypeError {
 }
 
 /**
- * Generic error for unsupported data types
+ * Generic error for unsupported condition
  * @exception UnsupportedCondition
  */
 class UnsupportedCondition extends TypeError {

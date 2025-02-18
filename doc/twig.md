@@ -9,13 +9,13 @@
 <dd><p>Generic error for non implemented feature</p>
 </dd>
 <dt><a href="#UnsupportedParser">UnsupportedParser</a></dt>
-<dd><p>Error for unsupported data types</p>
+<dd><p>Error for unsupported parser</p>
 </dd>
 <dt><a href="#UnsupportedType">UnsupportedType</a></dt>
-<dd><p>Generic error for unsupported data types</p>
+<dd><p>Generic error for unsupported data type</p>
 </dd>
 <dt><a href="#UnsupportedCondition">UnsupportedCondition</a></dt>
-<dd><p>Generic error for unsupported data types</p>
+<dd><p>Generic error for unsupported condition</p>
 </dd>
 </dl>
 
@@ -1386,7 +1386,7 @@ Generic error for non implemented feature
 <a name="UnsupportedParser"></a>
 
 ## UnsupportedParser
-Error for unsupported data types
+Error for unsupported parser
 
 **Kind**: global class  
 <a name="new_UnsupportedParser_new"></a>
@@ -1404,7 +1404,7 @@ Error for unsupported data types
 <a name="UnsupportedType"></a>
 
 ## UnsupportedType
-Generic error for unsupported data types
+Generic error for unsupported data type
 
 **Kind**: global class  
 <a name="new_UnsupportedType_new"></a>
@@ -1422,7 +1422,7 @@ Generic error for unsupported data types
 <a name="UnsupportedCondition"></a>
 
 ## UnsupportedCondition
-Generic error for unsupported data types
+Generic error for unsupported condition
 
 **Kind**: global class  
 <a name="new_UnsupportedCondition_new"></a>
