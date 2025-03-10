@@ -48,8 +48,8 @@ API Documentation: see [Twig](./doc/twig.md)
    const fs = require('fs')
    const twig = require('xml-twig')
 
-   function rootHandler(elt) {
-      console.log(`<${elt.name}> finished after ${parser.currentLine} lines`);
+   function rootHandler(elt, parserObj) {
+      console.log(`<${elt.name}> finished after ${parserObj.currentLine} lines`);
    }
 
    const parser = twig.createParser({ tag: twig.Root, function: rootHandler }, { method: 'sax' })
@@ -78,8 +78,8 @@ API Documentation: see [Twig](./doc/twig.md)
 
 
    ```js
-   function bookHandler(elt) {
-      console.log(`${elt.attr("category")} ${elt.name} at line ${parser.currentLine}`)
+   function bookHandler(elt, parserObj) {
+      console.log(`${elt.attr("category")} ${elt.name} at line ${parserObj.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
    }
 
@@ -119,8 +119,8 @@ API Documentation: see [Twig](./doc/twig.md)
 - **Read every element from XML Document**
   
    ```js
-   function anyHandler(elt) {
-      console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${parser.currentLine}`)
+   function anyHandler(elt, parserObj) {
+      console.log(`${'  '.repeat(elt.level)}${elt.name} => "${elt.text ?? ''}" at line ${parserObj.currentLine}`)
       elt.purge() // -> without `purge()` the entire XML document will be loaded into memory
    }
 
@@ -164,8 +164,8 @@ Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `
    const parser = twig.createParser(handle_ebook, { partial: true })
    fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser);
 
-   function ebookHandler(elt) {
-      console.log(`${elt.name} at line ${parser.currentLine}`)
+   function ebookHandler(elt, parserObj) {
+      console.log(`${elt.name} at line ${parserObj.currentLine}`)
    }
 
    function rootHandler(elt) {
@@ -355,6 +355,7 @@ For methods which return a single **Twig** element (e.g. `elt.next("book")`) the
 `.namespace` - **object**: Namespace of the element or `null`. Only available if parsed with option `xmlns: true`.<br>
    Example `{ local: 'h', uri: 'http://www.w3.org/TR/html4/' }`
 
+`.path` - **string**: The [XPath](https://www.w3.org/TR/xpath/) location of the Element. **Note:**<br> Like all other methods the returned path refers to currently loaded XML Chunk, not the input XML-File. Unlike JavaScript, indexes in XPath are starting at 1 instead of 0.
 
 #### Update XML Elements
 

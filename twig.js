@@ -158,7 +158,7 @@ function createParser(handler, options = {}) {
          get() { return parser._parser.column + 1; }
       });
 
-      parser.on("closetag", onClose.bind(null, handler, options));
+      parser.on("closetag", onClose.bind(null, handler, parser, options));
       parser.on("opentagstart", onStart.bind(null, {
          handler: Array.isArray(handler) ? handler : [handler],
          options: options,
@@ -226,7 +226,7 @@ function createParser(handler, options = {}) {
          get() { return parser.parser.getCurrentColumnNumber(); }
       });
 
-      parser.on("endElement", onClose.bind(null, handler, options));
+      parser.on("endElement", onClose.bind(null, handler, parser, options));
       parser.on("startElement", onStart.bind(null, {
          handler: Array.isArray(handler) ? handler : [handler],
          options: options,
@@ -370,38 +370,39 @@ function onStart(binds, node, attrs) {
 }
 
 /**
-* Common Event hanlder for closing tag
+* Common Event hanlder for closing tag. On closed elements it either calls the Handler function or emits the specified event.
 * @param {TwigHandler|TwigHandler[]} handler - Object or array of element specification and function to handle elements
+* @param {external:sax|external:node-expat} parser - SAXStream or node-expat Stream object
 * @param {ParserOptions} options - Object of optional options 
 * @param {string} name - Event handler parameter
 */
-function onClose(handler, options, name) {
+function onClose(handler, parser, options, name) {
    current.close();
    let purge = true;
 
    for (let hndl of Array.isArray(handler) ? handler : [handler]) {
       if (hndl.tag instanceof AnyHandler) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
       } else if (hndl.tag instanceof RootHandler && current.isRoot) {
-         if (typeof hndl.function === 'function') hndl.function(tree);
+         if (typeof hndl.function === 'function') hndl.function(tree, parser);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, tree);
          purge = false;
       } else if (Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
       } else if (typeof hndl.tag === 'string' && name === hndl.tag) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
       } else if (hndl.tag instanceof RegExp && hndl.tag.test(name)) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
       } else if (typeof hndl.tag === 'function' && hndl.tag(name, current ?? tree)) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
          if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
          purge = false;
       }

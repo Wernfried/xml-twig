@@ -37,8 +37,8 @@
 <dt><a href="#onStart">onStart(binds, node, attrs)</a></dt>
 <dd><p>Common Event hanlder for starting tag</p>
 </dd>
-<dt><a href="#onClose">onClose(handler, options, name)</a></dt>
-<dd><p>Common Event hanlder for closing tag</p>
+<dt><a href="#onClose">onClose(handler, parser, options, name)</a></dt>
+<dd><p>Common Event hanlder for closing tag. On closed elements it either calls the Handler function or emits the specified event.</p>
 </dd>
 </dl>
 
@@ -1478,14 +1478,15 @@ Common Event hanlder for starting tag
 
 <a name="onClose"></a>
 
-## onClose(handler, options, name)
-Common Event hanlder for closing tag
+## onClose(handler, parser, options, name)
+Common Event hanlder for closing tag. On closed elements it either calls the Handler function or emits the specified event.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Object or array of element specification and function to handle elements |
+| parser | [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) | SAXStream or node-expat Stream object |
 | options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 | name | <code>string</code> | Event handler parameter |
 
