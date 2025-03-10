@@ -1506,6 +1506,7 @@ Optional settings for the Twig parser
 | [trim] | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
 | [resumeAfterError] | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
 | [partial] | <code>boolean</code> | If `true` then unhandled elements are purged. |
+| [file] | <code>string</code> | The filename to be parsed. Just used for information and logging purpose. |
 
 **Example**  
 ```js
