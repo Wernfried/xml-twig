@@ -63,7 +63,7 @@ const Any = new AnyHandler();
 * @property {boolean} [trim] - If `true`, then turn any whitespace into a single space. Text and comments are trimmed.
 * @property {boolean} [resumeAfterError] - If `true` then parser continues reading after an error. Otherwise it throws exception.
 * @property {boolean} [partial] - If `true` then unhandled elements are purged.
-* @property {string} [file] - The filename to be parsed. Just used for information and logging purpose.
+* @property {string} [file] - Optional. The name of file to be parsed. Just used for information and logging purpose.
 * @example { method: 'expat', xmlns: true }
 * @default  { method: 'sax', xmlns: false, trim: true, resumeAfterError: false, partial: false }
 */
