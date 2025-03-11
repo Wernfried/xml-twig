@@ -1,9 +1,6 @@
 const SAX = 'sax';
 const EXPAT = ['expat', 'node-expat'];
 
-let tree;
-let current;
-
 /**
 * @external XMLWriter
 * @see {@link https://www.npmjs.com/package/xml-writer|xml-writer}
@@ -160,7 +157,7 @@ function createParser(handler, options = {}) {
       });
 
       parser.on("closetag", onClose.bind(null, handler, parser, options));
-      parser.on("opentagstart", onStart.bind(null, {
+      parser.on("opentagstart", onStart.bind(null, parser, {
          handler: Array.isArray(handler) ? handler : [handler],
          options: options,
          namespaces: namespaces
@@ -174,14 +171,14 @@ function createParser(handler, options = {}) {
                let [k, v] = item.split('=');
                declaration[k] = v.replaceAll('"', '').replaceAll("'", '');
             }
-            tree = new Twig(null);
-            Object.defineProperty(tree, 'declaration', {
+            parser.twig.tree = new Twig(parser, null);
+            Object.defineProperty(parser.twig.tree, 'declaration', {
                value: declaration,
                writable: false,
                enumerable: true
             });
-         } else if (tree.PI === undefined) {
-            Object.defineProperty(tree, 'PI', {
+         } else if (parser.twig.tree.PI === undefined) {
+            Object.defineProperty(parser.twig.tree, 'PI', {
                value: { target: pi.name, data: pi.body },
                writable: false,
                enumerable: true
@@ -192,26 +189,25 @@ function createParser(handler, options = {}) {
       parser.on("attribute", function (attr) {
          if (options.xmlns && (attr.uri ?? '') !== '' && attr.local !== undefined) {
             namespaces[attr.local] = attr.uri;
-            if (current.name.includes(':')) {
-               Object.defineProperty(current, 'namespace', {
+            if (parser.twig.current.name.includes(':')) {
+               Object.defineProperty(parser.twig.current, 'namespace', {
                   value: { local: attr.local, uri: attr.uri },
                   writable: false,
                   enumerable: true
                });
             } else {
-               current.attribute(attr.name, attr.value);
+               parser.twig.current.attribute(attr.name, attr.value);
             }
          } else {
-            current.attribute(attr.name, attr.value);
+            parser.twig.current.attribute(attr.name, attr.value);
          }
       });
       parser.on("cdata", function (str) {
-         current.text = options.trim ? str.trim() : str;
+         parser.twig.current.text = options.trim ? str.trim() : str;
       });
 
       parser.on('end', function () {
-         tree = undefined;
-         current = undefined;
+         parser.twig = { current: null, tree: null };
          parser.emit("finish");
          parser.emit("close");
       });
@@ -228,19 +224,19 @@ function createParser(handler, options = {}) {
       });
 
       parser.on("endElement", onClose.bind(null, handler, parser, options));
-      parser.on("startElement", onStart.bind(null, {
+      parser.on("startElement", onStart.bind(null, parser, {
          handler: Array.isArray(handler) ? handler : [handler],
          options: options,
          namespaces: namespaces
       }));
 
       parser.on('xmlDecl', function (version, encoding, standalone) {
-         tree = new Twig(null);
+         parser.twig.tree = new Twig(parser, null);
          let dec = {};
          if (version !== undefined) dec.version = version;
          if (encoding !== undefined) dec.encoding = encoding;
          if (standalone !== undefined) dec.standalone = standalone;
-         Object.defineProperty(tree, 'declaration', {
+         Object.defineProperty(parser.twig.tree, 'declaration', {
             value: dec,
             writable: false,
             enumerable: true
@@ -248,18 +244,23 @@ function createParser(handler, options = {}) {
       });
 
       parser.on('processingInstruction', function (target, data) {
-         tree.PI = { target: target, data: data };
+         parser.twig.tree.PI = { target: target, data: data };
       });
 
       parser.on('end', function () {
-         tree = undefined;
-         current = undefined;
+         parser.twig = { current: null, tree: null };
          parser.emit("finish");
       });
 
    } else {
       throw new UnsupportedParser(options.method);
    }
+
+   Object.defineProperty(parser, 'twig', {
+      enumerable: true,
+      value: { current: null, tree: null },
+      writable: true
+   });
 
    Object.defineProperty(parser, 'method', {
       value: options.method,
@@ -277,19 +278,19 @@ function createParser(handler, options = {}) {
 
    // Common events
    parser.on('text', function (str) {
-      if (current === undefined || current === null) return;
-      current.text = options.trim ? str.trim() : str;
+      if (parser.twig.current === null) return;
+      parser.twig.current.text = options.trim ? str.trim() : str;
    });
 
    parser.on("comment", function (str) {
-      if (current.hasOwnProperty('comment')) {
-         if (typeof current.comment === 'string') {
-            current.comment = [current.comment, str.trim()];
+      if (parser.twig.current.hasOwnProperty('comment')) {
+         if (typeof parser.twig.current.comment === 'string') {
+            parser.twig.current.comment = [parser.twig.current.comment, str.trim()];
          } else {
-            current.comment.push(str.trim());
+            parser.twig.current.comment.push(str.trim());
          }
       } else {
-         Object.defineProperty(current, 'comment', {
+         Object.defineProperty(parser.twig.current, 'comment', {
             value: str.trim(),
             writable: true,
             enumerable: true,
@@ -316,7 +317,7 @@ function createParser(handler, options = {}) {
 * @param {object|string} node - Node or Node name
 * @param {object} attrs - Node Attributes
 */
-function onStart(binds, node, attrs) {
+function onStart(parser, binds, node, attrs) {
 
    const name = typeof node === 'string' ? node : node.name;
    const handler = binds.handler;
@@ -329,17 +330,17 @@ function onStart(binds, node, attrs) {
          attrNS[key] = attrs[key];
    }
 
-   if (tree === undefined) {
-      tree = new Twig(name, current, options.xmlns ? attrNS : attrs);
+   if (parser.twig.tree === null) {
+      parser.twig.tree = new Twig(parser, name, parser.twig.current, options.xmlns ? attrNS : attrs);
    } else {
-      if (current.isRoot && current.name === undefined) {
-         current.setRoot(name);
+      if (parser.twig.current.isRoot && parser.twig.current.name === undefined) {
+         parser.twig.current.setRoot(name);
          if (attrs !== undefined) {
             for (let [key, val] of Object.entries(options.xmlns ? attrNS : attrs))
-               current.attribute(key, val);
+               parser.twig.current.attribute(key, val);
          }
       } else {
-         let elt = new Twig(name, current, options.xmlns ? attrNS : attrs);
+         let elt = new Twig(parser, name, parser.twig.current, options.xmlns ? attrNS : attrs);
          if (options.partial) {
             for (let hndl of handler) {
                if (typeof hndl.tag === 'string' && name === hndl.tag) {
@@ -351,7 +352,7 @@ function onStart(binds, node, attrs) {
                } else if (hndl.tag instanceof RegExp && hndl.tag.test(name)) {
                   elt.pin();
                   break;
-               } else if (typeof hndl.tag === 'function' && hndl.tag(name, current ?? tree)) {
+               } else if (typeof hndl.tag === 'function' && hndl.tag(name, parser.twig.current ?? parser.twig.tree)) {
                   elt.pin();
                   break;
                }
@@ -368,7 +369,7 @@ function onStart(binds, node, attrs) {
       if (name.includes(':')) {
          let prefix = name.split(':')[0];
          if (namespaces[prefix] !== undefined) {
-            Object.defineProperty(current, 'namespace', {
+            Object.defineProperty(parser.twig.current, 'namespace', {
                value: { local: prefix, uri: namespaces[prefix] },
                writable: false,
                enumerable: true
@@ -386,40 +387,40 @@ function onStart(binds, node, attrs) {
 * @param {string} name - Event handler parameter
 */
 function onClose(handler, parser, options, name) {
-   current.close();
+   parser.twig.current.close();
    let purge = true;
 
    for (let hndl of Array.isArray(handler) ? handler : [handler]) {
       if (hndl.tag instanceof AnyHandler) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
-         if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(parser.twig.current ?? parser.twig.tree, parser);
+         if (typeof hndl.event === 'string') parser.emit(hndl.event, parser.twig.current ?? parser.twig.tree);
          purge = false;
-      } else if (hndl.tag instanceof RootHandler && current.isRoot) {
-         if (typeof hndl.function === 'function') hndl.function(tree, parser);
-         if (typeof hndl.event === 'string') parser.emit(hndl.event, tree);
+      } else if (hndl.tag instanceof RootHandler && parser.twig.current.isRoot) {
+         if (typeof hndl.function === 'function') hndl.function(parser.twig.tree, parser);
+         if (typeof hndl.event === 'string') parser.emit(hndl.event, parser.twig.tree);
          purge = false;
       } else if (Array.isArray(hndl.tag) && hndl.tag.includes(name)) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
-         if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(parser.twig.current ?? parser.twig.tree, parser);
+         if (typeof hndl.event === 'string') parser.emit(hndl.event, parser.twig.current ?? parser.twig.tree);
          purge = false;
       } else if (typeof hndl.tag === 'string' && name === hndl.tag) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
-         if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(parser.twig.current ?? parser.twig.tree, parser);
+         if (typeof hndl.event === 'string') parser.emit(hndl.event, parser.twig.current ?? parser.twig.tree);
          purge = false;
       } else if (hndl.tag instanceof RegExp && hndl.tag.test(name)) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
-         if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
+         if (typeof hndl.function === 'function') hndl.function(parser.twig.current ?? parser.twig.tree, parser);
+         if (typeof hndl.event === 'string') parser.emit(hndl.event, parser.twig.current ?? parser.twig.tree);
          purge = false;
-      } else if (typeof hndl.tag === 'function' && hndl.tag(name, current ?? tree)) {
-         if (typeof hndl.function === 'function') hndl.function(current ?? tree, parser);
-         if (typeof hndl.event === 'string') parser.emit(hndl.event, current ?? tree);
+      } else if (typeof hndl.tag === 'function' && hndl.tag(name, parser.twig.current ?? parser.twig.tree)) {
+         if (typeof hndl.function === 'function') hndl.function(parser.twig.current ?? parser.twig.tree, parser);
+         if (typeof hndl.event === 'string') parser.emit(hndl.event, parser.twig.current ?? parser.twig.tree);
          purge = false;
       }
    }
 
-   if (options.partial && purge && !current.pinned && !current.isRoot)
-      current.purge();
-   current = current.parent();
+   if (options.partial && purge && !parser.twig.current.pinned && !parser.twig.current.isRoot)
+      parser.twig.parser.twig.current.purge();
+   parser.twig.current = parser.twig.current.parent();
 
 }
 
@@ -507,20 +508,20 @@ class Twig {
    * @param {object} [attributes] - Attribute object
    * @param {string|number} [index] - Position name 'first', 'last' or the position in the current `children` array.<br>Defaults to 'last'
    */
-   constructor(name, parent, attributes, index) {
+   constructor(parser, name, parent, attributes, index) {
       if (index === undefined)
-         current = this;
+         parser.twig.current = this;
 
       if (name === null) {
          // Root element not available yet
-         tree = this;
+         parser.twig.tree = this;
       } else {
          this.#name = name;
          if (attributes !== undefined)
             this.#attributes = attributes;
          if (parent === undefined) {
             // Root element
-            tree = this;
+            parser.twig.tree = this;
          } else {
             this.#parent = parent;
             if (this.#parent.#pinned)
@@ -1216,8 +1217,8 @@ class Twig {
    * @param {name|number} [position] - Position name 'first', 'last' or the position in the `children`
    * @returns {Twig} - The appended element
    */
-   addElement = function (name, text, attributes, position) {
-      let twig = new Twig(name, this, attributes ?? {}, position ?? 'last');
+   addElement = function (parser, name, text, attributes, position) {
+      let twig = new Twig(parser, name, this, attributes ?? {}, position ?? 'last');
       twig.#text = text ?? null;
       twig.close();
       return twig;
