@@ -121,6 +121,9 @@ const Any = new AnyHandler();
 * @typedef Parser
 * @property {number} [currentLine] - The currently processed line in the XML-File.
 * @property {number} [currentColumn] - The currently processed column in the XML-File.
+* @property {string} [file] - The name of file to be parsed. Just used for information and logging purpose.
+* @property {object} [twig] - Object with XML tree and current XML element
+* @property {string} [method] - The underlying parser. Either `'sax'`, `'expat'`.
 * @returns {external:sax|external:node-expat} The parser Object
 */
 
@@ -313,6 +316,7 @@ function createParser(handler, options = {}) {
 
 /**
 * Common Event hanlder for starting tag
+* @param {Parser} parser - The main parser object
 * @param {object} binds - Additional parameter object
 * @param {object|string} node - Node or Node name
 * @param {object} attrs - Node Attributes
@@ -382,6 +386,7 @@ function onStart(parser, binds, node, attrs) {
 /**
 * Common Event hanlder for closing tag. On closed elements it either calls the Handler function or emits the specified event.
 * @param {TwigHandler|TwigHandler[]} handler - Object or array of element specification and function to handle elements
+* @param {Parser} parser - The main parser object
 * @param {external:sax|external:node-expat} parser - SAXStream or node-expat Stream object
 * @param {ParserOptions} options - Object of optional options 
 * @param {string} name - Event handler parameter
@@ -503,6 +508,7 @@ class Twig {
 
    /**
    * Create a new Twig object
+   * @param {Parser} parser - The main parser object
    * @param {?string} name - The name of the XML element
    * @param {Twig} [parent] - The parent object
    * @param {object} [attributes] - Attribute object
