@@ -1,3 +1,10 @@
+/**
+* @version: 3.3.5
+* @author: Wernfried Domscheit
+* @copyright: Copyright (c) 2025 Wernfried Domscheit. All rights reserved.
+* @website: https://www.npmjs.com/package/xml-twig
+*/
+
 const SAX = 'sax';
 const EXPAT = ['expat', 'node-expat'];
 

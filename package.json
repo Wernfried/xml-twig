@@ -5,18 +5,24 @@
   },
   "name": "xml-twig",
   "description": "Node module for processing huge XML documents in tree mode",
-  "version": "2.0.0-0",
+  "version": "1.7.1",
   "main": "twig.js",
   "directories": {
     "doc": "doc"
   },
+  "files": [
+    "twig.js",
+    "doc/*.md"
+  ],
   "devDependencies": {
     "jsdoc-to-markdown": "^9.0.0",
     "luxon": "^3.5.0",
     "node-expat": "^2.4.1"
   },
   "scripts": {
-    "test": "node demo.js"
+    "test": "node demo.js",
+    "preprepare": "sed -i -e \"s/@version: .*/@version: %npm_package_version%/\" twig.js",
+    "prepare": "jsdoc2md --private doc/twig.js > doc/twig.md"
   },
   "repository": {
     "type": "git",
