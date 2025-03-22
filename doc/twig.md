@@ -22,6 +22,8 @@
 ## Constants
 
 <dl>
+<dt><a href="#SAX">SAX</a></dt>
+<dd></dd>
 <dt><a href="#Root">Root</a> : <code>RootHandler</code></dt>
 <dd></dd>
 <dt><a href="#Any">Any</a> : <code>AnyHandler</code></dt>
@@ -34,10 +36,10 @@
 <dt><a href="#createParser">createParser(handler, [options])</a> ⇒ <code><a href="#Parser">Parser</a></code></dt>
 <dd><p>Create a new Twig parser</p>
 </dd>
-<dt><a href="#onStart">onStart(binds, node, attrs)</a></dt>
+<dt><a href="#onStart">onStart(parser, binds, node, attrs)</a></dt>
 <dd><p>Common Event hanlder for starting tag</p>
 </dd>
-<dt><a href="#onClose">onClose(handler, parser, options, name)</a></dt>
+<dt><a href="#onClose">onClose(handler, parser, parser, options, name)</a></dt>
 <dd><p>Common Event hanlder for closing tag. On closed elements it either calls the Handler function or emits the specified event.</p>
 </dd>
 </dl>
@@ -118,7 +120,7 @@ You can specify a <code>function</code> or a <code>event</code> name</p>
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, [parent], [attributes], [index])](#new_Twig_new)
+    * [new Twig(parser, name, [parent], [attributes], [index])](#new_Twig_new)
     * [.attributes](#Twig+attributes) : <code>object</code> ℗
     * [.text](#Twig+text) : <code>string</code> \| <code>number</code> ℗
     * [.name](#Twig+name) : <code>string</code> ℗
@@ -184,12 +186,13 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, [parent], [attributes], [index])
+### new Twig(parser, name, [parent], [attributes], [index])
 Create a new Twig object
 
 
 | Param | Type | Description |
 | --- | --- | --- |
+| parser | [<code>Parser</code>](#Parser) | The main parser object |
 | name | <code>string</code> | The name of the XML element |
 | [parent] | [<code>Twig</code>](#Twig) | The parent object |
 | [attributes] | <code>object</code> | Attribute object |
@@ -246,7 +249,8 @@ Purges the current, typically used after element has been processed.<br>The root
 <a name="Twig+purgeUpTo"></a>
 
 ### twig.purgeUpTo
-Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The `elt` object is not purged. If you like to purge including `elt`, use `.purgeUpTo(elt.previous())`
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>
+The `elt` object is not purged. If you like to purge including `elt`, use `.purgeUpTo(elt.previous())`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 
@@ -268,7 +272,8 @@ Escapes special XML characters. According W3C specification these are only `&, <
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
-Returns `true` if the element is empty, otherwise `false`.An empty element has no text nor any child elements, however empty elements can have attributes.
+Returns `true` if the element is empty, otherwise `false`.
+An empty element has no text nor any child elements, however empty elements can have attributes.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if empty element  
@@ -303,7 +308,8 @@ The position in `#children` array. For root object 0
 <a name="Twig+path"></a>
 
 ### twig.path ⇒ <code>string</code>
-The X-Path position of the elementNOTE: Applies only to currently loaded elements.
+The X-Path position of the element
+NOTE: Applies only to currently loaded elements.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> - X-Path  
@@ -403,7 +409,8 @@ Creates xml-writer from current element
 <a name="Twig+attr"></a>
 
 ### twig.attr ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
-Returns attribute value or `null` if not found.<br>If more than one  matches the condition, then it returns object as [attribute()](#attribute)
+Returns attribute value or `null` if not found.<br>
+If more than one  matches the condition, then it returns object as [attribute()](#attribute)
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> \| <code>number</code> \| <code>object</code> - - The value of the attribute or `null` if the  does not exist  
@@ -446,7 +453,10 @@ Retrieve or update XML attribute. For update, the condition must be a string, i.
 
 **Example**  
 ```js
-attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
+attribute((name, val) => { return name === 'age' && val > 50})
+attribute((name) => { return ['firstName', 'lastName'].includes(name) })
+attribute('firstName')
+attribute(/name/i)
 ```
 <a name="Twig+deleteAttribute"></a>
 
@@ -709,7 +719,8 @@ Deletes the current element from tree, same as `purge()`. The root object cannot
 <a name="Twig+setRoot"></a>
 
 ### twig.setRoot(name) ℗
-Sets the name of root element. In some cases the root is created before the XML-Root element is available<br>Used internally!
+Sets the name of root element. In some cases the root is created before the XML-Root element is available<br>
+Used internally!
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
 **Access**: private  
@@ -751,7 +762,7 @@ Common function to filter Twig element
 
 * [Twig](#Twig)
     * [new Twig()](#new_Twig_new)
-    * [new Twig(name, [parent], [attributes], [index])](#new_Twig_new)
+    * [new Twig(parser, name, [parent], [attributes], [index])](#new_Twig_new)
     * [.attributes](#Twig+attributes) : <code>object</code> ℗
     * [.text](#Twig+text) : <code>string</code> \| <code>number</code> ℗
     * [.name](#Twig+name) : <code>string</code> ℗
@@ -817,12 +828,13 @@ Generic class modeling a XML Node
 
 <a name="new_Twig_new"></a>
 
-### new Twig(name, [parent], [attributes], [index])
+### new Twig(parser, name, [parent], [attributes], [index])
 Create a new Twig object
 
 
 | Param | Type | Description |
 | --- | --- | --- |
+| parser | [<code>Parser</code>](#Parser) | The main parser object |
 | name | <code>string</code> | The name of the XML element |
 | [parent] | [<code>Twig</code>](#Twig) | The parent object |
 | [attributes] | <code>object</code> | Attribute object |
@@ -879,7 +891,8 @@ Purges the current, typically used after element has been processed.<br>The root
 <a name="Twig+purgeUpTo"></a>
 
 ### twig.purgeUpTo
-Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>The `elt` object is not purged. If you like to purge including `elt`, use `.purgeUpTo(elt.previous())`
+Purges up to the elt element. This allows you to keep part of the tree in memory when you purge.<br>
+The `elt` object is not purged. If you like to purge including `elt`, use `.purgeUpTo(elt.previous())`
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 
@@ -901,7 +914,8 @@ Escapes special XML characters. According W3C specification these are only `&, <
 <a name="Twig+isEmpty"></a>
 
 ### twig.isEmpty ⇒ <code>boolean</code>
-Returns `true` if the element is empty, otherwise `false`.An empty element has no text nor any child elements, however empty elements can have attributes.
+Returns `true` if the element is empty, otherwise `false`.
+An empty element has no text nor any child elements, however empty elements can have attributes.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>boolean</code> - true if empty element  
@@ -936,7 +950,8 @@ The position in `#children` array. For root object 0
 <a name="Twig+path"></a>
 
 ### twig.path ⇒ <code>string</code>
-The X-Path position of the elementNOTE: Applies only to currently loaded elements.
+The X-Path position of the element
+NOTE: Applies only to currently loaded elements.
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> - X-Path  
@@ -1036,7 +1051,8 @@ Creates xml-writer from current element
 <a name="Twig+attr"></a>
 
 ### twig.attr ⇒ <code>string</code> \| <code>number</code> \| <code>object</code>
-Returns attribute value or `null` if not found.<br>If more than one  matches the condition, then it returns object as [attribute()](#attribute)
+Returns attribute value or `null` if not found.<br>
+If more than one  matches the condition, then it returns object as [attribute()](#attribute)
 
 **Kind**: instance property of [<code>Twig</code>](#Twig)  
 **Returns**: <code>string</code> \| <code>number</code> \| <code>object</code> - - The value of the attribute or `null` if the  does not exist  
@@ -1079,7 +1095,10 @@ Retrieve or update XML attribute. For update, the condition must be a string, i.
 
 **Example**  
 ```js
-attribute((name, val) => { return name === 'age' && val > 50})attribute((name) => { return ['firstName', 'lastName'].includes(name) })attribute('firstName')attribute(/name/i)
+attribute((name, val) => { return name === 'age' && val > 50})
+attribute((name) => { return ['firstName', 'lastName'].includes(name) })
+attribute('firstName')
+attribute(/name/i)
 ```
 <a name="Twig+deleteAttribute"></a>
 
@@ -1342,7 +1361,8 @@ Deletes the current element from tree, same as `purge()`. The root object cannot
 <a name="Twig+setRoot"></a>
 
 ### twig.setRoot(name) ℗
-Sets the name of root element. In some cases the root is created before the XML-Root element is available<br>Used internally!
+Sets the name of root element. In some cases the root is created before the XML-Root element is available<br>
+Used internally!
 
 **Kind**: instance method of [<code>Twig</code>](#Twig)  
 **Access**: private  
@@ -1438,6 +1458,14 @@ Generic error for unsupported condition
 | condition | <code>\*</code> | The condition value |
 | t | <code>Array.&lt;string&gt;</code> | List of supported data types |
 
+<a name="SAX"></a>
+
+## SAX
+**Kind**: global constant  
+**Version:**: 1.7.5  
+**Author:**: Wernfried Domscheit  
+**Copyright:**: Copyright (c) 2025 Wernfried Domscheit. All rights reserved.  
+**Website:**: https://www.npmjs.com/package/xml-twig  
 <a name="Root"></a>
 
 ## Root : <code>RootHandler</code>
@@ -1465,20 +1493,21 @@ Create a new Twig parser
 
 <a name="onStart"></a>
 
-## onStart(binds, node, attrs)
+## onStart(parser, binds, node, attrs)
 Common Event hanlder for starting tag
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
+| parser | [<code>Parser</code>](#Parser) | The main parser object |
 | binds | <code>object</code> | Additional parameter object |
 | node | <code>object</code> \| <code>string</code> | Node or Node name |
 | attrs | <code>object</code> | Node Attributes |
 
 <a name="onClose"></a>
 
-## onClose(handler, parser, options, name)
+## onClose(handler, parser, parser, options, name)
 Common Event hanlder for closing tag. On closed elements it either calls the Handler function or emits the specified event.
 
 **Kind**: global function  
@@ -1486,6 +1515,7 @@ Common Event hanlder for closing tag. On closed elements it either calls the Han
 | Param | Type | Description |
 | --- | --- | --- |
 | handler | [<code>TwigHandler</code>](#TwigHandler) \| [<code>Array.&lt;TwigHandler&gt;</code>](#TwigHandler) | Object or array of element specification and function to handle elements |
+| parser | [<code>Parser</code>](#Parser) | The main parser object |
 | parser | [<code>sax</code>](https://www.npmjs.com/package/sax) \| [<code>node-expat</code>](https://www.npmjs.com/package/node-expat) | SAXStream or node-expat Stream object |
 | options | [<code>ParserOptions</code>](#ParserOptions) | Object of optional options |
 | name | <code>string</code> | Event handler parameter |
@@ -1506,7 +1536,7 @@ Optional settings for the Twig parser
 | [trim] | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
 | [resumeAfterError] | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
 | [partial] | <code>boolean</code> | If `true` then unhandled elements are purged. |
-| [file] | <code>string</code> | The filename to be parsed. Just used for information and logging purpose. |
+| [file] | <code>string</code> | Optional. The name of file to be parsed. Just used for information and logging purpose. |
 
 **Example**  
 ```js
@@ -1515,7 +1545,9 @@ Optional settings for the Twig parser
 <a name="TwigHandler"></a>
 
 ## TwigHandler
-Reference to handler functions for Twig objects.<br> Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`<br> You can specify a `function` or a `event` name
+Reference to handler functions for Twig objects.<br> 
+Element can be specified as string, Regular Expression, custom function, `Twig.Root` or `Twig.Any`<br> 
+You can specify a `function` or a `event` name
 
 **Kind**: global typedef  
 **Properties**
@@ -1529,7 +1561,13 @@ Reference to handler functions for Twig objects.<br> Element can be specified a
 <a name="HandlerCondition"></a>
 
 ## HandlerCondition : <code>string</code> \| <code>Array.&lt;string&gt;</code> \| <code>RegExp</code> \| [<code>HandlerConditionFilter</code>](#HandlerConditionFilter) \| [<code>Root</code>](#Root) \| [<code>Any</code>](#Any)
-Condition to specify when handler shall be called<br> - If `string` then the element name must be equal to the string- If `string[]` then the element name must be included in string array- If `RegExp` then the element name must match the Regular Expression- If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`- Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached- Use `Twig.Any` to call the handler on every element
+Condition to specify when handler shall be called<br> 
+- If `string` then the element name must be equal to the string
+- If `string[]` then the element name must be included in string array
+- If `RegExp` then the element name must match the Regular Expression
+- If [HandlerConditionFilter](#HandlerConditionFilter) then function must return `true`
+- Use `Twig.Root` to call the handler on root element, i.e. when the end of document is reached
+- Use `Twig.Any` to call the handler on every element
 
 **Kind**: global typedef  
 <a name="HandlerFunction"></a>
@@ -1558,7 +1596,12 @@ Custom filter function to specify when handler shall be called
 <a name="ElementCondition"></a>
 
 ## ElementCondition : <code>string</code> \| <code>RegExp</code> \| [<code>ElementConditionFilter</code>](#ElementConditionFilter) \| [<code>Twig</code>](#Twig) \| <code>undefined</code>
-Optional condition to get elements<br> - If `undefined`, then all elements are returned.<br> - If `string` then the element name must be equal to the string- If `RegExp` then the element name must match the Regular Expression- If [ElementConditionFilter](#ElementConditionFilter) then function must return `true`- Use [Twig](#Twig) object to find a specific element
+Optional condition to get elements<br> 
+- If `undefined`, then all elements are returned.<br> 
+- If `string` then the element name must be equal to the string
+- If `RegExp` then the element name must match the Regular Expression
+- If [ElementConditionFilter](#ElementConditionFilter) then function must return `true`
+- Use [Twig](#Twig) object to find a specific element
 
 **Kind**: global typedef  
 <a name="ElementConditionFilter"></a>
@@ -1585,11 +1628,18 @@ Custom filter function to select desired elements
 | --- | --- | --- |
 | [currentLine] | <code>number</code> | The currently processed line in the XML-File. |
 | [currentColumn] | <code>number</code> | The currently processed column in the XML-File. |
+| [file] | <code>string</code> | The name of file to be parsed. Just used for information and logging purpose. |
+| [twig] | <code>object</code> | Object with XML tree and current XML element |
+| [method] | <code>string</code> | The underlying parser. Either `'sax'`, `'expat'`. |
 
 <a name="AttributeCondition"></a>
 
 ## AttributeCondition : <code>string</code> \| <code>RegExp</code> \| [<code>AttributeConditionFilter</code>](#AttributeConditionFilter)
-Optional condition to get attributes<br> - If `undefined`, then all attributes are returned.<br> - If `string` then the attribute name must be equal to the string- If `RegExp` then the attribute name must match the Regular Expression- If [AttributeConditionFilter](#AttributeConditionFilter) then the attribute must filter function
+Optional condition to get attributes<br> 
+- If `undefined`, then all attributes are returned.<br> 
+- If `string` then the attribute name must be equal to the string
+- If `RegExp` then the attribute name must match the Regular Expression
+- If [AttributeConditionFilter](#AttributeConditionFilter) then the attribute must filter function
 
 **Kind**: global typedef  
 <a name="AttributeConditionFilter"></a>

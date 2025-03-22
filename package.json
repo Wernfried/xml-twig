@@ -22,7 +22,8 @@
   "scripts": {
     "test": "node demo.js",
     "postversion": "sed -i -e \"s/@version: .*/@version: %npm_package_version%/\" twig.js",
-    "prepare": "jsdoc2md --private twig.js > doc/twig.md"
+    "prepare": "jsdoc2md --private twig.js > doc/twig.md",
+    "postpublish": "git commit -a \"Updated doc\""
   },
   "repository": {
     "type": "git",
