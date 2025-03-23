@@ -23,8 +23,8 @@
     "test": "node demo.js",
     "preversion": "jsdoc2md --private twig.js > doc/twig.md",
     "postversion": "sed -i -e \"s/@version: .*/@version: %npm_package_version%/\" twig.js",
-    "prepare": "unix2dos twig.js doc/twig.md",
-    "postpack": "git commit -a -m \"Updated doc and version\""
+    "prepack": "unix2dos twig.js doc/twig.md",
+    "prepare": "git commit -a -m \"Updated doc and version\""
   },
   "repository": {
     "type": "git",
