@@ -21,10 +21,9 @@
   },
   "scripts": {
     "test": "node demo.js",
-    "preversion": "jsdoc2md --private twig.js > doc/twig.md",
-    "postversion": "sed -i -e \"s/@version: .*/@version: %npm_package_version%/\" twig.js",
-    "prepack": "unix2dos twig.js doc/twig.md",
-    "prepare": "git commit -a -m \"Updated doc and version\""
+    "postversion": "sed -bi -e \"s/@version: .*/@version: %npm_package_version%/\" twig.js",
+    "prepare": "jsdoc2md --EOL win32 --private twig.js > doc/twig.md",
+    "postpack": "git commit -a -m \"Updated doc and version\""
   },
   "repository": {
     "type": "git",
