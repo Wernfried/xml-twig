@@ -4,27 +4,29 @@ Node module for processing huge XML documents in tree mode
 Inspired by Perl module [XML::Twig](https://metacpan.org/pod/XML::Twig)
 
 
-## When should I use this, motivation of this module
-When you need to read a XML file, then you have two principles:
+## When to Use This Module and Its Motivation
+When you need to read an XML file, there are two primary approaches:
 
-* The **Document Object Model (DOM)** style. These parser read the entire XML document into memory. Usually they provide easy methods to navigate in the document tree or make modifications. 
+1. **The Document Object Model (DOM) Style**
 
-   DOM parsers are perfect for rather small files, for example configuration files or (X-)HTML pages. However, for bigger XML files you may run into memory limits. When you parse a XML-File as DOM, then the footprint in RAM can be easily 10-20 times the size of the raw XML-String. If the XML-File is greater than [Buffer.constants.MAX_STRING_LENGTH](https://nodejs.org/api/buffer.html#bufferconstantsmax_string_length) (typically 512 MiB), then a DOM parser may throw error "Cannot create a string longer than 0x1fffffe8 characters".
+   These parsers read the entire XML document into memory. They usually provide convenient methods for navigating the document tree or making modifications. DOM parsers are ideal for smaller files, such as configuration files or (X-)HTML pages. However, for larger XML files, you may run into memory limitations. Parsing an XML file using the DOM method can cause memory usage to increase by 10-20 times the size of the raw XML string. If the XML file exceeds the size of [Buffer.constants.MAX_STRING_LENGTH](https://nodejs.org/api/buffer.html#bufferconstantsmax_string_length) (typically 512 MB), the DOM parser may throw an error: "Cannot create a string longer than 0x1fffffe8 characters."
 
-* The **stream** or **event** based parsers. These parser read the XML file "line by line". The biggest advantage of such a parser is, there is no limit in the size of the XML file. You can read XML files having a size of many terabytes, because you read always just a single node. 
+1. **Stream or Event-Based Parsers**
 
-   The backside: By default you cannot navigate in the document tree, you know only the current node.
+   These parsers read the XML file "line by line" or node by node. The main advantage of this approach is that there is no size limitation for the XML file. You can read XML files of several terabytes because only a single node is read into memory at a time.
+   
+   The downside is that, by default, you cannot navigate the document tree - you can only access the current node.
 
-This module tries to combine both principles. The XML document can be read in chunks and within a chunk you have all the nice features and functions you know from a DOM based parser.
+This module aims to combine both approaches. It reads the XML document in chunks, and within each chunk, you can utilize the familiar features and functions of a DOM-based parser.
 
 ## Dependencies
-XML documents are read either with [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. More parser may be added in future releases. By default the `sax` parser is used. However, I clearly recommend using the `node-expat` parser. All other parsers I tested, are not compliant to XML standards.
+XML documents are parsed using either the [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. parsers. Additional parsers may be added in future releases. By default, the `sax` parser is used. However, I strongly recommend using the `node-expat` parser, as other parsers I tested are not fully compliant with XML standards.
 
-**NOTE: The `node-expat` module is not automatically installed with this module. Install the parser by yourself, if you like to use it**
+**NOTE: The `node-expat` module is not automatically installed with this module. If you wish to use it, you must install it manually.**
 
 ## Installation
 
-Install module like any other node module and optionally `node-expat`:
+To install the module, use the standard Node.js installation process. Optionally, you can also install the `node-expat` parser:
 ```bash
 npm install xml-twig
 
@@ -32,7 +34,7 @@ npm install xml-twig
 npm install node-expat
 
 ```
-In my tests I parsed a 900 MB big XML file, the `node-expat` is faster than `sax` (node-expat: around 2:30 Minutes, sax: around 3:40 Minutes). However, you may run into problems when you try to install the `node-expat` parser. That's the reason why `node-expat` parser is not installed automatically.
+In my tests, I parsed a 900 MB XML file, and the `node-expat`t parser was faster than `sax` (`node-expat`: around 2:30 minutes, `sax`: around 3:40 minutes). However, you may encounter issues when installing the `node-expat` parser, which is why it's not installed automatically.
 
 ## How to use it
 
@@ -72,10 +74,9 @@ API Documentation: see [Twig](./doc/twig.md)
 
 - **Read XML Document in chucks**
   
-  The key feature of this module is to read and process XML files in chunks. You need to create handler functions for elements you like to process.<br>
-  The most notable difference to other parsers is the `purge()` and `purgeUpTo()` method. The parser reads the element and you decide how long you need to keep it in the memory. 
-  In many cases you will purge it immediately after you have used it but in some cases you may keep the element for later use. The parser knows the element position in the XML-Tree. 
+   The key feature of this module is the ability to read and process XML files in chunks. You need to define handler functions for the elements you want to process.
 
+   A major difference compared to other parsers is the  `purge()` and `purgeUpTo()` methods. The parser reads an element, and you decide how long to keep it in memory. In many cases, you will purge the element immediately after processing it, but in some situations, you might want to retain it for later use. The parser keeps track of the element’s position within the XML tree.
 
    ```js
    function bookHandler(elt, parserObj) {
@@ -145,10 +146,6 @@ API Documentation: see [Twig](./doc/twig.md)
    bookstore => "" at line 48
 
    ```
-
-Be aware if you run methods like `elt.followingSibling()`, `elt.descendant()`, `elt.next()`, etc. on the current element. Such calls return empty result, because following element are not yet read from the XML file. You must navigate to an earlier element, e.g.<br>
-`elt.root().children()[0].followingSibling()`
-
 
 - **Read only parts from XML Document**
 
@@ -293,6 +290,9 @@ Here are some examples the get attribute and values:
 `.purgeUpTo(elt)` - void: Purges up to the elt element. This allows you to keep part of the tree in memory when you purge. 
 
 `.writer(indented|xw)` - **XMLWriter**: Returns a [XMLWriter](https://www.npmjs.com/package/xml-writer) object you can use to print the currently loaded XML tree.<br>Instead of providing an indented parameter (`true`, `false` or indent character) you can also provide an `XMLWriter` object which adds more flexibility.
+
+Be aware if you call methods like `elt.followingSibling()`, `elt.descendant()`, `elt.next()`, etc. on the current element, they will return empty results. This is because the following elements have not yet been read from the XML file. To navigate to an earlier element, you can use a method like:<br>
+`elt.root().children()[0].followingSibling()`
 
 **condition** Parameter
 
