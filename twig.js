@@ -1,5 +1,5 @@
 /**
-* @version: 1.8.0
+* @version: 1.9.0
 * @author: Wernfried Domscheit
 * @copyright: Copyright (c) 2025 Wernfried Domscheit. All rights reserved.
 * @website: https://www.npmjs.com/package/xml-twig
