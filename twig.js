@@ -959,6 +959,26 @@ class Twig {
    };
 
    /**
+   * The first matching child, optionally matching `condition` of the current element or null
+   * @param {ElementCondition} condition - Optional condition
+   * @returns {?Twig} 
+   */
+   firstChild = function (condition) {
+      let _children = this.children(condition);
+      return _children.length == 0 ? null : _children[0];
+   };
+
+   /**
+   * The last matching child, optionally matching `condition` of the current element or null
+   * @param {ElementCondition} condition - Optional condition
+   * @returns {?Twig} 
+   */
+   lastChild = function (condition) {
+      let _children = this.children(condition);
+      return _children.length == 0 ? null : _children[_children.length - 1];
+   };
+
+   /**
    * Returns the next matching element. 
    * @param {ElementCondition} condition - Optional condition
    * @returns {?Twig} - The next element
