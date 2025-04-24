@@ -278,6 +278,12 @@ function createParser(handler, options = {}) {
       enumerable: true
    });
 
+   Object.defineProperty(parser, 'trimText', {
+      value: options.trim,
+      writable: false,
+      enumerable: true
+   });
+
    if (options.file != null) {
       Object.defineProperty(parser, 'file', {
          value: options.file,
@@ -289,7 +295,7 @@ function createParser(handler, options = {}) {
    // Common events
    parser.on('text', function (str) {
       if (parser.twig.current === null) return;
-      parser.twig.current.text = options.trim ? str.trim() : str;
+      parser.twig.current.text = str;
    });
 
    parser.on("comment", function (str) {
@@ -514,6 +520,12 @@ class Twig {
    #pinned = false;
 
    /**
+    * Determines whether text is trimmed
+   * @type {boolean}
+   */
+   #trim = true;
+
+   /**
    * Create a new Twig object
    * @param {Parser} parser - The main parser object
    * @param {?string} name - The name of the XML element
@@ -525,6 +537,7 @@ class Twig {
       if (index === undefined)
          parser.twig.current = this;
 
+      this.#trim = parser.trimText;
       if (name === null) {
          // Root element not available yet
          parser.twig.tree = this;
@@ -698,11 +711,15 @@ class Twig {
    }
 
    /**
-   * The text of the element. No matter if given as text or CDATA entity
+   * The text of the element. No matter if given as text or CDATA entity.
+   * If option `trim: true`, then whitespace from both ends of the string are removed
    * @returns {string} Element text or empty string
    */
    get text() {
-      return this.#text ?? '';
+      if (this.#text === null)
+         return ''
+      else
+         return this.#trim ? this.#text.trim() : this.#text;
    }
 
    /**
