@@ -15,8 +15,8 @@
     "doc/*.md"
   ],
   "devDependencies": {
-    "jsdoc-to-markdown": "^9.1.1",
-    "luxon": "^3.6.1",
+    "jsdoc-to-markdown": "^9.1.3",
+    "luxon": "^3.7.2",
     "node-expat": "^2.4.1"
   },
   "scripts": {
