@@ -20,7 +20,7 @@ When you need to read an XML file, there are two primary approaches:
 This module aims to combine both approaches. It reads the XML document in chunks, and within each chunk, you can utilize the familiar features and functions of a DOM-based parser.
 
 ## Dependencies
-XML documents are parsed using either the [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. parsers. Additional parsers may be added in future releases. By default, the `sax` parser is used. However, I strongly recommend using the `node-expat` parser, as other parsers I tested are not fully compliant with XML standards.
+XML documents are parsed using either the [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. parsers. Additional parsers may be added in future releases. By default, the `sax` parser is used. However, I recommend using the `node-expat` parser, which is faster more compliant with XML standards.
 
 **NOTE: The `node-expat` module is not automatically installed with this module. If you wish to use it, you must install it manually.**
 
@@ -385,13 +385,6 @@ To update the XML, use these methods. These methods modify the XML tree in the m
 This `xml-twig` module focus on reading a XML files. In principle it would be possible to create a XML file from scratch with the [Twig](./doc/twig.md#Twig) class. However, I think there are better modules available. Of course, you may run operations like `elt.root().children().push(elt.root().children()[0])`, but I think this is not so handy to use.
 
 Accessing Twig-Elements by [XML-Path](https://www.w3.org/TR/xpath/) language is not supported. One reason it, the `Twig` class models more an [Element](https://www.w3schools.com/xml/xml_elements.asp) rather than a [Node](https://www.w3schools.com/xml/dom_nodes.asp) which would be more generic.
-
-As already mentioned above, I recommend the `expat` parser. The other parser may work for your purpose, however they have several limitations and bugs:
-
-- `sax` does not support UTF-16 encoding. I did not test other encodings, because [W3C Recommendations](https://www.w3.org/TR/xml/#charencoding) defines only UTF-8 and UTF-16 as required
-- `sax` misinterpret character entities
-
-
 
 
 
