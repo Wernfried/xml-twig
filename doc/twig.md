@@ -1528,7 +1528,7 @@ Generic error for unsupported condition
 
 ## SAX
 **Kind**: global constant  
-**Version:**: 1.9.4  
+**Version:**: 1.10.0  
 **Author:**: Wernfried Domscheit  
 **Copyright:**: Copyright (c) 2025 Wernfried Domscheit. All rights reserved.  
 **Website:**: https://www.npmjs.com/package/xml-twig  
@@ -1600,7 +1600,7 @@ Optional settings for the Twig parser
 | method | <code>&#x27;sax&#x27;</code> \| <code>&#x27;expat&#x27;</code> | The underlying parser. Either `'sax'`, `'expat'`. |
 | xmlns | <code>boolean</code> | If `true`, then namespaces are accessible by `namespace` property. |
 | trim | <code>boolean</code> | If `true`, then turn any whitespace into a single space. Text and comments are trimmed. |
-| resumeAfterError | <code>boolean</code> | If `true` then parser continues reading after an error. Otherwise it throws exception. |
+| resumeAfterError | <code>boolean</code> | If `true` then parser continues reading after an error.<br> Only relevant for `sax`, `expat` always terminates on error. |
 | partial | <code>boolean</code> | If `true` then unhandled elements are purged. |
 | file | <code>string</code> | Optional. The name of file to be parsed. Just used for information and logging purpose. |
 
