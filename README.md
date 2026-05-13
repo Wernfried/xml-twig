@@ -57,6 +57,10 @@ API Documentation: see [Twig](./doc/twig.md)
    const parser = twig.createParser({ tag: twig.Root, function: rootHandler }, { method: 'sax' })
    fs.createReadStream(`${__dirname}/bookstore.xml`).pipe(parser)
 
+   parser.on('error', function (err) {
+      console.error(err);
+   });
+
    // Output -> <bookstore> finished after 48 lines
    ```
 

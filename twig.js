@@ -65,7 +65,8 @@ const Any = new AnyHandler();
 * @property {'sax' | 'expat'} method - The underlying parser. Either `'sax'`, `'expat'`.
 * @property {boolean} xmlns - If `true`, then namespaces are accessible by `namespace` property.
 * @property {boolean} trim - If `true`, then turn any whitespace into a single space. Text and comments are trimmed.
-* @property {boolean} resumeAfterError - If `true` then parser continues reading after an error. Otherwise it throws exception.
+* @property {boolean} resumeAfterError - If `true` then parser continues reading after an error.<br>
+* Only relevant for `sax`, `expat` always terminates on error.
 * @property {boolean} partial - If `true` then unhandled elements are purged.
 * @property {string} [file - Optional. The name of file to be parsed. Just used for information and logging purpose.
 * @example { method: 'expat', xmlns: true }
@@ -222,6 +223,15 @@ function createParser(handler, options = {}) {
          parser.emit("close");
       });
 
+      parser.on('error', function (err) {
+         if (options.resumeAfterError) {
+            parser._parser.error = null;
+            parser._parser.resume();
+         } else {
+            parser._parser.close();
+         }
+      });
+
    } else if (EXPAT.includes(options.method)) {
       parser = require("node-expat").createParser();
       Object.defineProperty(parser, 'currentLine', {
@@ -260,6 +270,13 @@ function createParser(handler, options = {}) {
       parser.on('end', function () {
          parser.twig = { current: null, tree: null };
          parser.emit("finish");
+      });
+
+      parser.on('error', function (err) {
+         // convert 'err' string into Error object
+         if (typeof err === 'string')
+            parser.emit('error', Error(`${err}\nLine: ${parser.currentLine}\nColumn: ${parser.currentColumn}`))
+         // resume not supported
       });
 
    } else {
@@ -312,14 +329,6 @@ function createParser(handler, options = {}) {
             enumerable: true,
             configurable: true
          });
-      }
-   });
-
-   parser.on('error', function (err) {
-      console.error(`error at line [${parser.currentLine}], column [${parser.currentColumn}]`, err);
-      if (options.resumeAfterError) {
-         parser.underlyingParser.error = null;
-         parser.underlyingParser.resume();
       }
    });
 
