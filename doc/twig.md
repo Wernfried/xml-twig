@@ -1528,7 +1528,7 @@ Generic error for unsupported condition
 
 ## SAX
 **Kind**: global constant  
-**Version:**: 1.10.2  
+**Version:**: 1.10.3  
 **Author:**: Wernfried Domscheit  
 **Copyright:**: Copyright (c) 2025 Wernfried Domscheit. All rights reserved.  
 **Website:**: https://www.npmjs.com/package/xml-twig  
