@@ -20,7 +20,7 @@ When you need to read an XML file, there are two primary approaches:
 This module aims to combine both approaches. It reads the XML document in chunks, and within each chunk, you can utilize the familiar features and functions of a DOM-based parser.
 
 ## Dependencies
-XML documents are parsed using either the [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parser. parsers. Additional parsers may be added in future releases. By default, the `sax` parser is used. However, I recommend using the `node-expat` parser, which is faster more compliant with XML standards.
+XML documents are parsed using either the [sax](https://www.npmjs.com/package/sax) or [node-expat](https://www.npmjs.com/package/node-expat) parsers. Additional parsers may be added in future releases. By default, the `sax` parser is used. However, I recommend using the `node-expat` parser, which is faster more compliant with XML standards.
 
 **NOTE: The `node-expat` module is not automatically installed with this module. If you wish to use it, you must install it manually.**
 
@@ -34,7 +34,7 @@ npm install xml-twig
 npm install node-expat
 
 ```
-In my tests, I parsed a 900 MB XML file, and the `node-expat`t parser was faster than `sax` (`node-expat`: around 2:30 minutes, `sax`: around 3:40 minutes). However, you may encounter issues when installing the `node-expat` parser, which is why it's not installed automatically.
+In my tests, I parsed a 900 MB XML file, and the `node-expat` parser was faster than `sax` (`node-expat`: around 2:30 minutes, `sax`: around 3:40 minutes). However, you may encounter issues when installing the `node-expat` parser, which is why it's not installed automatically.
 
 ## How to use it
 
